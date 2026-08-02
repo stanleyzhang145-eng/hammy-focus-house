@@ -113,3 +113,42 @@ CREATE TABLE IF NOT EXISTS reward_code_redemptions (
 
 CREATE INDEX IF NOT EXISTS reward_code_redemptions_code_idx
   ON reward_code_redemptions (code, redeemed_at DESC);
+
+
+CREATE TABLE IF NOT EXISTS admin_events (
+  id UUID PRIMARY KEY,
+  event_type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  reward_data JSONB NOT NULL DEFAULT '{}'::jsonb,
+  starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  ends_at TIMESTAMPTZ NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS event_claims (
+  event_id UUID NOT NULL REFERENCES admin_events(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  reward_data JSONB NOT NULL DEFAULT '{}'::jsonb,
+  claimed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (event_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS admin_audit_log (
+  id BIGSERIAL PRIMARY KEY,
+  action TEXT NOT NULL,
+  target_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  target_player_id TEXT,
+  details JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS admin_events_active_idx
+  ON admin_events (status, starts_at, ends_at);
+
+CREATE INDEX IF NOT EXISTS event_claims_user_idx
+  ON event_claims (user_id, claimed_at DESC);
+
+CREATE INDEX IF NOT EXISTS admin_audit_log_created_idx
+  ON admin_audit_log (created_at DESC);

@@ -47,3 +47,43 @@ The database records each account and redeemed code in
 - Five incorrect attempts temporarily lock admin login for 15 minutes.
 - The one-click Render Blueprint generates `ADMIN_ACCESS_CODE` automatically.
 - `admin.html` uses the same secure login and supports manual locking.
+
+
+## Version 23 — Admin Live Operations
+
+The Top Secret Admin panel now includes:
+
+- Dashboard statistics
+- Player lookup by Player ID or friend code
+- Custom coin grants
+- Apple, banana, berry, and mango grants
+- Six exclusive collectibles
+- Random global events
+- Custom events with duration and rewards
+- One event claim per cloud account
+- Event claim counts
+- End and cancel event controls
+- Player-facing live event banner
+- Equippable exclusive effects
+- Admin audit history
+
+Exclusive collectibles:
+
+- Solar Crown
+- Aurora Aura
+- Star Trail
+- Crystal Founder Badge
+- Golden Focus Trophy
+- Neon Profile Frame
+
+Random event templates:
+
+- Coin Shower
+- Fruit Festival
+- Cozy Weekend
+- Star Drop
+- Aurora Night
+- Focus Festival
+
+Admin reward grants and event claims update the latest cloud save using
+database transactions and revision increments.

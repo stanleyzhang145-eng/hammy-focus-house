@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=22">
-<link rel="stylesheet" href="cloud.css?v=22">
+<link rel="stylesheet" href="online.css?v=23">
+<link rel="stylesheet" href="cloud.css?v=23">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -817,7 +817,7 @@ body[data-theme="night"] .focus-warning{background:#5a4d2a;color:#fff}
 body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
 </style>
-<link rel="stylesheet" href="premium.css?v=22">
+<link rel="stylesheet" href="premium.css?v=23">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -954,7 +954,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v22">Build v22</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v23">Build v23</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -1030,6 +1030,37 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
 
 
+
+ <section id="liveEventCard" class="cloud-card live-event-card hidden" style="margin-top:12px">
+  <div class="live-event-heading">
+   <div>
+    <span class="live-event-kicker">LIVE HAMMY EVENT</span>
+    <h3 id="liveEventTitle">Special Event</h3>
+    <p id="liveEventDescription" class="muted">A special Hammy event is active.</p>
+   </div>
+   <span id="liveEventIcon" class="live-event-icon" aria-hidden="true">🎉</span>
+  </div>
+  <div class="live-event-details">
+   <div><span>Reward</span><strong id="liveEventReward">Mystery reward</strong></div>
+   <div><span>Time remaining</span><strong id="liveEventTime">Loading…</strong></div>
+  </div>
+  <button id="claimLiveEvent" class="primary cloud-wide">Claim event reward</button>
+  <div id="liveEventMessage" class="live-event-message" aria-live="polite"></div>
+ </section>
+
+ <section class="cloud-card exclusive-collection-card" style="margin-top:12px">
+  <div class="exclusive-collection-heading">
+   <div>
+    <h3>Exclusive Collection</h3>
+    <p class="muted">Special items from admin gifts, events, and rare celebrations.</p>
+   </div>
+   <span class="exclusive-count"><strong id="exclusiveCount">0</strong> owned</span>
+  </div>
+  <div id="exclusiveCollection" class="exclusive-collection-grid">
+   <div class="exclusive-empty">No exclusive items yet.</div>
+  </div>
+ </section>
+
  <section id="secretAdminSection" class="cloud-card secret-admin-card hidden" style="margin-top:12px">
   <div class="secret-admin-heading">
    <div>
@@ -1047,7 +1078,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v22 seven times whenever you need to show this section.
+   Tap Build v23 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -1095,7 +1126,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v22</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v23</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -1586,14 +1617,14 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=22"></script>
-<script src="cloud.js?v=22"></script>
-<script src="online.js?v=22"></script>
-<script src="gallery.js?v=22"></script>
+<script src="premium.js?v=23"></script>
+<script src="cloud.js?v=23"></script>
+<script src="online.js?v=23"></script>
+<script src="gallery.js?v=23"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=22").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=23").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>

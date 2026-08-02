@@ -11,6 +11,17 @@
   let syncing=false;
   let pendingConflict=null;
   let initialized=false;
+  let activeEvent=null;
+  let eventCountdownTimer=null;
+
+  const exclusiveCatalog={
+    solar_crown:{name:"Solar Crown",icon:"♛",description:"A glowing crown reserved for special Hammy rewards.",equippable:true},
+    aurora_aura:{name:"Aurora Aura",icon:"✦",description:"A colourful glow that surrounds the selected hamster.",equippable:true},
+    star_trail:{name:"Star Trail",icon:"★",description:"A sparkling star effect for the hamster room.",equippable:true},
+    crystal_badge:{name:"Crystal Founder Badge",icon:"◆",description:"A rare collectible badge shown in the Exclusive Collection.",equippable:false},
+    golden_trophy:{name:"Golden Focus Trophy",icon:"🏆",description:"A trophy for special events and achievements.",equippable:false},
+    neon_frame:{name:"Neon Profile Frame",icon:"▣",description:"A bright exclusive frame for special accounts.",equippable:true}
+  };
 
   function readMeta(){
     try{
@@ -116,6 +127,181 @@
     localStorage.setItem(ONLINE_KEY,JSON.stringify(settings));
     window.dispatchEvent(new CustomEvent("hammy-cloud-account",{detail:account}));
   }
+
+  function exclusiveIds(){
+    return Array.isArray(state?.adminExclusives)?state.adminExclusives.filter(id=>exclusiveCatalog[id]):[];
+  }
+  function ensureExclusiveVisual(){
+    const hamster=document.getElementById("hamster");
+    if(!hamster)return null;
+    let visual=document.getElementById("adminExclusiveVisual");
+    if(!visual){
+      visual=document.createElement("div");
+      visual.id="adminExclusiveVisual";
+      visual.className="admin-exclusive-visual";
+      visual.setAttribute("aria-hidden","true");
+      hamster.appendChild(visual);
+    }
+    return visual;
+  }
+  function applyExclusiveVisual(){
+    const hamster=document.getElementById("hamster");
+    const visual=ensureExclusiveVisual();
+    if(!hamster||!visual)return;
+    const owned=exclusiveIds();
+    if(!owned.includes(state.equippedAdminExclusive))state.equippedAdminExclusive=null;
+    const id=state.equippedAdminExclusive||"";
+    hamster.dataset.adminExclusive=id;
+    visual.dataset.item=id;
+    visual.textContent=id==="solar_crown"?"♛":id==="star_trail"?"★":id==="neon_frame"?"▣":id==="aurora_aura"?"✦":"";
+    visual.classList.toggle("hidden",!id);
+  }
+  function equipExclusive(id){
+    if(!exclusiveIds().includes(id))return;
+    state.equippedAdminExclusive=state.equippedAdminExclusive===id?null:id;
+    save();
+    renderExclusiveCollection();
+    applyExclusiveVisual();
+    toast(state.equippedAdminExclusive?`${exclusiveCatalog[id].name} equipped.`:"Exclusive effect removed.","success");
+  }
+  function renderExclusiveCollection(){
+    const grid=el("exclusiveCollection");
+    if(!grid)return;
+    const ids=exclusiveIds();
+    el("exclusiveCount").textContent=String(ids.length);
+    grid.innerHTML="";
+    if(!ids.length){
+      grid.innerHTML='<div class="exclusive-empty">No exclusive items yet. Admin gifts and live events can unlock them.</div>';
+      applyExclusiveVisual();
+      return;
+    }
+    ids.forEach(id=>{
+      const item=exclusiveCatalog[id];
+      const card=document.createElement("article");
+      card.className=`exclusive-item${state.equippedAdminExclusive===id?" equipped":""}`;
+      card.innerHTML=`<span class="exclusive-item-icon">${item.icon}</span>
+        <div><strong>${item.name}</strong><p>${item.description}</p></div>`;
+      if(item.equippable){
+        const button=document.createElement("button");
+        button.className=state.equippedAdminExclusive===id?"primary":"secondary";
+        button.textContent=state.equippedAdminExclusive===id?"Unequip":"Equip";
+        button.addEventListener("click",()=>equipExclusive(id));
+        card.appendChild(button);
+      }else{
+        const owned=document.createElement("span");
+        owned.className="exclusive-owned-label";
+        owned.textContent="Collectible";
+        card.appendChild(owned);
+      }
+      grid.appendChild(card);
+    });
+    applyExclusiveVisual();
+  }
+  function eventIcon(type){
+    return ({
+      coin_shower:"🪙",fruit_festival:"🍓",cozy_weekend:"🛏️",
+      star_drop:"⭐",aurora_night:"🌌",focus_festival:"🎯",custom:"🎉"
+    })[type]||"🎉";
+  }
+  function formatReward(reward){
+    const parts=[];
+    if(Number(reward?.coins)>0)parts.push(`${Number(reward.coins)} coins`);
+    const fruitNames={apple:"apple",banana:"banana",berry:"berry",mango:"mango"};
+    Object.entries(reward?.fruits||{}).forEach(([key,value])=>{
+      if(Number(value)>0)parts.push(`${Number(value)} ${fruitNames[key]||key}${Number(value)===1?"":"s"}`);
+    });
+    if(reward?.exclusiveId&&exclusiveCatalog[reward.exclusiveId])parts.push(exclusiveCatalog[reward.exclusiveId].name);
+    return parts.join(" · ")||"Special reward";
+  }
+  function eventTimeRemaining(){
+    if(!activeEvent)return "";
+    const remaining=new Date(activeEvent.endsAt).getTime()-Date.now();
+    if(remaining<=0)return "Ended";
+    const minutes=Math.floor(remaining/60000);
+    const hours=Math.floor(minutes/60);
+    const days=Math.floor(hours/24);
+    if(days>0)return `${days}d ${hours%24}h`;
+    if(hours>0)return `${hours}h ${minutes%60}m`;
+    return `${Math.max(1,minutes)}m`;
+  }
+  function renderActiveEvent(){
+    const card=el("liveEventCard");
+    if(!card)return;
+    const valid=activeEvent&&activeEvent.status==="active"&&new Date(activeEvent.endsAt).getTime()>Date.now();
+    card.classList.toggle("hidden",!valid);
+    clearInterval(eventCountdownTimer);
+    if(!valid)return;
+    el("liveEventTitle").textContent=activeEvent.title;
+    el("liveEventDescription").textContent=activeEvent.description;
+    el("liveEventIcon").textContent=eventIcon(activeEvent.eventType);
+    el("liveEventReward").textContent=formatReward(activeEvent.reward);
+    el("liveEventTime").textContent=eventTimeRemaining();
+    const button=el("claimLiveEvent");
+    button.disabled=Boolean(activeEvent.claimed);
+    button.textContent=activeEvent.claimed?"Reward claimed":"Claim event reward";
+    el("liveEventMessage").textContent=activeEvent.claimed?"This account already claimed the event reward.":"Claim once before the event ends.";
+    eventCountdownTimer=setInterval(()=>{
+      if(!activeEvent)return clearInterval(eventCountdownTimer);
+      el("liveEventTime").textContent=eventTimeRemaining();
+      if(new Date(activeEvent.endsAt).getTime()<=Date.now()){
+        clearInterval(eventCountdownTimer);
+        activeEvent=null;
+        renderActiveEvent();
+      }
+    },30000);
+  }
+  async function loadActiveEvent(){
+    try{
+      const data=await api("/api/events/active");
+      activeEvent=data.event||null;
+      renderActiveEvent();
+    }catch(error){
+      activeEvent=null;
+      renderActiveEvent();
+    }
+  }
+  async function claimActiveEvent(){
+    if(!activeEvent)return;
+    const button=el("claimLiveEvent");
+    if(button)button.disabled=true;
+    el("liveEventMessage").textContent="Syncing progress and claiming the event reward…";
+    try{
+      await ensureAccount();
+      await syncNow();
+      const result=await api(`/api/events/${activeEvent.id}/claim`,{
+        method:"POST",body:{deviceId:deviceId()}
+      });
+      sessionStorage.setItem("hammyLiveEventNotice",JSON.stringify({
+        message:`${activeEvent.title}: ${formatReward(activeEvent.reward)} claimed!`
+      }));
+      applyCloudState(result.save);
+    }catch(error){
+      if(error.status===409&&error.data?.alreadyClaimed){
+        activeEvent.claimed=true;
+        renderActiveEvent();
+        el("liveEventMessage").textContent="This account already claimed the event reward.";
+      }else{
+        el("liveEventMessage").textContent=error.message||"The event reward could not be claimed.";
+      }
+    }finally{
+      if(button&&!activeEvent?.claimed)button.disabled=false;
+    }
+  }
+  function showPendingEventNotice(){
+    try{
+      const notice=JSON.parse(sessionStorage.getItem("hammyLiveEventNotice")||"null");
+      if(!notice)return;
+      sessionStorage.removeItem("hammyLiveEventNotice");
+      setTimeout(()=>toast(notice.message,"success"),450);
+    }catch{sessionStorage.removeItem("hammyLiveEventNotice")}
+  }
+  async function refreshServerUpdates(){
+    if(!meta.accessToken)return;
+    try{
+      await pullLatest({auto:true});
+    }catch{}
+  }
+
   function render(){
     if(!el("accountPage"))return;
     el("cloudPlayerId").textContent=meta.playerId||"Not created yet";
@@ -137,6 +323,8 @@
       el("remoteConflictSummary").textContent=progressSummary(remote);
       setChip("conflict","Choose a save");
     }
+    renderExclusiveCollection();
+    renderActiveEvent();
   }
   async function checkHealth(){
     setChip("syncing","Checking cloud");
@@ -523,15 +711,23 @@
     el("rewardCodeInput")?.addEventListener("keydown",event=>{
       if(event.key==="Enter"){event.preventDefault();redeemRewardCode()}
     });
-    document.querySelector('[data-page="account"]')?.addEventListener("click",render);
+    el("claimLiveEvent")?.addEventListener("click",claimActiveEvent);
+    document.querySelector('[data-page="account"]')?.addEventListener("click",async()=>{
+      render();
+      await refreshServerUpdates();
+      await loadActiveEvent();
+    });
   }
 
   window.HammyCloud={
     authHeaders,api,ensureAccount,scheduleSave,syncNow,getMeta:()=>({...meta}),
-    isSignedIn:()=>Boolean(meta.accessToken),baseUrl
+    isSignedIn:()=>Boolean(meta.accessToken),baseUrl,
+    loadActiveEvent,renderExclusiveCollection
   };
 
   bind();
-  initialize();
+  initialize().then(()=>loadActiveEvent()).catch(()=>{});
   showPendingRewardNotice();
+  showPendingEventNotice();
+  renderExclusiveCollection();
 })();

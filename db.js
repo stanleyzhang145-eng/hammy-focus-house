@@ -10,7 +10,8 @@ const mem={
   users:new Map(), sessions:new Map(), saves:new Map(), entitlements:new Map(),
   profiles:new Map(), codes:new Map(), codeByUser:new Map(), friends:new Map(),
   reports:[], blocks:new Map(), hidden:new Map(), reactions:new Map(),
-  rewardRedemptions:new Map()
+  rewardRedemptions:new Map(), events:new Map(), eventClaims:new Map(),
+  audit:[], eventSequence:0, auditSequence:0
 };
 
 function now(){return new Date().toISOString()}
@@ -583,6 +584,388 @@ async function redeemRewardCode(userId,{code,reward,deviceId="reward-code"}){
   }
 }
 
+
+function applyAdminReward(stateInput,rewardInput,source="admin"){
+  const state=clone(stateInput||{});
+  const reward=clone(rewardInput||{});
+  state.coins=Math.max(0,Number(state.coins)||0)+Math.max(0,Number(reward.coins)||0);
+  state.foods={apple:0,banana:0,berry:0,mango:0,...(state.foods||{})};
+  for(const key of ["apple","banana","berry","mango"]){
+    state.foods[key]=Math.max(0,Number(state.foods[key])||0)+Math.max(0,Number(reward.fruits?.[key])||0);
+  }
+  if(!Array.isArray(state.adminExclusives))state.adminExclusives=[];
+  if(reward.exclusiveId&&!state.adminExclusives.includes(reward.exclusiveId)){
+    state.adminExclusives.push(String(reward.exclusiveId));
+  }
+  if(!Array.isArray(state.adminGiftHistory))state.adminGiftHistory=[];
+  state.adminGiftHistory.unshift({
+    source,
+    title:String(reward.title||"Admin Gift").slice(0,80),
+    coins:Math.max(0,Number(reward.coins)||0),
+    fruits:clone(reward.fruits||{}),
+    exclusiveId:reward.exclusiveId||null,
+    grantedAt:now()
+  });
+  state.adminGiftHistory=state.adminGiftHistory.slice(0,30);
+  return state;
+}
+
+async function findUserByIdentifier(identifier){
+  const value=String(identifier||"").trim().toUpperCase();
+  if(memoryMode){
+    let user=null,friendCode=null;
+    if(mem.codes.has(value)){
+      const userId=mem.codes.get(value);
+      user=mem.users.get(userId)||null;
+      friendCode=value;
+    }else{
+      user=[...mem.users.values()].find(row=>String(row.player_id).toUpperCase()===value)||null;
+      if(user)friendCode=mem.codeByUser.get(user.id)||null;
+    }
+    return user?{...clone(user),friend_code:friendCode}:null;
+  }
+  const {rows}=await pool.query(
+    `SELECT u.*,f.code friend_code
+     FROM users u
+     LEFT JOIN friend_codes f ON f.user_id=u.id
+     WHERE UPPER(u.player_id)=UPPER($1) OR UPPER(COALESCE(f.code,''))=UPPER($1)
+     LIMIT 1`,
+    [value]
+  );
+  return rows[0]||null;
+}
+
+async function addAudit(action,{targetUserId=null,targetPlayerId=null,details={}}={}){
+  if(memoryMode){
+    const row={
+      id:++mem.auditSequence,
+      action:String(action),
+      target_user_id:targetUserId,
+      target_player_id:targetPlayerId,
+      details:clone(details),
+      created_at:now()
+    };
+    mem.audit.unshift(row);
+    mem.audit=mem.audit.slice(0,500);
+    return clone(row);
+  }
+  const {rows}=await pool.query(
+    `INSERT INTO admin_audit_log(action,target_user_id,target_player_id,details)
+     VALUES($1,$2,$3,$4::jsonb) RETURNING *`,
+    [String(action),targetUserId,targetPlayerId,JSON.stringify(details||{})]
+  );
+  return rows[0];
+}
+
+async function adminPlayerSummary(identifier){
+  const user=await findUserByIdentifier(identifier);
+  if(!user)return null;
+  const save=await getCloudSave(user.id);
+  const entitlement=await getEntitlement(user.id);
+  const profile=await getProfileForUser(user.id);
+  const state=clone(save?.state||{});
+  return {
+    userId:user.id,
+    playerId:user.player_id,
+    friendCode:user.friend_code||profile?.code||null,
+    nickname:profile?.nickname||null,
+    premium:Boolean(entitlement?.active),
+    premiumSource:entitlement?.source||"none",
+    revision:Number(save?.revision)||0,
+    updatedAt:save?.updated_at||null,
+    progress:{
+      coins:Math.max(0,Number(state.coins)||0),
+      practiceDays:Math.max(0,Number(state.practiceDays)||0),
+      totalFocusMinutes:Math.max(0,Number(state.totalFocusMinutes)||0),
+      streak:Math.max(0,Number(state.streak)||0),
+      skin:String(state.skin||"white"),
+      adminExclusives:Array.isArray(state.adminExclusives)?state.adminExclusives:[]
+    }
+  };
+}
+
+async function adminGrant(identifier,{reward,note="",deviceId="admin-panel"}){
+  const user=await findUserByIdentifier(identifier);
+  if(!user)return null;
+  const safeReward=clone(reward||{});
+
+  if(memoryMode){
+    const current=mem.saves.get(user.id)||{
+      user_id:user.id,revision:0,device_id:deviceId,state:{},updated_at:now()
+    };
+    const nextState=applyAdminReward(current.state,safeReward,"admin-grant");
+    const row={
+      user_id:user.id,
+      revision:Number(current.revision||0)+1,
+      device_id:deviceId,
+      state:nextState,
+      updated_at:now()
+    };
+    mem.saves.set(user.id,row);
+    await addAudit("player_reward_grant",{
+      targetUserId:user.id,targetPlayerId:user.player_id,
+      details:{reward:safeReward,note:String(note||"").slice(0,160),revision:row.revision}
+    });
+    return {save:clone(row),player:await adminPlayerSummary(user.player_id)};
+  }
+
+  const client=await pool.connect();
+  try{
+    await client.query("BEGIN");
+    await client.query(`SELECT id FROM users WHERE id=$1 FOR UPDATE`,[user.id]);
+    const currentResult=await client.query(`SELECT * FROM cloud_saves WHERE user_id=$1 FOR UPDATE`,[user.id]);
+    const current=currentResult.rows[0]||{
+      user_id:user.id,revision:0,device_id:deviceId,state:{},updated_at:new Date()
+    };
+    const nextState=applyAdminReward(current.state,safeReward,"admin-grant");
+    const nextRevision=Number(current.revision||0)+1;
+    const {rows}=await client.query(
+      `INSERT INTO cloud_saves(user_id,revision,device_id,state,updated_at)
+       VALUES($1,$2,$3,$4::jsonb,NOW())
+       ON CONFLICT(user_id) DO UPDATE SET
+        revision=EXCLUDED.revision,device_id=EXCLUDED.device_id,
+        state=EXCLUDED.state,updated_at=NOW()
+       RETURNING *`,
+      [user.id,nextRevision,String(deviceId||"admin-panel").slice(0,80),JSON.stringify(nextState)]
+    );
+    await client.query(
+      `INSERT INTO admin_audit_log(action,target_user_id,target_player_id,details)
+       VALUES('player_reward_grant',$1,$2,$3::jsonb)`,
+      [user.id,user.player_id,JSON.stringify({
+        reward:safeReward,note:String(note||"").slice(0,160),revision:nextRevision
+      })]
+    );
+    await client.query("COMMIT");
+    return {save:rows[0],player:await adminPlayerSummary(user.player_id)};
+  }catch(error){
+    await client.query("ROLLBACK");throw error;
+  }finally{client.release()}
+}
+
+async function createAdminEvent(event){
+  const row={
+    id:event.id,
+    event_type:event.eventType,
+    title:event.title,
+    description:event.description,
+    reward_data:clone(event.reward||{}),
+    starts_at:event.startsAt||now(),
+    ends_at:event.endsAt,
+    status:"active",
+    created_at:now()
+  };
+  if(memoryMode){
+    for(const existing of mem.events.values()){
+      if(existing.status==="active"){
+        existing.status="ended";
+        existing.ends_at=now();
+      }
+    }
+    mem.events.set(row.id,row);
+    await addAudit("event_created",{details:{
+      eventId:row.id,eventType:row.event_type,title:row.title,
+      endsAt:row.ends_at,reward:row.reward_data,replacedPreviousEvent:true
+    }});
+    return clone(row);
+  }
+  const client=await pool.connect();
+  try{
+    await client.query("BEGIN");
+    await client.query(
+      `UPDATE admin_events SET status='ended',ends_at=NOW()
+       WHERE status='active' AND ends_at>NOW()`
+    );
+    const {rows}=await client.query(
+      `INSERT INTO admin_events(id,event_type,title,description,reward_data,starts_at,ends_at,status)
+       VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,'active') RETURNING *`,
+      [row.id,row.event_type,row.title,row.description,JSON.stringify(row.reward_data),row.starts_at,row.ends_at]
+    );
+    await client.query(
+      `INSERT INTO admin_audit_log(action,details)
+       VALUES('event_created',$1::jsonb)`,
+      [JSON.stringify({
+        eventId:row.id,eventType:row.event_type,title:row.title,
+        endsAt:row.ends_at,reward:row.reward_data,replacedPreviousEvent:true
+      })]
+    );
+    await client.query("COMMIT");
+    return rows[0];
+  }catch(error){
+    await client.query("ROLLBACK");throw error;
+  }finally{client.release()}
+}
+
+async function listAdminEvents(limit=50){
+  if(memoryMode){
+    return clone([...mem.events.values()]
+      .sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))
+      .slice(0,limit)
+      .map(event=>({
+        ...event,
+        claim_count:[...mem.eventClaims.values()].filter(claim=>claim.event_id===event.id).length
+      })));
+  }
+  const {rows}=await pool.query(
+    `SELECT e.*,(SELECT COUNT(*)::int FROM event_claims c WHERE c.event_id=e.id) claim_count
+     FROM admin_events e ORDER BY e.created_at DESC LIMIT $1`,
+    [Math.max(1,Math.min(200,Number(limit)||50))]
+  );
+  return rows;
+}
+
+async function getActiveEvent(userId=null){
+  const currentTime=Date.now();
+  if(memoryMode){
+    const events=[...mem.events.values()].filter(event=>
+      event.status==="active" &&
+      new Date(event.starts_at).getTime()<=currentTime &&
+      new Date(event.ends_at).getTime()>currentTime
+    ).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
+    const event=events[0]||null;
+    if(!event)return null;
+    const claim=userId?mem.eventClaims.get(`${event.id}|${userId}`):null;
+    return {...clone(event),claimed:Boolean(claim),claimed_at:claim?.claimed_at||null};
+  }
+  const {rows}=await pool.query(
+    `SELECT e.*,
+      CASE WHEN $1::uuid IS NULL THEN FALSE
+      ELSE EXISTS(SELECT 1 FROM event_claims c WHERE c.event_id=e.id AND c.user_id=$1) END claimed,
+      (SELECT claimed_at FROM event_claims c WHERE c.event_id=e.id AND c.user_id=$1) claimed_at
+     FROM admin_events e
+     WHERE e.status='active' AND e.starts_at<=NOW() AND e.ends_at>NOW()
+     ORDER BY e.created_at DESC LIMIT 1`,
+    [userId]
+  );
+  return rows[0]||null;
+}
+
+async function claimAdminEvent(eventId,userId,deviceId="event-claim"){
+  if(memoryMode){
+    const event=mem.events.get(eventId);
+    if(!event||event.status!=="active"||new Date(event.ends_at).getTime()<=Date.now())return {notActive:true};
+    const key=`${eventId}|${userId}`;
+    if(mem.eventClaims.has(key)){
+      return {alreadyClaimed:true,event:clone(event),save:clone(mem.saves.get(userId)||null)};
+    }
+    const current=mem.saves.get(userId)||{
+      user_id:userId,revision:0,device_id:deviceId,state:{},updated_at:now()
+    };
+    const nextState=applyAdminReward(current.state,event.reward_data,`event:${eventId}`);
+    const row={
+      user_id:userId,revision:Number(current.revision||0)+1,
+      device_id:deviceId,state:nextState,updated_at:now()
+    };
+    const claim={event_id:eventId,user_id:userId,reward_data:clone(event.reward_data),claimed_at:now()};
+    mem.saves.set(userId,row);mem.eventClaims.set(key,claim);
+    return {alreadyClaimed:false,event:clone(event),save:clone(row),claim:clone(claim)};
+  }
+
+  const client=await pool.connect();
+  try{
+    await client.query("BEGIN");
+    await client.query(`SELECT id FROM users WHERE id=$1 FOR UPDATE`,[userId]);
+    const eventResult=await client.query(
+      `SELECT * FROM admin_events WHERE id=$1 FOR UPDATE`,
+      [eventId]
+    );
+    const event=eventResult.rows[0];
+    if(!event||event.status!=="active"||new Date(event.ends_at).getTime()<=Date.now()){
+      await client.query("ROLLBACK");return {notActive:true};
+    }
+    const claimed=await client.query(
+      `SELECT * FROM event_claims WHERE event_id=$1 AND user_id=$2`,
+      [eventId,userId]
+    );
+    if(claimed.rows[0]){
+      const current=await client.query(`SELECT * FROM cloud_saves WHERE user_id=$1`,[userId]);
+      await client.query("COMMIT");
+      return {alreadyClaimed:true,event,save:current.rows[0]||null,claim:claimed.rows[0]};
+    }
+    const currentResult=await client.query(`SELECT * FROM cloud_saves WHERE user_id=$1 FOR UPDATE`,[userId]);
+    const current=currentResult.rows[0]||{
+      user_id:userId,revision:0,device_id:deviceId,state:{},updated_at:new Date()
+    };
+    const nextState=applyAdminReward(current.state,event.reward_data,`event:${eventId}`);
+    const nextRevision=Number(current.revision||0)+1;
+    const saveResult=await client.query(
+      `INSERT INTO cloud_saves(user_id,revision,device_id,state,updated_at)
+       VALUES($1,$2,$3,$4::jsonb,NOW())
+       ON CONFLICT(user_id) DO UPDATE SET
+        revision=EXCLUDED.revision,device_id=EXCLUDED.device_id,
+        state=EXCLUDED.state,updated_at=NOW()
+       RETURNING *`,
+      [userId,nextRevision,String(deviceId||"event-claim").slice(0,80),JSON.stringify(nextState)]
+    );
+    const claimResult=await client.query(
+      `INSERT INTO event_claims(event_id,user_id,reward_data)
+       VALUES($1,$2,$3::jsonb) RETURNING *`,
+      [eventId,userId,JSON.stringify(event.reward_data||{})]
+    );
+    await client.query("COMMIT");
+    return {alreadyClaimed:false,event,save:saveResult.rows[0],claim:claimResult.rows[0]};
+  }catch(error){
+    await client.query("ROLLBACK");throw error;
+  }finally{client.release()}
+}
+
+async function updateAdminEventStatus(eventId,status){
+  const safeStatus=["active","ended","cancelled"].includes(status)?status:"ended";
+  if(memoryMode){
+    const event=mem.events.get(eventId);if(!event)return null;
+    event.status=safeStatus;
+    if(safeStatus!=="active")event.ends_at=now();
+    await addAudit("event_status_changed",{details:{eventId,status:safeStatus}});
+    return clone(event);
+  }
+  const {rows}=await pool.query(
+    `UPDATE admin_events SET status=$2,
+      ends_at=CASE WHEN $2='active' THEN ends_at ELSE NOW() END
+     WHERE id=$1 RETURNING *`,
+    [eventId,safeStatus]
+  );
+  if(rows[0])await addAudit("event_status_changed",{details:{eventId,status:safeStatus}});
+  return rows[0]||null;
+}
+
+async function adminStats(){
+  if(memoryMode){
+    return {
+      users:mem.users.size,
+      cloudSaves:mem.saves.size,
+      publicProfiles:[...mem.profiles.values()].filter(profile=>profile.visibility==="public"&&profile.moderation_status==="active").length,
+      openReports:mem.reports.filter(report=>report.status==="open").length,
+      activeEvents:[...mem.events.values()].filter(event=>event.status==="active"&&new Date(event.ends_at).getTime()>Date.now()).length,
+      totalEventClaims:mem.eventClaims.size,
+      totalAdminActions:mem.audit.length
+    };
+  }
+  const {rows}=await pool.query(
+    `SELECT
+      (SELECT COUNT(*)::int FROM users) users,
+      (SELECT COUNT(*)::int FROM cloud_saves) cloud_saves,
+      (SELECT COUNT(*)::int FROM profiles WHERE visibility='public' AND moderation_status='active') public_profiles,
+      (SELECT COUNT(*)::int FROM reports WHERE status='open') open_reports,
+      (SELECT COUNT(*)::int FROM admin_events WHERE status='active' AND ends_at>NOW()) active_events,
+      (SELECT COUNT(*)::int FROM event_claims) total_event_claims,
+      (SELECT COUNT(*)::int FROM admin_audit_log) total_admin_actions`
+  );
+  const row=rows[0];
+  return {
+    users:row.users,cloudSaves:row.cloud_saves,publicProfiles:row.public_profiles,
+    openReports:row.open_reports,activeEvents:row.active_events,
+    totalEventClaims:row.total_event_claims,totalAdminActions:row.total_admin_actions
+  };
+}
+
+async function listAudit(limit=100){
+  if(memoryMode)return clone(mem.audit.slice(0,Math.max(1,Math.min(300,Number(limit)||100))));
+  const {rows}=await pool.query(
+    `SELECT * FROM admin_audit_log ORDER BY created_at DESC LIMIT $1`,
+    [Math.max(1,Math.min(300,Number(limit)||100))]
+  );
+  return rows;
+}
+
 async function accountSummary(userId){
   const user=await getUserById(userId);
   const save=await getCloudSave(userId);
@@ -595,5 +978,8 @@ module.exports={
   init,mode,createUser,findUserByPlayerId,getUserById,createSession,getSession,deleteSessionsForUser,
   getEntitlement,setEntitlement,getCloudSave,saveCloud,publishProfile,getProfileByCode,getProfileForUser,
   deleteProfile,gallery,listFriends,saveFriend,removeFriend,setReaction,addReport,blockProfile,hideProfile,
-  listReports,setReportStatus,moderateProfile,redeemRewardCode,deleteUser,accountSummary
+  listReports,setReportStatus,moderateProfile,redeemRewardCode,
+  findUserByIdentifier,adminPlayerSummary,adminGrant,createAdminEvent,listAdminEvents,
+  getActiveEvent,claimAdminEvent,updateAdminEventStatus,adminStats,listAudit,addAudit,
+  deleteUser,accountSummary
 };

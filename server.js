@@ -27,6 +27,54 @@ const rewardCodeCatalog=new Map([
     coins:200
   }]
 ]);
+
+const adminExclusiveCatalog=new Map([
+  ["solar_crown",{name:"Solar Crown",icon:"♛",description:"A glowing crown reserved for special Hammy rewards."}],
+  ["aurora_aura",{name:"Aurora Aura",icon:"✦",description:"A colourful glow that surrounds the selected hamster."}],
+  ["star_trail",{name:"Star Trail",icon:"★",description:"A sparkling star effect for the hamster room."}],
+  ["crystal_badge",{name:"Crystal Founder Badge",icon:"◆",description:"A rare collectible badge shown in the Exclusive Collection."}],
+  ["golden_trophy",{name:"Golden Focus Trophy",icon:"🏆",description:"A trophy for special events and achievements."}],
+  ["neon_frame",{name:"Neon Profile Frame",icon:"▣",description:"A bright exclusive frame for special accounts."}]
+]);
+
+const randomEventTemplates=[
+  {
+    eventType:"coin_shower",
+    title:"Coin Shower",
+    description:"A surprise shower of shiny Hammy coins is happening!",
+    reward:{title:"Coin Shower Reward",coins:100}
+  },
+  {
+    eventType:"fruit_festival",
+    title:"Fruit Festival",
+    description:"The Hammy kitchen is celebrating with a colourful fruit bundle.",
+    reward:{title:"Fruit Festival Bundle",fruits:{apple:3,banana:2,berry:3,mango:1}}
+  },
+  {
+    eventType:"cozy_weekend",
+    title:"Cozy Weekend",
+    description:"Claim a cozy reward and a rare Solar Crown collectible.",
+    reward:{title:"Cozy Weekend Gift",coins:50,exclusiveId:"solar_crown"}
+  },
+  {
+    eventType:"star_drop",
+    title:"Star Drop",
+    description:"A starry surprise has landed in Hammy Focus House.",
+    reward:{title:"Star Drop Gift",coins:75,exclusiveId:"star_trail"}
+  },
+  {
+    eventType:"aurora_night",
+    title:"Aurora Night",
+    description:"A rare aurora is glowing over every Hammy house.",
+    reward:{title:"Aurora Night Gift",exclusiveId:"aurora_aura",fruits:{berry:2}}
+  },
+  {
+    eventType:"focus_festival",
+    title:"Focus Festival",
+    description:"Celebrate focused practice with coins and a Crystal Founder Badge.",
+    reward:{title:"Focus Festival Reward",coins:150,exclusiveId:"crystal_badge"}
+  }
+];
 const unsafeNicknamePatterns=[
   /https?:/i,/www\./i,/@/,/discord/i,/snapchat/i,/instagram/i,/tiktok/i,/telegram/i,
   /\b(?:address|school|phone|email|location)\b/i,
@@ -58,6 +106,41 @@ function normalizePlayerId(value){return String(value||"").toUpperCase().replace
 function normalizeRecovery(value){return String(value||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function normalizeCode(value){return String(value||"").toUpperCase().replace(/[^A-Z2-9]/g,"").slice(0,8)}
 function normalizeRewardCode(value){return String(value||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,24)}
+function cleanPlayerIdentifier(value){return String(value||"").trim().toUpperCase().replace(/[^A-Z0-9-]/g,"").slice(0,24)}
+function cleanAdminText(value,max=120){
+  return String(value||"").trim().replace(/[<>]/g,"").replace(/\s+/g," ").slice(0,max);
+}
+function cleanAdminReward(input){
+  const reward=input&&typeof input==="object"?input:{};
+  const exclusiveId=adminExclusiveCatalog.has(String(reward.exclusiveId||""))?String(reward.exclusiveId):null;
+  return {
+    title:cleanAdminText(reward.title||"Admin Gift",80)||"Admin Gift",
+    coins:safeNumber(reward.coins,0,1000000,0),
+    fruits:{
+      apple:safeNumber(reward.fruits?.apple,0,100,0),
+      banana:safeNumber(reward.fruits?.banana,0,100,0),
+      berry:safeNumber(reward.fruits?.berry,0,100,0),
+      mango:safeNumber(reward.fruits?.mango,0,100,0)
+    },
+    exclusiveId
+  };
+}
+function publicEvent(event){
+  if(!event)return null;
+  return {
+    id:event.id,
+    eventType:event.event_type,
+    title:event.title,
+    description:event.description,
+    reward:event.reward_data||{},
+    startsAt:event.starts_at,
+    endsAt:event.ends_at,
+    status:event.status,
+    claimed:Boolean(event.claimed),
+    claimedAt:event.claimed_at||null,
+    claimCount:Number(event.claim_count)||0
+  };
+}
 
 
 function safeEqual(left,right){
@@ -133,7 +216,7 @@ function json(res,status,data,extraHeaders={}){
     "Content-Type":"application/json; charset=utf-8",
     "Content-Length":Buffer.byteLength(body),
     "Access-Control-Allow-Origin":"*",
-    "Access-Control-Allow-Headers":"Content-Type, Authorization, X-Admin-Key",
+    "Access-Control-Allow-Headers":"Content-Type, Authorization, X-Admin-Key, X-Admin-Session",
     "Access-Control-Allow-Methods":"GET, POST, PUT, PATCH, DELETE, OPTIONS",
     "Cache-Control":"no-store",
     ...extraHeaders
@@ -337,17 +420,17 @@ async function handleApi(req,res,url){
     if(!databaseReady){
       return json(res,503,{
         ok:false,
-        version:22,
+        version:23,
         databaseReady:false,
         error:String(databaseError?.message||"Database is not ready.")
       });
     }
-    return json(res,200,{ok:true,version:22,databaseReady:true,databaseMode:db.mode()});
+    return json(res,200,{ok:true,version:23,databaseReady:true,databaseMode:db.mode()});
   }
 
   if(req.method==="GET"&&url.pathname==="/api/health"){
     return json(res,200,{
-      ok:true,name:"Hammy Cloud server",version:22,
+      ok:true,name:"Hammy Cloud server",version:23,
       databaseReady,databaseMode:databaseReady?db.mode():"not-configured",
       setupRequired:!databaseReady,
       databaseError:databaseReady?null:String(databaseError?.message||"DATABASE_URL is missing")
@@ -489,6 +572,39 @@ async function handleApi(req,res,url){
     return json(res,200,{premium:{active:true,source:entitlement.source}});
   }
 
+
+  if(req.method==="GET"&&url.pathname==="/api/events/active"){
+    requireDatabase();
+    const auth=await optionalAuth(req);
+    const event=await db.getActiveEvent(auth?.userId||null);
+    return json(res,200,{event:publicEvent(event)});
+  }
+
+  const eventClaimMatch=url.pathname.match(/^\/api\/events\/([0-9a-f-]{36})\/claim$/i);
+  if(eventClaimMatch&&req.method==="POST"){
+    const auth=await requireAuth(req);
+    const body=await parseBody(req);
+    const result=await db.claimAdminEvent(
+      eventClaimMatch[1],
+      auth.userId,
+      String(body.deviceId||auth.deviceId||"event-claim").slice(0,80)
+    );
+    if(result.notActive)return json(res,404,{error:"This event is no longer active."});
+    if(result.alreadyClaimed){
+      return json(res,409,{
+        error:"This event reward was already claimed on this Hammy account.",
+        alreadyClaimed:true,
+        event:publicEvent(result.event),
+        save:formatSave(result.save)
+      });
+    }
+    return json(res,200,{
+      claimed:true,
+      event:publicEvent(result.event),
+      save:formatSave(result.save)
+    });
+  }
+
   if(req.method==="POST"&&url.pathname==="/api/profile"){
     const auth=await requireAuth(req);
     const body=await parseBody(req);
@@ -615,6 +731,108 @@ async function handleApi(req,res,url){
     return json(res,200,{authenticated:true,expiresInSeconds:ADMIN_SESSION_SECONDS});
   }
 
+
+  if(url.pathname==="/api/admin/stats"&&req.method==="GET"){
+    requireDatabase();
+    if(!adminSecret())return json(res,503,{error:"ADMIN_ACCESS_CODE is not configured."});
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    return json(res,200,{stats:await db.adminStats()});
+  }
+
+  if(url.pathname==="/api/admin/exclusives"&&req.method==="GET"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    return json(res,200,{exclusives:[...adminExclusiveCatalog.entries()].map(([id,item])=>({id,...item}))});
+  }
+
+  const adminPlayerMatch=url.pathname.match(/^\/api\/admin\/players\/([A-Z0-9-]{4,24})$/i);
+  if(adminPlayerMatch&&req.method==="GET"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const player=await db.adminPlayerSummary(cleanPlayerIdentifier(adminPlayerMatch[1]));
+    return player?json(res,200,{player}):json(res,404,{error:"Player ID or friend code was not found."});
+  }
+
+  const adminGrantMatch=url.pathname.match(/^\/api\/admin\/players\/([A-Z0-9-]{4,24})\/grant$/i);
+  if(adminGrantMatch&&req.method==="POST"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const reward=cleanAdminReward(body.reward);
+    const hasReward=reward.coins>0||Object.values(reward.fruits).some(value=>value>0)||Boolean(reward.exclusiveId);
+    if(!hasReward)return json(res,400,{error:"Choose coins, fruit, or an exclusive item to grant."});
+    const result=await db.adminGrant(cleanPlayerIdentifier(adminGrantMatch[1]),{
+      reward,
+      note:cleanAdminText(body.note,160),
+      deviceId:"admin-live-ops"
+    });
+    return result?json(res,200,{granted:true,save:formatSave(result.save),player:result.player})
+      :json(res,404,{error:"Player ID or friend code was not found."});
+  }
+
+  if(url.pathname==="/api/admin/events"&&req.method==="GET"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const events=await db.listAdminEvents(100);
+    return json(res,200,{events:events.map(publicEvent)});
+  }
+
+  if(url.pathname==="/api/admin/events/random"&&req.method==="POST"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const durationMinutes=safeNumber(body.durationMinutes,5,10080,60);
+    const template=randomEventTemplates[crypto.randomInt(randomEventTemplates.length)];
+    const event=await db.createAdminEvent({
+      id:crypto.randomUUID(),
+      eventType:template.eventType,
+      title:template.title,
+      description:template.description,
+      reward:cleanAdminReward(template.reward),
+      startsAt:now(),
+      endsAt:new Date(Date.now()+(durationMinutes*60*1000)).toISOString()
+    });
+    return json(res,201,{event:publicEvent(event)});
+  }
+
+  if(url.pathname==="/api/admin/events"&&req.method==="POST"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const durationMinutes=safeNumber(body.durationMinutes,5,10080,60);
+    const title=cleanAdminText(body.title,40);
+    const description=cleanAdminText(body.description,140);
+    if(title.length<3||description.length<3)return json(res,400,{error:"Enter an event title and description."});
+    const reward=cleanAdminReward(body.reward);
+    const hasReward=reward.coins>0||Object.values(reward.fruits).some(value=>value>0)||Boolean(reward.exclusiveId);
+    if(!hasReward)return json(res,400,{error:"The event needs a reward."});
+    const event=await db.createAdminEvent({
+      id:crypto.randomUUID(),
+      eventType:cleanAdminText(body.eventType||"custom",30)||"custom",
+      title,description,reward,
+      startsAt:now(),
+      endsAt:new Date(Date.now()+(durationMinutes*60*1000)).toISOString()
+    });
+    return json(res,201,{event:publicEvent(event)});
+  }
+
+  const adminEventMatch=url.pathname.match(/^\/api\/admin\/events\/([0-9a-f-]{36})$/i);
+  if(adminEventMatch&&req.method==="PATCH"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const status=["active","ended","cancelled"].includes(body.status)?body.status:"ended";
+    const event=await db.updateAdminEventStatus(adminEventMatch[1],status);
+    return event?json(res,200,{event:publicEvent(event)}):json(res,404,{error:"Event not found."});
+  }
+
+  if(url.pathname==="/api/admin/audit"&&req.method==="GET"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const limit=safeNumber(url.searchParams.get("limit"),1,300,100);
+    return json(res,200,{entries:await db.listAudit(limit)});
+  }
+
   if(url.pathname==="/api/admin/reports"&&req.method==="GET"){
     requireDatabase();
     if(!adminSecret())return json(res,503,{error:"ADMIN_ACCESS_CODE is not configured."});
@@ -671,5 +889,5 @@ const server=http.createServer(async(req,res)=>{
     databaseReady=false;databaseError=error;
     console.error("Cloud database setup incomplete:",error.message);
   }
-  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v22 running at http://${HOST}:${PORT}`));
+  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v23 running at http://${HOST}:${PORT}`));
 })();

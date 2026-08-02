@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#33273e">
-<title>Hammy Top Secret Admin</title>
-<link rel="stylesheet" href="admin.css?v=22">
+<title>Hammy Live Operations Admin</title>
+<link rel="stylesheet" href="admin.css?v=23">
 </head>
 <body>
 <main class="admin-shell">
  <header>
   <div>
-   <h1>Hammy Top Secret Admin</h1>
-   <p>Private moderation tools. Admin sessions expire automatically.</p>
+   <h1>Hammy Live Operations</h1>
+   <p>Top Secret administration, rewards, events, moderation, and audit history.</p>
   </div>
-  <span class="build">Build v22</span>
+  <span class="build">Build v23</span>
  </header>
 
  <section id="adminLoginPanel" class="panel admin-login-panel">
@@ -27,23 +27,183 @@
   <a class="back-link" href="./">Return to Hammy</a>
  </section>
 
- <section id="adminToolsPanel" class="panel hidden">
-  <label>Report status
-   <select id="reportStatus">
-    <option value="open">Open</option>
-    <option value="reviewed">Reviewed</option>
-    <option value="dismissed">Dismissed</option>
-    <option value="all">All</option>
-   </select>
-  </label>
-  <button id="loadReports">Refresh reports</button>
-  <button id="adminLogout" class="secondary">Lock admin panel</button>
-  <a class="back-link" href="./">Return to Hammy</a>
- </section>
-
  <div id="adminMessage" class="message">Enter the private top secret code.</div>
- <section id="reportList" class="report-list"></section>
+
+ <section id="adminWorkspace" class="hidden">
+  <nav class="admin-tabs" aria-label="Admin sections">
+   <button class="active" data-admin-tab="dashboard">Dashboard</button>
+   <button data-admin-tab="players">Player Rewards</button>
+   <button data-admin-tab="events">Live Events</button>
+   <button data-admin-tab="moderation">Moderation</button>
+   <button data-admin-tab="audit">Audit Log</button>
+  </nav>
+
+  <section id="adminToolsPanel" class="panel admin-toolbar">
+   <button id="refreshEverything">Refresh dashboard</button>
+   <button id="adminLogout" class="secondary">Lock admin panel</button>
+   <a class="back-link" href="./">Return to Hammy</a>
+  </section>
+
+  <section class="admin-page active" data-admin-page="dashboard">
+   <div id="statsGrid" class="stats-grid">
+    <article><span>Accounts</span><strong id="statUsers">—</strong></article>
+    <article><span>Cloud saves</span><strong id="statSaves">—</strong></article>
+    <article><span>Public profiles</span><strong id="statProfiles">—</strong></article>
+    <article><span>Open reports</span><strong id="statReports">—</strong></article>
+    <article><span>Active events</span><strong id="statEvents">—</strong></article>
+    <article><span>Event claims</span><strong id="statClaims">—</strong></article>
+   </div>
+
+   <section class="panel dashboard-guide">
+    <h2>Live Operations Dashboard</h2>
+    <p>Use Player Rewards for individual gifts. Use Live Events for rewards that every account may claim once. Every grant and event change is written to the Audit Log.</p>
+    <div class="quick-actions">
+     <button data-go-tab="players">Give player rewards</button>
+     <button data-go-tab="events">Host an event</button>
+     <button data-go-tab="moderation" class="secondary">Review reports</button>
+    </div>
+   </section>
+  </section>
+
+  <section class="admin-page" data-admin-page="players">
+   <div class="two-column">
+    <section class="panel">
+     <h2>Find a Player</h2>
+     <p>Search with a Player ID such as <code>HF-ABCD-2345</code> or an eight-character friend code.</p>
+     <label>Player ID or friend code
+      <input id="playerLookupInput" type="text" maxlength="24" autocomplete="off"
+       autocapitalize="characters" placeholder="HF-ABCD-2345">
+     </label>
+     <button id="lookupPlayer">Find player</button>
+     <div id="playerLookupResult" class="player-result empty-result">No player selected.</div>
+    </section>
+
+    <section class="panel">
+     <h2>Give Custom Rewards</h2>
+     <p>Rewards are added directly to the selected account’s newest cloud save.</p>
+     <label>Gift title
+      <input id="grantTitle" type="text" maxlength="80" value="Admin Gift">
+     </label>
+     <div class="form-grid compact">
+      <label>Coins
+       <input id="grantCoins" type="number" min="0" max="1000000" value="0">
+      </label>
+      <label>Exclusive item
+       <select id="grantExclusive"><option value="">No exclusive item</option></select>
+      </label>
+      <label>Apples
+       <input id="grantApple" type="number" min="0" max="100" value="0">
+      </label>
+      <label>Bananas
+       <input id="grantBanana" type="number" min="0" max="100" value="0">
+      </label>
+      <label>Berries
+       <input id="grantBerry" type="number" min="0" max="100" value="0">
+      </label>
+      <label>Mangoes
+       <input id="grantMango" type="number" min="0" max="100" value="0">
+      </label>
+     </div>
+     <label>Private admin note
+      <input id="grantNote" type="text" maxlength="160" placeholder="Reason for this gift">
+     </label>
+     <button id="grantPlayerReward" class="reward-button" disabled>Grant reward</button>
+     <p class="warning-note">Maximum single grant: 1,000,000 coins, 100 of each fruit, and one exclusive item.</p>
+    </section>
+   </div>
+  </section>
+
+  <section class="admin-page" data-admin-page="events">
+   <div class="two-column">
+    <section class="panel random-event-panel">
+     <h2>Host a Random Event</h2>
+     <p>The server chooses from Coin Shower, Fruit Festival, Cozy Weekend, Star Drop, Aurora Night, and Focus Festival. Starting a new event ends the current one.</p>
+     <label>Duration
+      <select id="randomEventDuration">
+       <option value="15">15 minutes</option>
+       <option value="30">30 minutes</option>
+       <option value="60" selected>1 hour</option>
+       <option value="180">3 hours</option>
+       <option value="720">12 hours</option>
+       <option value="1440">1 day</option>
+       <option value="4320">3 days</option>
+      </select>
+     </label>
+     <button id="hostRandomEvent">🎲 Host random event</button>
+    </section>
+
+    <section class="panel">
+     <h2>Create a Custom Event</h2><p>Only one event is live at a time. A new event ends the previous one.</p>
+     <div class="form-grid">
+      <label>Event title
+       <input id="eventTitle" type="text" maxlength="40" placeholder="Hammy Celebration">
+      </label>
+      <label>Duration in minutes
+       <input id="eventDuration" type="number" min="5" max="10080" value="60">
+      </label>
+     </div>
+     <label>Description
+      <input id="eventDescription" type="text" maxlength="140" placeholder="A special reward is ready to claim!">
+     </label>
+     <div class="form-grid compact">
+      <label>Coins
+       <input id="eventCoins" type="number" min="0" max="1000000" value="100">
+      </label>
+      <label>Exclusive item
+       <select id="eventExclusive"><option value="">No exclusive item</option></select>
+      </label>
+      <label>Apples
+       <input id="eventApple" type="number" min="0" max="100" value="0">
+      </label>
+      <label>Bananas
+       <input id="eventBanana" type="number" min="0" max="100" value="0">
+      </label>
+      <label>Berries
+       <input id="eventBerry" type="number" min="0" max="100" value="0">
+      </label>
+      <label>Mangoes
+       <input id="eventMango" type="number" min="0" max="100" value="0">
+      </label>
+     </div>
+     <button id="createCustomEvent">Create live event</button>
+    </section>
+   </div>
+
+   <section class="panel" style="margin-top:12px">
+    <div class="section-heading">
+     <div><h2>Current and Recent Events</h2><p>Players can claim each active event once per account.</p></div>
+     <button id="refreshEvents" class="secondary">Refresh events</button>
+    </div>
+    <div id="eventsList" class="events-list"></div>
+   </section>
+  </section>
+
+  <section class="admin-page" data-admin-page="moderation">
+   <section class="panel moderation-toolbar">
+    <label>Report status
+     <select id="reportStatus">
+      <option value="open">Open</option>
+      <option value="reviewed">Reviewed</option>
+      <option value="dismissed">Dismissed</option>
+      <option value="all">All</option>
+     </select>
+    </label>
+    <button id="loadReports">Refresh reports</button>
+   </section>
+   <section id="reportList" class="report-list"></section>
+  </section>
+
+  <section class="admin-page" data-admin-page="audit">
+   <section class="panel">
+    <div class="section-heading">
+     <div><h2>Admin Audit Log</h2><p>Recent player grants and event actions.</p></div>
+     <button id="refreshAudit" class="secondary">Refresh log</button>
+    </div>
+    <div id="auditList" class="audit-list"></div>
+   </section>
+  </section>
+ </section>
 </main>
-<script src="admin.js?v=22"></script>
+<script src="admin.js?v=23"></script>
 </body>
 </html>

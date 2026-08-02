@@ -158,3 +158,82 @@
 .secret-admin-message.success{background:#275c3d}
 .secret-admin-message.error{background:#7d2d3d}
 .secret-admin-message.working{background:#6c5522}
+
+
+/* Hammy Focus House v23 — Live events and exclusive collection */
+.live-event-card{
+  background:
+    radial-gradient(circle at 90% 12%,rgba(255,235,151,.55),transparent 150px),
+    linear-gradient(135deg,#fff5c9,#f1e1ff);
+  border-color:#755692
+}
+.live-event-heading,.exclusive-collection-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap
+}
+.live-event-kicker{
+  display:inline-block;margin-bottom:4px;padding:4px 8px;border:2px solid var(--line);
+  border-radius:999px;background:#fff;font-size:.7rem;font-weight:1000;letter-spacing:.08em
+}
+.live-event-icon{
+  display:grid;place-items:center;width:68px;height:68px;border:3px solid var(--line);
+  border-radius:20px;background:#fff;font-size:2rem;box-shadow:0 5px 0 rgba(73,57,81,.14)
+}
+.live-event-details{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px
+}
+.live-event-details>div{
+  padding:10px;border:2px solid var(--line);border-radius:13px;background:rgba(255,255,255,.7)
+}
+.live-event-details span,.live-event-details strong{display:block}
+.live-event-details span{font-size:.75rem}.live-event-details strong{margin-top:4px}
+.live-event-message{
+  margin-top:9px;padding:9px 11px;border:2px dashed var(--line);border-radius:11px;
+  background:rgba(255,255,255,.6);font-weight:800
+}
+.exclusive-count{
+  display:inline-flex;gap:5px;align-items:center;padding:6px 10px;border:2px solid var(--line);
+  border-radius:999px;background:var(--soft);font-weight:800
+}
+.exclusive-collection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
+.exclusive-item{
+  display:grid;grid-template-columns:52px 1fr auto;gap:9px;align-items:center;
+  padding:10px;border:2px solid var(--line);border-radius:14px;background:var(--soft)
+}
+.exclusive-item.equipped{background:#fff1bd;box-shadow:0 0 0 4px rgba(240,198,79,.18)}
+.exclusive-item-icon{
+  display:grid;place-items:center;width:52px;height:52px;border:2px solid var(--line);
+  border-radius:14px;background:var(--panel);font-size:1.65rem
+}
+.exclusive-item p{margin:4px 0 0;font-size:.78rem}
+.exclusive-owned-label{
+  padding:6px 8px;border:2px solid var(--line);border-radius:999px;background:var(--panel);
+  font-size:.72rem;font-weight:900
+}
+.exclusive-empty{
+  grid-column:1/-1;padding:18px;border:2px dashed var(--line);border-radius:13px;
+  text-align:center;background:var(--soft)
+}
+#hamster{position:relative}
+.admin-exclusive-visual{
+  position:absolute;z-index:95;left:50%;top:-15%;transform:translateX(-50%);
+  display:grid;place-items:center;pointer-events:none;font-size:2rem;font-weight:1000;
+  filter:drop-shadow(0 3px 1px rgba(0,0,0,.18))
+}
+#hamster[data-admin-exclusive="solar_crown"] .admin-exclusive-visual{color:#f4c84c;font-size:2.4rem}
+#hamster[data-admin-exclusive="star_trail"] .admin-exclusive-visual{
+  left:82%;top:7%;color:#ffd85f;animation:exclusiveStarSpin 2.2s linear infinite
+}
+#hamster[data-admin-exclusive="aurora_aura"]{
+  filter:drop-shadow(0 0 8px #87e9e3) drop-shadow(0 0 15px #b692ff)
+}
+#hamster[data-admin-exclusive="aurora_aura"] .admin-exclusive-visual{color:#9ff0e8;animation:exclusivePulse 1.5s ease-in-out infinite}
+#hamster[data-admin-exclusive="neon_frame"]{
+  outline:5px solid #85f3e8;outline-offset:8px;border-radius:42%;box-shadow:0 0 22px #9d79f4
+}
+@keyframes exclusiveStarSpin{to{transform:translateX(-50%) rotate(360deg)}}
+@keyframes exclusivePulse{50%{transform:translateX(-50%) scale(1.3);opacity:.55}}
+@media(max-width:720px){
+  .exclusive-collection-grid,.live-event-details{grid-template-columns:1fr}
+  .exclusive-item{grid-template-columns:48px 1fr}
+  .exclusive-item button,.exclusive-owned-label{grid-column:1/-1;width:100%;text-align:center}
+}

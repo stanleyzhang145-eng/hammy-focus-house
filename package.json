@@ -1,8 +1,8 @@
 {
   "name": "hammy-focus-house-cloud",
-  "version": "22.0.0",
+  "version": "23.0.0",
   "private": true,
-  "description": "Hammy Focus House with secure server-side top secret admin sessions",
+  "description": "Hammy Focus House with secure admin rewards, live events, exclusives, and audit history",
   "scripts": {
     "start": "node server.js",
     "check": "node --check server.js && node --check db.js && node --check cloud.js && node --check online.js && node --check gallery.js && node --check admin.js"
