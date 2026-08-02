@@ -1,12 +1,16 @@
 {
-  "name": "hammy-focus-house-online",
-  "version": "19.0.0",
+  "name": "hammy-focus-house-cloud",
+  "version": "20.0.0",
   "private": true,
-  "description": "Hammy Focus House with reliable Premium-room avatar taps and update-safe caching",
+  "description": "Hammy Focus House with PostgreSQL cloud accounts, reliable saves, and safe gallery moderation",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "check": "node --check server.js && node --check db.js && node --check cloud.js && node --check online.js && node --check gallery.js && node --check admin.js"
   },
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
   }
 }

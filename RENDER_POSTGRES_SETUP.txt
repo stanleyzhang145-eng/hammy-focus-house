@@ -1,0 +1,73 @@
+HAMMY FOCUS HOUSE V20 — RENDER POSTGRES SETUP
+
+WHY THIS IS REQUIRED
+The web service's local files are temporary. v20 stores accounts, cloud saves,
+profiles, rooms, reports, blocks, reactions, and Premium entitlements in PostgreSQL.
+
+PART 1 — UPLOAD V20 TO GITHUB
+1. Extract the v20 ZIP.
+2. Upload the CONTENTS to the existing hammy-focus-house repository.
+3. Replace the older files.
+4. Commit with: Update Hammy to v20 cloud accounts
+
+PART 2 — CREATE THE DATABASE
+1. In Render, press + New.
+2. Choose Postgres.
+3. Name it: hammy-focus-db
+4. Create the database in the same region as the Hammy web service.
+5. For testing, choose an available plan. Free Render Postgres is temporary
+   and currently expires after 30 days, so it is not suitable for a permanent release.
+
+PART 3 — CONNECT THE DATABASE TO THE WEB SERVICE
+1. Open the Hammy web service.
+2. Open Environment.
+3. Add DATABASE_URL.
+4. Use the database's Internal Database URL when the database and web service
+   are in the same Render region.
+5. Add ADMIN_KEY with a long random value. Keep it private.
+6. Add ALLOW_PREMIUM_PREVIEW=true while testing the current demo Premium system.
+7. Save the environment changes.
+
+PART 4 — DEPLOY
+Use Manual Deploy > Deploy latest commit.
+The first start automatically runs schema.sql and creates:
+- Users
+- UserSessions
+- CloudSaves
+- Profiles
+- NormalHomeRooms
+- PremiumRooms
+- FriendCodes
+- SavedFriends
+- Reports
+- Blocks
+- HiddenProfiles
+- Reactions
+- PremiumEntitlements
+
+PART 5 — VERIFY
+1. Open https://YOUR-SERVICE.onrender.com/api/health
+2. It should show:
+   "databaseReady": true
+   "databaseMode": "postgres"
+   "version": 20
+3. Open the game and choose Account.
+4. A Player ID and recovery code should appear.
+5. Press Sync now.
+6. Open Online and publish a Public profile.
+7. Open the game on another device and use Account > Restore on another device.
+
+ADMIN MODERATION
+Open:
+https://YOUR-SERVICE.onrender.com/admin.html
+
+Paste the ADMIN_KEY from Render.
+The page can review preset reports, dismiss reports, hide profiles,
+remove profiles, and restore profiles.
+
+IMPORTANT
+- Do not share ADMIN_KEY.
+- Recovery codes are private account secrets.
+- There is no chat or custom report text.
+- Real paid Premium still requires Apple/Google purchase verification.
+  v20 only syncs the existing Premium preview entitlement.

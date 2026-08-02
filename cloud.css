@@ -1,0 +1,42 @@
+
+/* Hammy Focus House v20 — Cloud accounts */
+.cloud-heading,.cloud-card-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cloud-chip-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.cloud-chip{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border:2px solid var(--line);border-radius:999px;background:var(--soft);font-size:.8rem;font-weight:900}
+.cloud-chip.online{background:#c9f0d1}.cloud-chip.offline{background:#ffd5dc}.cloud-chip.syncing{background:#ffe9a8}.cloud-chip.conflict{background:#ffd08c}
+.cloud-warning{margin-top:11px;padding:11px 13px;border:3px solid #9a7422;border-radius:14px;background:#fff1bd;color:#563f12;font-weight:800}
+.cloud-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.cloud-card{border:3px solid var(--line);border-radius:18px;padding:13px;background:var(--panel);box-shadow:0 4px 0 rgba(73,57,81,.12)}
+.cloud-label{display:grid;gap:6px;margin-top:10px;font-weight:900}
+.cloud-label input{width:100%;padding:11px;border:3px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);font:inherit;text-transform:uppercase}
+.cloud-identity{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;margin-top:11px;padding:10px;border:2px solid var(--line);border-radius:13px;background:var(--soft)}
+.cloud-identity span,.cloud-identity strong{display:block}.cloud-identity strong{margin-top:3px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.05em;overflow-wrap:anywhere}
+.cloud-identity.recovery{background:#fff1bd}
+.cloud-secret-note{margin-top:8px;font-size:.78rem;color:#6f5d36}
+.cloud-sync-status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:11px}
+.cloud-sync-status div{padding:8px;border:2px solid var(--line);border-radius:11px;background:var(--soft);text-align:center}
+.cloud-sync-status span,.cloud-sync-status strong{display:block}.cloud-sync-status span{font-size:.7rem}.cloud-sync-status strong{margin-top:3px}
+.cloud-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.cloud-wide{width:100%;margin-top:11px}
+.cloud-conflict{margin-top:12px;border-color:#9a7422;background:#fff8dd}
+.cloud-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:11px}
+.cloud-compare div{padding:11px;border:2px solid var(--line);border-radius:13px;background:var(--panel)}
+.cloud-compare strong,.cloud-compare span{display:block}.cloud-compare span{margin-top:5px;font-size:.84rem}
+.cloud-danger-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:11px}
+.cloud-danger-grid>div{padding:11px;border:2px solid var(--line);border-radius:13px;background:var(--soft)}
+.cloud-danger-grid button{margin-top:9px}
+.cloud-toast{position:fixed;left:50%;bottom:22px;z-index:12000;transform:translateX(-50%);max-width:min(92vw,560px);padding:11px 14px;border:3px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:0 7px 0 rgba(73,57,81,.22);font-weight:900;text-align:center}
+.cloud-toast.error{background:#ffd9df}.cloud-toast.success{background:#d5f0dd}
+.cloud-db-status{margin-top:8px;font-size:.78rem}
+.reaction-strip{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.reaction-button{display:flex;align-items:center;gap:5px;padding:8px 10px;border:2px solid var(--line);border-radius:999px;background:var(--panel);font-weight:900}
+.reaction-button.selected{background:var(--accent);color:#fff}
+.profile-safety-panel{margin-top:12px;padding:11px;border:2px dashed var(--line);border-radius:14px;background:var(--soft)}
+.profile-safety-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.profile-safety-actions select{flex:1;min-width:170px;padding:9px;border:2px solid var(--line);border-radius:11px;background:var(--panel);color:var(--ink);font:inherit}
+.admin-link-note{font-size:.75rem;margin-top:8px}
+@media(max-width:720px){
+ .cloud-grid,.cloud-danger-grid{grid-template-columns:1fr}
+ .cloud-sync-status{grid-template-columns:1fr}
+ .cloud-compare{grid-template-columns:1fr}
+}

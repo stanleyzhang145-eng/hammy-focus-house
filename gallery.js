@@ -9,7 +9,7 @@
   const read=()=>{try{return {apiUrl:"",visibility:"unlisted",friends:[],...JSON.parse(localStorage.getItem(KEY)||"{}")} }catch{return {apiUrl:"",visibility:"unlisted",friends:[]}}};
   const write=value=>localStorage.setItem(KEY,JSON.stringify(value));
   const base=()=>{const s=read(),configured=String(s.apiUrl||"").trim().replace(/\/+$/,"");return configured||((location.protocol==="http:"||location.protocol==="https:")?location.origin:"http://localhost:8080")};
-  const api=async path=>{const r=await fetch(base()+path,{headers:{"Content-Type":"application/json"}});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||`Server error ${r.status}`);return d};
+  const api=async(path,options={})=>{const r=await fetch(base()+path,{method:options.method||"GET",headers:{"Content-Type":"application/json",...(window.HammyCloud?.authHeaders?.()||{}),...(options.headers||{})},body:options.body===undefined?undefined:JSON.stringify(options.body),cache:"no-store"});let d={};try{d=await r.json()}catch{}if(!r.ok){const e=new Error(d.error||`Server error ${r.status}`);e.status=r.status;e.data=d;throw e}return d};
   const status=(message,type="")=>{const box=el("onlineStatus");if(box){box.textContent=message;box.className="online-status"+(type?" "+type:"")}};
   const names={bed:"Cozy Bed",sofa:"Tiny Sofa",desk:"Study Desk",plant:"Berry Plant",aquarium:"Aquarium",tunnel:"Play Tunnel",toybox:"Toy Box",bookshelf:"Book Shelf",lamp:"Moon Lamp",rug:"Cloud Rug",wheel:"Deluxe Wheel",snack:"Snack Table",music:"Music Player",castle:"Hamster Castle",giantWheel:"Giant Wheel",bunkBed:"Bunk Bed",gamingDesk:"Gaming Desk",pool:"Indoor Pool",bubbleBath:"Bubble Bath",cinema:"Mini Cinema",musicStage:"Music Stage",capsuleBed:"Capsule Bed",treehouse:"Treehouse",aquariumTunnel:"Aquarium Tunnel",kitchenSet:"Mini Kitchen",trainSet:"Train Set",clawMachine:"Claw Machine",playground:"Playground",portal:"Magic Portal"};
   const rooms={home:"Home",bedroom:"Bedroom",kitchen:"Kitchen",bathroom:"Bathroom",study:"Study Room",music:"Music Room",game:"Game Room",garden:"Garden",rooftop:"Rooftop",aquarium:"Aquarium Room",space:"Space Room",winter:"Winter Cabin",beach:"Beach House"};
@@ -71,8 +71,19 @@
   }
   function shareUrl(code){const u=new URL(location.href);u.searchParams.set("profile",normalize(code));u.hash="";return u.toString()}
   async function share(p){const url=shareUrl(p.code),data={title:`${p.nickname}'s Hammy Focus House`,text:`Visit ${p.nickname}'s hamster stats and base.`,url};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(url);status("Profile link copied.","success")}}catch(e){if(e.name!=="AbortError")status("Could not share the link.","error")}}
-  function open(p){el("friendCodeInput").value=p.code;el("viewFriendCode").click()}
-  function saveFriend(p){const s=read();s.friends=Array.isArray(s.friends)?s.friends:[];if(!s.friends.includes(p.code))s.friends.push(p.code);s.cachedFriends=Array.isArray(s.cachedFriends)?s.cachedFriends:[];s.cachedFriends=[...s.cachedFriends.filter(x=>x.code!==p.code),p];write(s);el("friendCodeInput").value=p.code;el("viewFriendCode").click()}
+  function open(p){window.HammyOnlineRooms?.showProfile?.(p,false)}
+  async function saveFriend(p){
+    const s=read();s.friends=Array.isArray(s.friends)?s.friends:[];if(!s.friends.includes(p.code))s.friends.push(p.code);
+    s.cachedFriends=Array.isArray(s.cachedFriends)?s.cachedFriends:[];s.cachedFriends=[...s.cachedFriends.filter(x=>x.code!==p.code),p];write(s);
+    try{
+      if(!p.demo){
+        if(!window.HammyCloud?.isSignedIn?.())throw new Error("Create or restore a cloud account first.");
+        await api("/api/friends",{method:"POST",body:{code:p.code}});
+      }
+      status(`${p.nickname} saved as a friend.`,"success");
+      open(p);
+    }catch(error){status(error.message||"Could not save this friend.","error")}
+  }
   function card(p){
     const s=p.stats||{},roomsForPremium=premiumRooms(p),article=document.createElement("article");
     article.className="online-friend-card gallery-profile-card";article.dataset.galleryCode=p.code;
@@ -80,6 +91,7 @@
       ${roomsForPremium.length?'<div class="premium-avatar-hint gallery-avatar-hint">Tap either hamster for Premium rooms</div>':""}
       <div class="gallery-room-title">Normal Home Room</div>
       <div class="gallery-base-peek">${baseView(p,homeBase(p))}</div>
+      ${p.demo?"":`<div class="gallery-reaction-summary">♥ ${clamp(p.reactions?.heart,0,999999)} · ★ ${clamp(p.reactions?.star,0,999999)} · ⌂ ${clamp(p.reactions?.cozy,0,999999)} · ✦ ${clamp(p.reactions?.creative,0,999999)}</div>`}
       <div class="online-actions"></div>`;
 
     if(roomsForPremium.length){
@@ -106,7 +118,8 @@
     }
 
     const actions=article.querySelector(".online-actions");
-    [["View Home Room","primary",()=>open(p)],["Share","secondary",()=>share(p)],["Save friend","secondary",()=>saveFriend(p)]].forEach(([text,className,handler])=>{
+    const alreadySaved=(read().friends||[]).includes(p.code);
+    [["View Home Room","primary",()=>open(p)],["Share","secondary",()=>share(p)],[alreadySaved?"Saved":"Save friend","secondary",()=>{if(!alreadySaved)saveFriend(p)}]].forEach(([text,className,handler])=>{
       const button=document.createElement("button");button.textContent=text;button.className=className;button.addEventListener("click",handler);actions.appendChild(button);
     });
     return article;
@@ -114,6 +127,31 @@
   function render(){const g=el("publicGalleryGrid");if(!g)return;g.innerHTML="";if(!profiles.length){g.innerHTML='<div class="online-empty">No public profiles yet. Publish yours as Public to appear here.</div>';return}profiles.forEach(p=>g.appendChild(card(p)))}
   async function load(reset=false){if(loading||(!hasMore&&!reset))return;if(reset){page=0;hasMore=true;profiles=[];render()}loading=true;el("galleryLoading").classList.remove("hidden");try{const sort=el("gallerySort").value;const d=await api(`/api/gallery?page=${page}&limit=12&sort=${encodeURIComponent(sort)}`);const incoming=Array.isArray(d.profiles)?d.profiles:[];const seen=new Set(profiles.map(p=>p.code));incoming.forEach(p=>{if(!seen.has(p.code)){profiles.push(p);seen.add(p.code)}});page++;hasMore=Boolean(d.hasMore);render();status(`Loaded ${profiles.length} public profile${profiles.length===1?"":"s"}.`,"success")}catch(e){if(page===0){profiles=[...demos];hasMore=false;render();status("Showing demo gallery because the online server is not connected.","")}else status(e.message||"Could not load gallery.","error")}finally{loading=false;el("galleryLoading").classList.add("hidden");el("loadMoreGallery").classList.toggle("hidden",!hasMore)}}
   async function openLink(){const code=normalize(new URL(location.href).searchParams.get("profile"));if(!CODE.test(code))return;document.querySelector('[data-page="online"]')?.click();el("friendCodeInput").value=code;setTimeout(()=>el("viewFriendCode").click(),100)}
-  function init(){if(!el("publicGalleryGrid"))return;const s=read();el("onlineVisibility").value=s.visibility||"unlisted";el("onlineVisibility").addEventListener("change",()=>{const x=read();x.visibility=el("onlineVisibility").value;write(x)});el("shareMyProfile").addEventListener("click",()=>{const x=read();if(x.code)share({code:x.code,nickname:x.nickname||"My Hamster"})});el("refreshGallery").addEventListener("click",()=>load(true));el("gallerySort").addEventListener("change",()=>load(true));el("loadMoreGallery").addEventListener("click",()=>load(false));const observer=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)&&hasMore)load(false)},{rootMargin:"220px"});observer.observe(el("gallerySentinel"));document.querySelector('[data-page="online"]')?.addEventListener("click",()=>{if(!profiles.length)load(true)});load(true);openLink()}
+  function replaceProfile(updated){
+    const index=profiles.findIndex(profile=>profile.code===updated.code);
+    if(index>=0){profiles[index]=updated;render()}
+  }
+  function removeProfile(code){
+    profiles=profiles.filter(profile=>profile.code!==code);
+    render();
+  }
+  function init(){
+    if(!el("publicGalleryGrid"))return;
+    const s=read();
+    el("onlineVisibility").value=s.visibility||"unlisted";
+    el("onlineVisibility").addEventListener("change",()=>{const x=read();x.visibility=el("onlineVisibility").value;write(x)});
+    el("shareMyProfile").addEventListener("click",()=>{const x=read();if(x.code)share({code:x.code,nickname:x.nickname||"My Hamster"})});
+    el("refreshGallery").addEventListener("click",()=>load(true));
+    el("gallerySort").addEventListener("change",()=>load(true));
+    el("loadMoreGallery").addEventListener("click",()=>load(false));
+    const observer=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)&&hasMore)load(false)},{rootMargin:"220px"});
+    observer.observe(el("gallerySentinel"));
+    document.querySelector('[data-page="online"]')?.addEventListener("click",()=>{if(!profiles.length)load(true)});
+    window.addEventListener("hammy-profile-filtered",event=>removeProfile(event.detail?.code));
+    window.addEventListener("hammy-profile-updated",event=>{if(event.detail?.profile)replaceProfile(event.detail.profile)});
+    window.addEventListener("hammy-gallery-refresh",()=>load(true));
+    window.addEventListener("hammy-cloud-account",()=>load(true));
+    load(true);openLink();
+  }
   init();
 })();

@@ -1,0 +1,40 @@
+HAMMY V20 TEST CHECKLIST
+
+ACCOUNT
+[ ] First launch creates Player ID and recovery code.
+[ ] Copy buttons work.
+[ ] Sync now updates Last synced and Cloud revision.
+[ ] Another device can sign in with Player ID + recovery code.
+[ ] Different saves show a choice instead of silently overwriting.
+[ ] Use cloud save reloads cloud progress.
+[ ] Keep this device uploads local progress as a newer revision.
+[ ] Reset local data leaves the cloud account recoverable.
+[ ] Delete cloud account removes all account data.
+
+PROGRESS
+[ ] Coins, fruit, furniture, costumes, rooms, themes, focus stats,
+    selected hamster, and settings return on another device.
+[ ] Premium preview appears on both devices after sync.
+[ ] Home Screen app and Safari use the same account after recovery sign-in.
+[ ] Automatic save runs after game changes.
+
+ONLINE PROFILE
+[ ] One friend code remains attached to the account.
+[ ] Public and Unlisted visibility work.
+[ ] Remove from gallery changes the profile to Unlisted.
+[ ] Saved friends return on another device.
+[ ] Preset reactions work and can be removed.
+[ ] Report uses preset reasons only.
+[ ] Hide removes a profile from the user's gallery.
+[ ] Block removes it from gallery and saved friends.
+[ ] Free profiles expose no Premium rooms.
+
+ADMIN
+[ ] Wrong ADMIN_KEY cannot load reports.
+[ ] Correct ADMIN_KEY loads reports.
+[ ] Reviewed and Dismissed status filters work.
+[ ] Hide, Remove, and Restore profile controls work.
+
+DATABASE
+[ ] /api/health says databaseReady true and databaseMode postgres.
+[ ] Redeploying the web service does not erase cloud accounts.

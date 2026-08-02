@@ -13,7 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=19">
+<link rel="stylesheet" href="online.css?v=20">
+<link rel="stylesheet" href="cloud.css?v=20">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -816,7 +817,7 @@ body[data-theme="night"] .focus-warning{background:#5a4d2a;color:#fff}
 body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
 </style>
-<link rel="stylesheet" href="premium.css?v=19">
+<link rel="stylesheet" href="premium.css?v=20">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -829,7 +830,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
  </div>
 </header>
 <nav class="nav">
- <button class="active" data-page="home">Home</button><button data-page="focus">Focus</button><button data-page="fruit">Fruit</button><button data-page="furniture">Furniture</button><button data-page="hamsters">Hamsters</button><button data-page="clothing">Clothing</button><button data-page="settings">Settings</button><button data-page="online">Online</button>
+ <button class="active" data-page="home">Home</button><button data-page="focus">Focus</button><button data-page="fruit">Fruit</button><button data-page="furniture">Furniture</button><button data-page="hamsters">Hamsters</button><button data-page="clothing">Clothing</button><button data-page="settings">Settings</button><button data-page="account">Account</button><button data-page="online">Online</button>
 </nav>
 <main>
 <section id="homePage" class="page">
@@ -945,13 +946,113 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
  </div>
 </section>
 
+
+<section id="accountPage" class="page hidden">
+ <div class="cloud-heading">
+  <div>
+   <h2>Cloud Account</h2>
+   <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
+  </div>
+  <div class="cloud-chip-row">
+   <span class="cloud-chip">Build v20</span>
+   <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
+  </div>
+ </div>
+
+ <div id="cloudSetupWarning" class="cloud-warning hidden">
+  Cloud saving needs the Render PostgreSQL database to be connected. Offline play still works.
+ </div>
+
+ <div class="cloud-grid">
+  <section class="cloud-card">
+   <div class="cloud-card-heading">
+    <h3>My Hammy account</h3>
+    <span id="cloudAccountType" class="cloud-chip">Guest</span>
+   </div>
+   <p id="cloudAccountMessage" class="muted">Creating a safe guest account…</p>
+
+   <div class="cloud-identity">
+    <div>
+     <span>Player ID</span>
+     <strong id="cloudPlayerId">Not created yet</strong>
+    </div>
+    <button id="copyPlayerId" class="secondary" disabled>Copy</button>
+   </div>
+
+   <div class="cloud-identity recovery">
+    <div>
+     <span>Recovery code</span>
+     <strong id="cloudRecoveryCode">Not created yet</strong>
+    </div>
+    <button id="copyRecoveryCode" class="secondary" disabled>Copy</button>
+   </div>
+   <p class="cloud-secret-note">Keep the recovery code private. Anyone with both codes could restore this Hammy account.</p>
+
+   <div class="cloud-sync-status">
+    <div><span>Cloud revision</span><strong id="cloudRevision">0</strong></div>
+    <div><span>Last synced</span><strong id="cloudLastSync">Never</strong></div>
+    <div><span>Device</span><strong id="cloudDeviceName">This device</strong></div>
+   </div>
+
+   <div class="cloud-actions">
+    <button id="syncCloudNow" class="primary">Sync now</button>
+    <button id="copyAccountBackup" class="secondary" disabled>Copy account backup</button>
+   </div>
+  </section>
+
+  <section class="cloud-card">
+   <h3>Restore on another device</h3>
+   <p class="muted">Enter the Player ID and recovery code from your other device. The game will show a choice before replacing progress.</p>
+   <label class="cloud-label">Player ID
+    <input id="restorePlayerId" type="text" maxlength="20" autocomplete="off" autocapitalize="characters" placeholder="HF-ABCD-2345">
+   </label>
+   <label class="cloud-label">Recovery code
+    <input id="restoreRecoveryCode" type="text" maxlength="44" autocomplete="off" autocapitalize="characters" placeholder="MAPLE-RIVER-CLOUD-7K2P9M4Q">
+   </label>
+   <button id="restoreCloudAccount" class="primary cloud-wide">Sign in and compare saves</button>
+   <p id="restoreAccountMessage" class="muted"></p>
+  </section>
+ </div>
+
+ <section id="cloudConflictPanel" class="cloud-card cloud-conflict hidden">
+  <h3>Two different saves were found</h3>
+  <p id="cloudConflictSummary">Choose which progress should become the account’s current save.</p>
+  <div class="cloud-compare">
+   <div><strong>This device</strong><span id="localConflictSummary">Local progress</span></div>
+   <div><strong>Cloud</strong><span id="remoteConflictSummary">Cloud progress</span></div>
+  </div>
+  <div class="cloud-actions">
+   <button id="useCloudSave" class="primary">Use cloud save</button>
+   <button id="keepDeviceSave" class="secondary">Keep this device</button>
+   <button id="cancelCloudConflict" class="secondary">Decide later</button>
+  </div>
+ </section>
+
+ <section class="cloud-card" style="margin-top:12px">
+  <h3>Account and data controls</h3>
+  <p class="muted">These actions do not happen automatically and require confirmation.</p>
+  <div class="cloud-danger-grid">
+   <div>
+    <strong>Reset only this device</strong>
+    <p class="muted">Clears local progress and signs this device out. The cloud copy stays available.</p>
+    <button id="resetLocalHammy" class="secondary danger-button">Reset local data</button>
+   </div>
+   <div>
+    <strong>Delete the whole account</strong>
+    <p class="muted">Deletes cloud progress, profile, rooms, reactions, reports, and friend data.</p>
+    <button id="deleteCloudAccount" class="secondary danger-button">Delete cloud account</button>
+   </div>
+  </div>
+ </section>
+</section>
+
 <section id="onlinePage" class="page hidden">
  <div class="online-heading">
   <div>
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v19</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v20</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -979,7 +1080,8 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
     <button id="publishOnlineProfile" class="primary">Publish profile</button>
     <button id="copyFriendCode" class="secondary" disabled>Copy friend code</button>
     <button id="shareMyProfile" class="secondary" disabled>Share link</button>
-    <button id="deleteOnlineProfile" class="secondary danger-button" disabled>Remove online profile</button>
+    <button id="removeFromGallery" class="secondary" disabled>Remove from gallery</button>
+    <button id="deleteOnlineProfile" class="secondary danger-button" disabled>Delete online profile</button>
    </div>
    <div id="myFriendCodeBox" class="friend-code-box hidden">
     <span>Your friend code</span>
@@ -1003,7 +1105,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
  <section class="online-card" style="margin-top:12px">
   <div class="online-heading">
-   <div><h3>Saved friends</h3><p class="muted">Friends are stored on this device. There is no messaging or global player search.</p></div>
+   <div><h3>Saved friends</h3><p class="muted">Saved friends sync with your Hammy cloud account. There is no messaging or global player search.</p></div>
    <span id="friendCount" class="online-chip">0 friends</span>
   </div>
   <div id="onlineFriendsGrid" class="online-friends-grid"></div>
@@ -1135,7 +1237,7 @@ const furniture={
  castle:{name:"Hamster Castle",cost:150,placed:"castlePlaced",action:"Nibbles explores the castle"}
 };
 let tickleCount=0,tickleReset=0,running=false,timer=null,remaining=20,total=20,paused=false,focusActive=false,focusFailedByLeaving=false;
-function save(){localStorage.setItem("hammyV8",JSON.stringify(state))}
+function save(){localStorage.setItem("hammyV8",JSON.stringify(state));window.HammyCloud?.scheduleSave("game progress changed")}
 function say(text){$("status").textContent=text;$("roomMessage").textContent=text}
 function safeSkin(){if(!skins[state.skin]||(skins[state.skin].premium&&!state.premium))state.skin="white"}
 function getLootLevel(){return Math.min(20,1+Math.floor(state.totalFocusMinutes/120))}
@@ -1441,7 +1543,15 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=19"></script>
-<script src="online.js?v=19"></script>
-<script src="gallery.js?v=19"></script>
+<script src="premium.js?v=20"></script>
+<script src="cloud.js?v=20"></script>
+<script src="online.js?v=20"></script>
+<script src="gallery.js?v=20"></script>
+<script>
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("./service-worker.js?v=20").catch(error=>console.warn("Service worker registration failed",error));
+  });
+}
+</script>
 </body></html>

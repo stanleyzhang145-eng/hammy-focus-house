@@ -117,10 +117,12 @@
     chip.className="online-chip "+state;chip.textContent=label;
   }
   async function apiRequest(path,options={}){
+    const cloudHeaders=window.HammyCloud?.authHeaders?.()||{};
     const response=await fetch(apiUrl(path),{
       method:options.method||"GET",
-      headers:{"Content-Type":"application/json",...(options.headers||{})},
-      body:options.body?JSON.stringify(options.body):undefined,
+      headers:{"Content-Type":"application/json",...cloudHeaders,...(options.headers||{})},
+      body:options.body===undefined?undefined:JSON.stringify(options.body),
+      cache:"no-store",
       signal:options.signal
     });
     let data={};
@@ -133,8 +135,13 @@
     try{
       const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),5000);
       const result=await apiRequest("/api/health",{signal:controller.signal});clearTimeout(timeout);
+      if(result.databaseReady!==true){
+        setConnection("offline","Database setup needed");
+        if(showMessage)setStatus("The website is online, but Render PostgreSQL is not connected yet. Gallery demos still work.","error");
+        return false;
+      }
       setConnection("online","Online");
-      if(showMessage)setStatus(`Connected to ${result.name||"Hammy Friends server"}.`,"success");
+      if(showMessage)setStatus(`Connected to ${result.name||"Hammy Cloud server"}.`,"success");
       return true;
     }catch(error){
       setConnection("offline","Offline");
@@ -234,11 +241,12 @@
     let profile;
     try{profile=snapshotProfile()}catch{profile={nickname:onlineState.nickname||"HammyFan",skin:state.skin||"white",skinColors:currentSkinColors(),costume:currentCostumeName(),premium:Boolean(state.premium),stats:{practiceDays:state.practiceDays||0,streak:state.streak||0,lootLevel:typeof getLootLevel==="function"?getLootLevel():1}}}
     box.innerHTML=miniProfileMarkup(profile);
-    const hasCode=Boolean(onlineState.code&&onlineState.token);
+    const hasCode=Boolean(onlineState.code);
     el("myFriendCodeBox").classList.toggle("hidden",!hasCode);
     el("myFriendCode").textContent=onlineState.code||"--------";
     el("copyFriendCode").disabled=!hasCode;
     if(el("shareMyProfile"))el("shareMyProfile").disabled=!hasCode;
+    if(el("removeFromGallery"))el("removeFromGallery").disabled=!hasCode||onlineState.visibility!=="public";
     el("deleteOnlineProfile").disabled=!hasCode;
     el("publishOnlineProfile").textContent=hasCode?"Update shared profile":"Publish profile";
   }
@@ -323,9 +331,73 @@
       });
     });
   }
+  function reactionCounts(profile){
+    return {heart:0,star:0,cozy:0,creative:0,...(profile.reactions||{})};
+  }
+  function reactionMarkup(profile){
+    const counts=reactionCounts(profile);
+    const options=[
+      ["heart","♥","Heart"],["star","★","Star"],["cozy","⌂","Cozy"],["creative","✦","Creative"]
+    ];
+    return `<div class="reaction-strip">${options.map(([key,icon,label])=>
+      `<button class="reaction-button ${profile.myReaction===key?"selected":""}" data-reaction="${key}">${icon} ${label} <span>${clamp(counts[key],0,999999)}</span></button>`
+    ).join("")}</div>`;
+  }
+  async function saveFriendToCloud(profile){
+    if(profile.demo||!FRIEND_CODE.test(profile.code||""))return;
+    try{
+      await apiRequest("/api/friends",{method:"POST",body:{code:profile.code}});
+    }catch(error){
+      setStatus(error.message||"Could not save this friend to the cloud.","error");
+    }
+  }
+  async function updateReaction(profile,reaction){
+    if(!window.HammyCloud?.isSignedIn?.())return setStatus("Create or restore a cloud account before reacting.","error");
+    try{
+      const next=profile.myReaction===reaction?null:reaction;
+      const data=await apiRequest(`/api/profiles/${profile.code}/reaction`,{method:"POST",body:{reaction:next}});
+      showProfile(data.profile,false);
+      setStatus(next?"Reaction saved.":"Reaction removed.","success");
+      window.dispatchEvent(new CustomEvent("hammy-profile-updated",{detail:{profile:data.profile}}));
+    }catch(error){setStatus(error.message||"Could not save the reaction.","error")}
+  }
+  async function reportProfile(profile,reason){
+    try{
+      await apiRequest(`/api/profiles/${profile.code}/report`,{method:"POST",body:{reason}});
+      setStatus("Report sent to the moderation list. Thank you.","success");
+    }catch(error){setStatus(error.message||"Could not send the report.","error")}
+  }
+  async function filterProfile(profile,kind){
+    const action=kind==="block"?"block":"hide";
+    if(kind==="block"&&!confirm(`Block ${profile.nickname}? Their profile will disappear from your gallery and saved-friend list.`))return;
+    try{
+      await apiRequest(`/api/profiles/${profile.code}/${action}`,{method:"POST",body:{}});
+      if(kind==="block"){
+        onlineState.friends=onlineState.friends.filter(code=>code!==profile.code);
+        onlineState.cachedFriends=(onlineState.cachedFriends||[]).filter(item=>item.code!==profile.code);
+        saveOnline();renderFriends();
+      }
+      el("onlineProfileModal").classList.add("hidden");
+      window.dispatchEvent(new CustomEvent("hammy-profile-filtered",{detail:{code:profile.code}}));
+      setStatus(kind==="block"?"Profile blocked.":"Profile hidden from your gallery.","success");
+    }catch(error){setStatus(error.message||`Could not ${action} the profile.`,"error")}
+  }
+  function bindProfileActions(content,profile){
+    content.querySelectorAll("[data-reaction]").forEach(button=>{
+      button.addEventListener("click",()=>updateReaction(profile,button.dataset.reaction));
+    });
+    const report=content.querySelector("#reportViewedProfile");
+    if(report)report.addEventListener("click",()=>{
+      const reason=content.querySelector("#profileReportReason")?.value||"other";
+      reportProfile(profile,reason);
+    });
+    content.querySelector("#hideViewedProfile")?.addEventListener("click",()=>filterProfile(profile,"hide"));
+    content.querySelector("#blockViewedProfile")?.addEventListener("click",()=>filterProfile(profile,"block"));
+  }
   function showProfile(profile,saveFriend=false){
     const modal=el("onlineProfileModal"),content=el("onlineModalContent");
     const stats=profile.stats||{},premiumRooms=premiumRoomsFor(profile);
+    const own=Boolean(onlineState.code&&profile.code===onlineState.code);
     el("onlineModalTitle").textContent=`${profile.nickname||"Hammy Friend"}'s profile`;
     content.innerHTML=`<div id="onlineProfileSummary">${miniProfileMarkup(profile)}</div>
       ${premiumRooms.length?'<p class="premium-avatar-hint">Tap either hamster avatar—the profile picture or the hamster inside the Home room—to visit this player’s Premium rooms.</p>':""}
@@ -337,37 +409,60 @@
       </div>
       <h3 style="margin-top:13px">Normal Home Room</h3>
       ${baseMarkup(profile,homeBaseFor(profile))}
-      <p class="muted" style="margin-top:8px">Updated ${profile.demo?"in demo mode":new Date(profile.updatedAt||Date.now()).toLocaleDateString()} · No chat or private information is shared.</p>`;
+      ${profile.demo?"":`<h3 style="margin-top:13px">Preset reactions</h3>${reactionMarkup(profile)}`}
+      ${profile.demo||own?"":`<div class="profile-safety-panel">
+       <strong>Safety controls</strong>
+       <p class="muted">There is no chat or custom report message.</p>
+       <div class="profile-safety-actions">
+        <select id="profileReportReason" aria-label="Report reason">
+         <option value="inappropriate_nickname">Inappropriate nickname</option>
+         <option value="personal_information">Personal information</option>
+         <option value="unsafe_content">Unsafe content</option>
+         <option value="spam">Spam</option>
+         <option value="other">Other preset reason</option>
+        </select>
+        <button id="reportViewedProfile" class="secondary">Report</button>
+        <button id="hideViewedProfile" class="secondary">Hide</button>
+        <button id="blockViewedProfile" class="secondary danger-button">Block</button>
+       </div>
+      </div>`}
+      <p class="muted" style="margin-top:8px">Updated ${profile.demo?"in demo mode":new Date(profile.updatedAt||Date.now()).toLocaleDateString()} · No chat, age, school, contact, or location details are shared.</p>`;
     attachPremiumAvatarAction(content,profile);
+    bindProfileActions(content,profile);
     modal.classList.remove("hidden");
     if(saveFriend&&!profile.demo&&FRIEND_CODE.test(profile.code||"")){
       if(!onlineState.friends.includes(profile.code))onlineState.friends.push(profile.code);
+      onlineState.cachedFriends=[...(onlineState.cachedFriends||[]).filter(item=>item.code!==profile.code),profile];
       onlineState.friends=onlineState.friends.slice(-30);
-      saveOnline();renderFriends();
+      saveOnline();renderFriends();saveFriendToCloud(profile);
     }
   }
 
   window.HammyOnlineRooms={
     showPremiumRooms,
+    showProfile,
     premiumRoomsFor,
     homeBaseFor,
-    baseMarkup
+    baseMarkup,
+    apiRequest
   };
 
   async function publishProfile(){
     try{
       const connected=await checkConnection(false);
-      if(!connected)throw new Error("Connect the Hammy server before publishing.");
+      if(!connected)throw new Error("Connect the Hammy cloud database before publishing.");
+      await window.HammyCloud?.ensureAccount?.();
+      if(!window.HammyCloud?.isSignedIn?.())throw new Error("Create or restore a cloud account first.");
       const profile=snapshotProfile();
       setStatus("Publishing your safe hamster profile…");
-      const data=await apiRequest("/api/profile",{
-        method:"POST",
-        headers:onlineState.token?{"X-Profile-Token":onlineState.token}:{},
-        body:{code:onlineState.code||undefined,profile}
-      });
-      onlineState.code=data.code;onlineState.token=data.token||onlineState.token;
-      onlineState.visibility=profile.visibility;saveOnline();
-      renderMyPreview();setStatus(`Profile published. Your friend code is ${data.code}.`,"success");
+      const data=await apiRequest("/api/profile",{method:"POST",body:{profile}});
+      onlineState.code=data.code;
+      onlineState.token=null;
+      onlineState.visibility=profile.visibility;
+      onlineState.nickname=profile.nickname;
+      saveOnline();
+      renderMyPreview();
+      setStatus(`Profile published. Your friend code is ${data.code}.`,"success");
     }catch(error){setStatus(error.message||"Could not publish the profile.","error")}
   }
   async function fetchProfile(code){
@@ -388,16 +483,25 @@
     }catch(error){setStatus(error.message||"Profile not found.","error")}
   }
   async function refreshFriends(){
-    if(!onlineState.friends.length){renderFriends();return}
     setStatus("Refreshing saved Hammy friends…");
-    const results=[];
-    for(const code of [...onlineState.friends]){
-      try{
-        const profile=await fetchProfile(code);profile.code=code;results.push(profile);
-      }catch{}
-    }
-    onlineState.cachedFriends=results;saveOnline();renderFriends();
-    setStatus(`Refreshed ${results.length} friend profile${results.length===1?"":"s"}.`,"success");
+    try{
+      if(window.HammyCloud?.isSignedIn?.()){
+        const data=await apiRequest("/api/friends");
+        const real=Array.isArray(data.profiles)?data.profiles:[];
+        const demos=demoProfiles.filter(profile=>onlineState.friends.includes(profile.code));
+        onlineState.cachedFriends=[...real,...demos];
+        onlineState.friends=[...new Set([...real.map(profile=>profile.code),...demos.map(profile=>profile.code)])];
+        saveOnline();renderFriends();
+        setStatus(`Refreshed ${real.length} cloud friend profile${real.length===1?"":"s"}.`,"success");
+        return;
+      }
+      const results=[];
+      for(const code of [...onlineState.friends]){
+        try{const profile=await fetchProfile(code);profile.code=code;results.push(profile)}catch{}
+      }
+      onlineState.cachedFriends=results;saveOnline();renderFriends();
+      setStatus(`Refreshed ${results.length} local friend profile${results.length===1?"":"s"}.`,"success");
+    }catch(error){setStatus(error.message||"Could not refresh saved friends.","error")}
   }
   function renderFriends(){
     const grid=el("onlineFriendsGrid");if(!grid)return;grid.innerHTML="";
@@ -418,8 +522,13 @@
       card.innerHTML=miniProfileMarkup(profile);
       const actions=document.createElement("div");actions.className="online-actions";
       const view=document.createElement("button");view.className="primary";view.textContent="View base";view.addEventListener("click",()=>showProfile(profile,false));
-      const remove=document.createElement("button");remove.className="secondary";remove.textContent="Remove";remove.addEventListener("click",()=>{
-        onlineState.friends=onlineState.friends.filter(code=>code!==profile.code);saveOnline();renderFriends();
+      const remove=document.createElement("button");remove.className="secondary";remove.textContent="Remove";remove.addEventListener("click",async()=>{
+        onlineState.friends=onlineState.friends.filter(code=>code!==profile.code);
+        onlineState.cachedFriends=(onlineState.cachedFriends||[]).filter(item=>item.code!==profile.code);
+        saveOnline();renderFriends();
+        if(!profile.demo&&window.HammyCloud?.isSignedIn?.()){
+          try{await apiRequest(`/api/friends/${profile.code}`,{method:"DELETE"})}catch{}
+        }
       });
       actions.append(view,remove);card.appendChild(actions);grid.appendChild(card);
     });
@@ -442,13 +551,27 @@
       setStatus("Copy was blocked, so the code was placed in the friend-code box.","error");
     }
   }
-  async function deleteProfile(){
-    if(!onlineState.code||!onlineState.token)return;
+  async function removeFromGallery(){
+    if(!onlineState.code)return;
     try{
-      await apiRequest(`/api/profile/${onlineState.code}`,{method:"DELETE",headers:{"X-Profile-Token":onlineState.token}});
-      onlineState.code=null;onlineState.token=null;saveOnline();renderMyPreview();
-      setStatus("Your online profile was removed. Local game progress was not changed.","success");
-    }catch(error){setStatus(error.message||"Could not remove the online profile.","error")}
+      const data=await apiRequest("/api/profile/visibility",{method:"PATCH",body:{visibility:"unlisted"}});
+      onlineState.visibility="unlisted";
+      el("onlineVisibility").value="unlisted";
+      saveOnline();renderMyPreview();
+      setStatus("Your profile is now unlisted and has been removed from the public gallery.","success");
+      window.dispatchEvent(new CustomEvent("hammy-gallery-refresh"));
+    }catch(error){setStatus(error.message||"Could not remove the profile from the gallery.","error")}
+  }
+  async function deleteProfile(){
+    if(!onlineState.code)return;
+    if(!confirm("Delete your shared online profile and friend code? Your cloud game save will remain."))return;
+    try{
+      await apiRequest("/api/profile",{method:"DELETE",body:{}});
+      onlineState.code=null;onlineState.token=null;onlineState.visibility="unlisted";
+      saveOnline();renderMyPreview();
+      setStatus("Your online profile was deleted. Cloud game progress was not changed.","success");
+      window.dispatchEvent(new CustomEvent("hammy-gallery-refresh"));
+    }catch(error){setStatus(error.message||"Could not delete the online profile.","error")}
   }
   function saveServer(){
     onlineState.apiUrl=String(el("onlineServerUrl").value||"").trim().replace(/\/+$/,"");
@@ -463,6 +586,7 @@
     el("onlineNickname").addEventListener("input",()=>{onlineState.nickname=el("onlineNickname").value;saveOnline();renderMyPreview()});
     el("publishOnlineProfile").addEventListener("click",publishProfile);
     el("copyFriendCode").addEventListener("click",copyCode);
+    el("removeFromGallery").addEventListener("click",removeFromGallery);
     el("deleteOnlineProfile").addEventListener("click",deleteProfile);
     el("viewFriendCode").addEventListener("click",viewCode);
     el("refreshFriends").addEventListener("click",refreshFriends);
@@ -472,6 +596,19 @@
     el("closeOnlineModal").addEventListener("click",()=>el("onlineProfileModal").classList.add("hidden"));
     el("onlineProfileModal").addEventListener("click",e=>{if(e.target===el("onlineProfileModal"))el("onlineProfileModal").classList.add("hidden")});
     document.querySelector('[data-page="online"]')?.addEventListener("click",()=>{renderMyPreview();renderFriends();checkConnection(false)});
+    window.addEventListener("hammy-cloud-account",event=>{
+      const profile=event.detail?.profile;
+      if(profile){
+        onlineState.code=profile.code;
+        onlineState.nickname=profile.nickname||onlineState.nickname;
+        onlineState.visibility=profile.visibility||"unlisted";
+        onlineState.token=null;
+        saveOnline();
+        el("onlineNickname").value=onlineState.nickname;
+        el("onlineVisibility").value=onlineState.visibility;
+        renderMyPreview();
+      }
+    });
     renderMyPreview();renderFriends();checkConnection(false);
   }
   init();

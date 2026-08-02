@@ -1,13 +1,15 @@
-const CACHE="hammy-v19";
+const CACHE="hammy-v20";
 const CORE=[
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./premium.css?v=19",
-  "./premium.js?v=19",
-  "./online.css?v=19",
-  "./online.js?v=19",
-  "./gallery.js?v=19",
+  "./premium.css?v=20",
+  "./premium.js?v=20",
+  "./online.css?v=20",
+  "./cloud.css?v=20",
+  "./cloud.js?v=20",
+  "./online.js?v=20",
+  "./gallery.js?v=20",
   "./apple-touch-icon.png",
   "./icon-192.png",
   "./icon-512.png",
@@ -51,12 +53,10 @@ self.addEventListener("fetch",event=>{
   if(request.method!=="GET")return;
   const url=new URL(request.url);
   if(url.origin!==self.location.origin)return;
+  if(url.pathname.startsWith("/api/"))return;
 
-  const isUpdateFile=
-    request.mode==="navigate" ||
-    /\.(?:html|js|css)$/.test(url.pathname);
-
-  if(isUpdateFile){
+  const updateFile=request.mode==="navigate"||/\.(?:html|js|css)$/.test(url.pathname);
+  if(updateFile){
     event.respondWith(networkFirst(request));
     return;
   }

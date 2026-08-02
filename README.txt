@@ -181,3 +181,34 @@ VERSION 19 — AVATAR TAP AND CACHE FIX
 - Replaced cache-first service-worker behavior with network-first loading for HTML, JavaScript, and CSS.
 - The new service worker activates immediately, removes old Hammy caches, and takes control of open pages.
 - This fixes cases where Render was updated but the Home Screen app kept showing v17 or v18.
+
+
+VERSION 20 — CLOUD ACCOUNTS, POSTGRES SAVING, AND GALLERY SAFETY
+- Creates a guest cloud account automatically when PostgreSQL is connected.
+- Gives each account a unique Player ID and private recovery code.
+- Restores the same account on another device without requiring email.
+- Syncs coins, fruit, furniture, costumes, rooms, themes, selected hamster,
+  settings, focus statistics, Premium preview status, and other game state.
+- Adds automatic cloud saving after existing local save events.
+- Adds Sync now, Last synced, Cloud revision, and connection indicators.
+- Adds revision conflict protection. Older devices cannot silently overwrite
+  newer progress; the player chooses Cloud or This Device.
+- Adds local reset and complete cloud-account deletion controls.
+- Keeps one online profile and friend code attached to the cloud account.
+- Syncs saved friends through the account.
+- Replaces server-data/profiles.json with PostgreSQL.
+- Adds Users, UserSessions, CloudSaves, Profiles, NormalHomeRooms,
+  PremiumRooms, FriendCodes, SavedFriends, Reports, Blocks, HiddenProfiles,
+  Reactions, and PremiumEntitlements tables.
+- Adds preset Heart, Star, Cozy, and Creative reactions.
+- Adds preset-only reporting, Hide, Block, and Remove from Gallery controls.
+- Adds stronger nickname filtering for links, contact details, and unsafe words.
+- Adds admin.html for reviewing reports and hiding, removing, or restoring profiles.
+- Does not add chat, comments, custom report messages, ages, schools,
+  emails, contact details, or location sharing.
+
+IMPORTANT V20 LIMITS
+- Real paid Premium still needs Apple/Google receipt verification.
+  This build synchronizes the existing Premium preview only.
+- PostgreSQL is required for reliable public accounts and profiles.
+- Free database plans may have expiration or backup limits.

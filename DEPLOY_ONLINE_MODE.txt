@@ -1,27 +1,45 @@
-HAMMY FRIENDS ONLINE — DEPLOYMENT
+HAMMY FOCUS HOUSE V20 — ONLINE AND CLOUD DEPLOYMENT
 
-WHAT IS INCLUDED
-- The website game.
-- server.js: a small Node server with no third-party packages.
-- Friend-code profile publishing and viewing.
-- Public hamster stats and base snapshots.
-- No chat, email, age, location, task history, or global player search.
-- Profile update/delete protected by a secret token stored on the owner's device.
+This file replaces the older JSON-file deployment instructions.
 
-LOCAL TEST
-1. Install Node.js 18 or newer.
-2. Open a terminal in this folder.
-3. Run: npm start
-4. Open: http://localhost:8080
+The v20 server does NOT save profiles in server-data/profiles.json.
+All long-term data is stored in PostgreSQL through DATABASE_URL.
 
-PUBLIC HOSTING
-The Online mode needs a host that can run a Node server and keep the server-data folder.
-Static-only hosts such as itch.io or basic GitHub Pages cannot run server.js.
+START HERE
+Read:
+RENDER_POSTGRES_SETUP.txt
 
-When the game and server use the same address, leave Online > Server address blank.
-When the game is on a separate static host, deploy server.js elsewhere and enter that server's HTTPS address in Online > Server setup.
+REQUIRED GITHUB FILES
+- index.html
+- premium.js and premium.css
+- cloud.js and cloud.css
+- online.js and online.css
+- gallery.js
+- server.js
+- db.js
+- schema.sql
+- package.json
+- admin.html, admin.js, admin.css
+- service-worker.js
+- manifest and icon files
 
-IMPORTANT FOR A PUBLIC RELEASE
-- The included JSON-file server is suitable for a small private test.
-- A larger public release should use a managed database, backups, abuse monitoring, HTTPS, and stronger moderation.
-- Do not add chat, real names, ages, schools, addresses, email addresses, or location sharing.
+RENDER WEB SERVICE
+Build command:
+npm install
+
+Start command:
+npm start
+
+REQUIRED ENVIRONMENT VARIABLES
+DATABASE_URL = Render PostgreSQL connection URL
+ADMIN_KEY = long private random value
+ALLOW_PREMIUM_PREVIEW = true while testing the current Premium preview
+
+VERIFY
+Open /api/health and confirm:
+- version: 20
+- databaseReady: true
+- databaseMode: postgres
+
+The game remains playable offline, but accounts, gallery publishing,
+reactions, reports, blocking, and cloud sync require the server and database.
