@@ -35,3 +35,15 @@ Initial code:
 
 The database records each account and redeemed code in
 `reward_code_redemptions`.
+
+
+## Version 22 — Top Secret Admin Access
+
+- Tap the **Build v22** badge seven times on the Account page.
+- A hidden Top Secret Admin Access section appears.
+- The private code is verified only by the server.
+- The code is never stored in HTML or browser JavaScript.
+- Successful login creates a signed admin session lasting 30 minutes.
+- Five incorrect attempts temporarily lock admin login for 15 minutes.
+- The one-click Render Blueprint generates `ADMIN_ACCESS_CODE` automatically.
+- `admin.html` uses the same secure login and supports manual locking.

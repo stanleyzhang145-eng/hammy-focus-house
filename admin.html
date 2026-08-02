@@ -3,24 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#8b63d9">
-<title>Hammy Moderation</title>
-<link rel="stylesheet" href="admin.css?v=21">
+<meta name="theme-color" content="#33273e">
+<title>Hammy Top Secret Admin</title>
+<link rel="stylesheet" href="admin.css?v=22">
 </head>
 <body>
 <main class="admin-shell">
  <header>
   <div>
-   <h1>Hammy Gallery Moderation</h1>
-   <p>Review preset reports. No chat or custom report text is collected.</p>
+   <h1>Hammy Top Secret Admin</h1>
+   <p>Private moderation tools. Admin sessions expire automatically.</p>
   </div>
-  <span class="build">Build v21</span>
+  <span class="build">Build v22</span>
  </header>
 
- <section class="panel">
-  <label>Admin key
-   <input id="adminKey" type="password" autocomplete="off" placeholder="Paste the Render ADMIN_KEY">
+ <section id="adminLoginPanel" class="panel admin-login-panel">
+  <div class="admin-lock">🔐</div>
+  <label>Top secret admin code
+   <input id="adminCode" type="password" autocomplete="off" maxlength="160"
+    placeholder="Enter private admin code">
   </label>
+  <button id="adminLogin">Unlock panel</button>
+  <a class="back-link" href="./">Return to Hammy</a>
+ </section>
+
+ <section id="adminToolsPanel" class="panel hidden">
   <label>Report status
    <select id="reportStatus">
     <option value="open">Open</option>
@@ -29,13 +36,14 @@
     <option value="all">All</option>
    </select>
   </label>
-  <button id="loadReports">Load reports</button>
-  <button id="forgetAdminKey" class="secondary">Forget key</button>
+  <button id="loadReports">Refresh reports</button>
+  <button id="adminLogout" class="secondary">Lock admin panel</button>
+  <a class="back-link" href="./">Return to Hammy</a>
  </section>
 
- <div id="adminMessage" class="message">Enter the private ADMIN_KEY from Render.</div>
+ <div id="adminMessage" class="message">Enter the private top secret code.</div>
  <section id="reportList" class="report-list"></section>
 </main>
-<script src="admin.js?v=21"></script>
+<script src="admin.js?v=22"></script>
 </body>
 </html>

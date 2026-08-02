@@ -104,3 +104,57 @@
   .reward-code-entry{grid-template-columns:1fr}
   .reward-code-entry button{width:100%}
 }
+
+
+/* Hammy Focus House v22 — Top Secret Admin */
+.secret-build-trigger{
+  font:inherit;
+  color:var(--ink);
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none
+}
+.secret-build-trigger:active{transform:translateY(1px)}
+.secret-admin-card{
+  border-color:#4d385f;
+  background:
+    radial-gradient(circle at 92% 12%,rgba(255,216,95,.23),transparent 130px),
+    linear-gradient(135deg,#33273e,#5c4270);
+  color:#fff;
+  position:relative;
+  overflow:hidden
+}
+.secret-admin-card .muted{color:#eadff2}
+.secret-admin-card .cloud-label input{
+  background:#fff;
+  color:#30243a
+}
+.secret-admin-heading{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center
+}
+.secret-lock{
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:62px;
+  height:62px;
+  border:3px solid #f6d96f;
+  border-radius:18px;
+  background:#211a29;
+  font-size:2rem;
+  box-shadow:0 0 0 5px rgba(246,217,111,.12)
+}
+.secret-admin-message{
+  margin-top:10px;
+  padding:10px 12px;
+  border:2px dashed #d9c5e5;
+  border-radius:12px;
+  background:rgba(255,255,255,.09);
+  font-weight:900
+}
+.secret-admin-message.success{background:#275c3d}
+.secret-admin-message.error{background:#7d2d3d}
+.secret-admin-message.working{background:#6c5522}

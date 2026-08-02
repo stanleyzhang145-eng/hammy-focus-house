@@ -33,6 +33,8 @@ const unsafeNicknamePatterns=[
   /\b(?:fuck|shit|bitch|cunt|nigger|nigga|porn|sex)\b/i
 ];
 const rateMap=new Map();
+const adminLoginMap=new Map();
+const ADMIN_SESSION_SECONDS=30*60;
 let databaseReady=false;
 let databaseError=null;
 
@@ -56,6 +58,74 @@ function normalizePlayerId(value){return String(value||"").toUpperCase().replace
 function normalizeRecovery(value){return String(value||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function normalizeCode(value){return String(value||"").toUpperCase().replace(/[^A-Z2-9]/g,"").slice(0,8)}
 function normalizeRewardCode(value){return String(value||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,24)}
+
+
+function safeEqual(left,right){
+  const a=Buffer.from(String(left||""));
+  const b=Buffer.from(String(right||""));
+  if(a.length!==b.length)return false;
+  return crypto.timingSafeEqual(a,b);
+}
+function adminSecret(){
+  return String(process.env.ADMIN_ACCESS_CODE||process.env.ADMIN_KEY||"");
+}
+function encodeBase64Url(value){
+  return Buffer.from(value).toString("base64url");
+}
+function signAdminPayload(payloadText){
+  return crypto.createHmac("sha256",adminSecret()).update(payloadText).digest("base64url");
+}
+function createAdminSession(){
+  const payload={
+    role:"hammy-admin",
+    issuedAt:Date.now(),
+    expiresAt:Date.now()+(ADMIN_SESSION_SECONDS*1000),
+    nonce:crypto.randomBytes(12).toString("base64url")
+  };
+  const encoded=encodeBase64Url(JSON.stringify(payload));
+  return `${encoded}.${signAdminPayload(encoded)}`;
+}
+function verifyAdminSession(token){
+  const parts=String(token||"").split(".");
+  if(parts.length!==2||!adminSecret())return false;
+  const [encoded,signature]=parts;
+  const expected=signAdminPayload(encoded);
+  if(!safeEqual(signature,expected))return false;
+  try{
+    const payload=JSON.parse(Buffer.from(encoded,"base64url").toString("utf8"));
+    return payload.role==="hammy-admin"&&Number(payload.expiresAt)>Date.now();
+  }catch{return false}
+}
+function adminAuthorized(req){
+  const directKey=String(req.headers["x-admin-key"]||"");
+  if(directKey&&adminSecret()&&safeEqual(directKey,adminSecret()))return true;
+  const explicitSession=String(req.headers["x-admin-session"]||"");
+  const authorization=String(req.headers.authorization||"");
+  const bearer=authorization.startsWith("Bearer ")?authorization.slice(7).trim():"";
+  return verifyAdminSession(explicitSession||bearer);
+}
+function adminLoginLimited(req){
+  const ip=req.socket.remoteAddress||"unknown";
+  const current=Date.now();
+  const windowMs=15*60*1000;
+  const entry=adminLoginMap.get(ip);
+  if(!entry||current-entry.start>windowMs){
+    adminLoginMap.set(ip,{start:current,failures:0,blockedUntil:0});
+    return false;
+  }
+  return Number(entry.blockedUntil||0)>current;
+}
+function recordAdminFailure(req){
+  const ip=req.socket.remoteAddress||"unknown";
+  const current=Date.now();
+  const entry=adminLoginMap.get(ip)||{start:current,failures:0,blockedUntil:0};
+  entry.failures++;
+  if(entry.failures>=5)entry.blockedUntil=current+(15*60*1000);
+  adminLoginMap.set(ip,entry);
+}
+function clearAdminFailures(req){
+  adminLoginMap.delete(req.socket.remoteAddress||"unknown");
+}
 
 function json(res,status,data,extraHeaders={}){
   const body=JSON.stringify(data);
@@ -267,17 +337,17 @@ async function handleApi(req,res,url){
     if(!databaseReady){
       return json(res,503,{
         ok:false,
-        version:21,
+        version:22,
         databaseReady:false,
         error:String(databaseError?.message||"Database is not ready.")
       });
     }
-    return json(res,200,{ok:true,version:21,databaseReady:true,databaseMode:db.mode()});
+    return json(res,200,{ok:true,version:22,databaseReady:true,databaseMode:db.mode()});
   }
 
   if(req.method==="GET"&&url.pathname==="/api/health"){
     return json(res,200,{
-      ok:true,name:"Hammy Cloud server",version:21,
+      ok:true,name:"Hammy Cloud server",version:22,
       databaseReady,databaseMode:databaseReady?db.mode():"not-configured",
       setupRequired:!databaseReady,
       databaseError:databaseReady?null:String(databaseError?.message||"DATABASE_URL is missing")
@@ -516,11 +586,39 @@ async function handleApi(req,res,url){
     return json(res,200,{hidden:true});
   }
 
+
+  if(req.method==="POST"&&url.pathname==="/api/admin/login"){
+    requireDatabase();
+    if(adminLoginLimited(req)){
+      return json(res,429,{error:"Too many incorrect attempts. Admin access is temporarily locked."});
+    }
+    const body=await parseBody(req);
+    const submitted=String(body.code||"").trim();
+    const secret=adminSecret();
+    if(!secret){
+      return json(res,503,{error:"ADMIN_ACCESS_CODE is not configured."});
+    }
+    if(!submitted||!safeEqual(submitted,secret)){
+      recordAdminFailure(req);
+      return json(res,401,{error:"The top secret admin code is incorrect."});
+    }
+    clearAdminFailures(req);
+    return json(res,200,{
+      authenticated:true,
+      sessionToken:createAdminSession(),
+      expiresInSeconds:ADMIN_SESSION_SECONDS
+    });
+  }
+
+  if(req.method==="GET"&&url.pathname==="/api/admin/session"){
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing or expired."});
+    return json(res,200,{authenticated:true,expiresInSeconds:ADMIN_SESSION_SECONDS});
+  }
+
   if(url.pathname==="/api/admin/reports"&&req.method==="GET"){
     requireDatabase();
-    const adminKey=String(req.headers["x-admin-key"]||"");
-    if(!process.env.ADMIN_KEY)return json(res,503,{error:"ADMIN_KEY is not configured."});
-    if(!adminKey||adminKey!==process.env.ADMIN_KEY)return json(res,401,{error:"Admin key is incorrect."});
+    if(!adminSecret())return json(res,503,{error:"ADMIN_ACCESS_CODE is not configured."});
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
     const status=["open","reviewed","dismissed","all"].includes(url.searchParams.get("status"))?url.searchParams.get("status"):"open";
     return json(res,200,{reports:await db.listReports(status)});
   }
@@ -528,8 +626,8 @@ async function handleApi(req,res,url){
   const adminReportMatch=url.pathname.match(/^\/api\/admin\/reports\/(\d+)$/);
   if(adminReportMatch&&req.method==="PATCH"){
     requireDatabase();
-    const adminKey=String(req.headers["x-admin-key"]||"");
-    if(!process.env.ADMIN_KEY||adminKey!==process.env.ADMIN_KEY)return json(res,401,{error:"Admin key is incorrect."});
+    if(!adminSecret())return json(res,503,{error:"ADMIN_ACCESS_CODE is not configured."});
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
     const body=await parseBody(req);
     const status=["reviewed","dismissed","open"].includes(body.status)?body.status:"reviewed";
     const report=await db.setReportStatus(Number(adminReportMatch[1]),status);
@@ -539,8 +637,8 @@ async function handleApi(req,res,url){
   const adminProfileMatch=url.pathname.match(/^\/api\/admin\/profiles\/([A-Z2-9]{8})$/);
   if(adminProfileMatch&&req.method==="PATCH"){
     requireDatabase();
-    const adminKey=String(req.headers["x-admin-key"]||"");
-    if(!process.env.ADMIN_KEY||adminKey!==process.env.ADMIN_KEY)return json(res,401,{error:"Admin key is incorrect."});
+    if(!adminSecret())return json(res,503,{error:"ADMIN_ACCESS_CODE is not configured."});
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
     const body=await parseBody(req);
     const status=["active","hidden","removed"].includes(body.status)?body.status:"hidden";
     const profile=await db.moderateProfile(adminProfileMatch[1],status);
@@ -573,5 +671,5 @@ const server=http.createServer(async(req,res)=>{
     databaseReady=false;databaseError=error;
     console.error("Cloud database setup incomplete:",error.message);
   }
-  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v21 running at http://${HOST}:${PORT}`));
+  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v22 running at http://${HOST}:${PORT}`));
 })();

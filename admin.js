@@ -1,7 +1,8 @@
 "use strict";
 (() => {
   const el=id=>document.getElementById(id);
-  const keyName="hammyAdminKeyV1";
+  const sessionKey="hammyAdminSessionV1";
+  const expiryKey="hammyAdminSessionExpiresV1";
   const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const reasonLabels={
     inappropriate_nickname:"Inappropriate nickname",
@@ -13,26 +14,82 @@
   function message(text,type=""){
     const box=el("adminMessage");box.textContent=text;box.className=`message${type?" "+type:""}`;
   }
-  function adminKey(){return el("adminKey").value.trim()}
-  async function api(path,options={}){
+  function sessionToken(){
+    const expires=Number(sessionStorage.getItem(expiryKey)||0);
+    if(!expires||expires<=Date.now()){
+      sessionStorage.removeItem(sessionKey);
+      sessionStorage.removeItem(expiryKey);
+      return "";
+    }
+    return sessionStorage.getItem(sessionKey)||"";
+  }
+  function showLogin(){
+    el("adminLoginPanel").classList.remove("hidden");
+    el("adminToolsPanel").classList.add("hidden");
+    el("reportList").innerHTML="";
+  }
+  function showTools(){
+    el("adminLoginPanel").classList.add("hidden");
+    el("adminToolsPanel").classList.remove("hidden");
+  }
+  function logout(messageText="Admin panel locked."){
+    sessionStorage.removeItem(sessionKey);
+    sessionStorage.removeItem(expiryKey);
+    showLogin();
+    message(messageText);
+  }
+  async function publicApi(path,options={}){
     const response=await fetch(path,{
       method:options.method||"GET",
-      headers:{"Content-Type":"application/json","X-Admin-Key":adminKey()},
+      headers:{"Content-Type":"application/json"},
       body:options.body===undefined?undefined:JSON.stringify(options.body),
       cache:"no-store"
     });
     let data={};try{data=await response.json()}catch{}
-    if(!response.ok)throw new Error(data.error||`Server error ${response.status}`);
+    if(!response.ok){const error=new Error(data.error||`Server error ${response.status}`);error.status=response.status;throw error}
     return data;
   }
+  async function adminApi(path,options={}){
+    const token=sessionToken();
+    if(!token){logout("Your admin session expired. Enter the code again.");throw new Error("Admin session expired.")}
+    const response=await fetch(path,{
+      method:options.method||"GET",
+      headers:{"Content-Type":"application/json","X-Admin-Session":token},
+      body:options.body===undefined?undefined:JSON.stringify(options.body),
+      cache:"no-store"
+    });
+    let data={};try{data=await response.json()}catch{}
+    if(!response.ok){
+      if(response.status===401)logout("Your admin session expired or is invalid.");
+      const error=new Error(data.error||`Server error ${response.status}`);error.status=response.status;throw error
+    }
+    return data;
+  }
+  async function login(){
+    const code=String(el("adminCode").value||"");
+    if(!code)return message("Enter the top secret admin code.","error");
+    el("adminLogin").disabled=true;
+    message("Checking the top secret code…");
+    try{
+      const result=await publicApi("/api/admin/login",{method:"POST",body:{code}});
+      sessionStorage.setItem(sessionKey,result.sessionToken);
+      sessionStorage.setItem(expiryKey,String(Date.now()+(Number(result.expiresInSeconds||1800)*1000)));
+      el("adminCode").value="";
+      showTools();
+      message("Admin panel unlocked. Session expires automatically.","success");
+      await load();
+    }catch(error){
+      message(error.message||"The admin code is incorrect.","error");
+    }finally{el("adminLogin").disabled=false}
+  }
   async function updateReport(id,status){
-    await api(`/api/admin/reports/${id}`,{method:"PATCH",body:{status}});
+    await adminApi(`/api/admin/reports/${id}`,{method:"PATCH",body:{status}});
     await load();
   }
   async function moderate(code,status){
-    const label=status==="removed"?"permanently remove":"hide";
+    const label=status==="removed"?"permanently remove":status==="hidden"?"hide":"restore";
     if(!confirm(`${label} profile ${code}?`))return;
-    await api(`/api/admin/profiles/${code}`,{method:"PATCH",body:{status}});
+    await adminApi(`/api/admin/profiles/${code}`,{method:"PATCH",body:{status}});
     message(`Profile ${code} changed to ${status}.`,"success");
     await load();
   }
@@ -51,14 +108,13 @@
        <p style="margin-top:9px">Submitted ${new Date(report.created_at).toLocaleString()}</p>
        <div class="actions"></div>`;
       const actions=card.querySelector(".actions");
-      const buttons=[
+      [
         ["Mark reviewed","secondary",()=>updateReport(report.id,"reviewed")],
         ["Dismiss report","secondary",()=>updateReport(report.id,"dismissed")],
         ["Hide profile","hide",()=>moderate(report.profile_code,"hidden")],
         ["Remove profile","remove",()=>moderate(report.profile_code,"removed")],
         ["Restore profile","secondary",()=>moderate(report.profile_code,"active")]
-      ];
-      buttons.forEach(([text,className,handler])=>{
+      ].forEach(([text,className,handler])=>{
         const button=document.createElement("button");button.textContent=text;button.className=className;
         button.addEventListener("click",()=>handler().catch(error=>message(error.message,"error")));
         actions.appendChild(button);
@@ -67,18 +123,29 @@
     });
   }
   async function load(){
-    if(!adminKey())return message("Enter the private ADMIN_KEY first.","error");
-    sessionStorage.setItem(keyName,adminKey());
     message("Loading reports…");
     try{
       const status=el("reportStatus").value;
-      const data=await api(`/api/admin/reports?status=${encodeURIComponent(status)}`);
+      const data=await adminApi(`/api/admin/reports?status=${encodeURIComponent(status)}`);
       render(Array.isArray(data.reports)?data.reports:[]);
       message(`Loaded ${data.reports?.length||0} report${data.reports?.length===1?"":"s"}.`,"success");
-    }catch(error){message(error.message||"Could not load reports.","error")}
+    }catch(error){
+      if(error.status!==401)message(error.message||"Could not load reports.","error");
+    }
   }
-  el("adminKey").value=sessionStorage.getItem(keyName)||"";
+  async function verifyExistingSession(){
+    if(!sessionToken()){showLogin();return}
+    try{
+      await adminApi("/api/admin/session");
+      showTools();
+      await load();
+    }catch{showLogin()}
+  }
+
+  el("adminLogin").addEventListener("click",login);
+  el("adminCode").addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();login()}});
   el("loadReports").addEventListener("click",load);
-  el("reportStatus").addEventListener("change",()=>{if(adminKey())load()});
-  el("forgetAdminKey").addEventListener("click",()=>{sessionStorage.removeItem(keyName);el("adminKey").value="";el("reportList").innerHTML="";message("Admin key forgotten.")});
+  el("reportStatus").addEventListener("change",()=>{if(sessionToken())load()});
+  el("adminLogout").addEventListener("click",()=>logout());
+  verifyExistingSession();
 })();

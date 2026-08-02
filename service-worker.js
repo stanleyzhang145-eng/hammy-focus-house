@@ -1,15 +1,15 @@
-const CACHE="hammy-v21";
+const CACHE="hammy-v22";
 const CORE=[
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./premium.css?v=21",
-  "./premium.js?v=21",
-  "./online.css?v=21",
-  "./cloud.css?v=21",
-  "./cloud.js?v=21",
-  "./online.js?v=21",
-  "./gallery.js?v=21",
+  "./premium.css?v=22",
+  "./premium.js?v=22",
+  "./online.css?v=22",
+  "./cloud.css?v=22",
+  "./cloud.js?v=22",
+  "./online.js?v=22",
+  "./gallery.js?v=22",
   "./apple-touch-icon.png",
   "./icon-192.png",
   "./icon-512.png",

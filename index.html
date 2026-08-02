@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=21">
-<link rel="stylesheet" href="cloud.css?v=21">
+<link rel="stylesheet" href="online.css?v=22">
+<link rel="stylesheet" href="cloud.css?v=22">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -817,7 +817,7 @@ body[data-theme="night"] .focus-warning{background:#5a4d2a;color:#fff}
 body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
 </style>
-<link rel="stylesheet" href="premium.css?v=21">
+<link rel="stylesheet" href="premium.css?v=22">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -954,7 +954,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <span class="cloud-chip">Build v21</span>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v22">Build v22</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -1029,6 +1029,28 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
  </section>
 
 
+
+ <section id="secretAdminSection" class="cloud-card secret-admin-card hidden" style="margin-top:12px">
+  <div class="secret-admin-heading">
+   <div>
+    <h3>Top Secret Admin Access</h3>
+    <p class="muted">This code is verified securely by the server and is never stored in the public website files.</p>
+   </div>
+   <span class="secret-lock" aria-hidden="true">🔐</span>
+  </div>
+  <label class="cloud-label">Top secret code
+   <input id="secretAdminCode" type="password" maxlength="160" autocomplete="off"
+    autocapitalize="off" spellcheck="false" placeholder="Enter private admin code">
+  </label>
+  <div class="cloud-actions">
+   <button id="unlockSecretAdmin" class="primary">Unlock admin panel</button>
+   <button id="hideSecretAdmin" class="secondary">Hide</button>
+  </div>
+  <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
+   Tap Build v22 seven times whenever you need to show this section.
+  </div>
+ </section>
+
  <section class="cloud-card reward-code-card" style="margin-top:12px">
   <div class="reward-code-heading">
    <div>
@@ -1073,7 +1095,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v21</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v22</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -1564,14 +1586,14 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=21"></script>
-<script src="cloud.js?v=21"></script>
-<script src="online.js?v=21"></script>
-<script src="gallery.js?v=21"></script>
+<script src="premium.js?v=22"></script>
+<script src="cloud.js?v=22"></script>
+<script src="online.js?v=22"></script>
+<script src="gallery.js?v=22"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=21").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=22").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>

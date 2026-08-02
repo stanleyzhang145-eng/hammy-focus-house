@@ -446,6 +446,54 @@
     }
   }
 
+
+  let secretAdminTapCount=0;
+  let secretAdminTapTimer=null;
+  function setSecretAdminMessage(message,type=""){
+    const box=el("secretAdminMessage");if(!box)return;
+    box.textContent=message;
+    box.className=`secret-admin-message${type?" "+type:""}`;
+  }
+  function revealSecretAdmin(){
+    const section=el("secretAdminSection");
+    if(!section)return;
+    section.classList.remove("hidden");
+    setSecretAdminMessage("Enter the private server-side admin code.","");
+    setTimeout(()=>el("secretAdminCode")?.focus(),80);
+    section.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+  function handleSecretAdminTap(){
+    secretAdminTapCount++;
+    clearTimeout(secretAdminTapTimer);
+    secretAdminTapTimer=setTimeout(()=>{secretAdminTapCount=0},2500);
+    if(secretAdminTapCount>=7){
+      secretAdminTapCount=0;
+      revealSecretAdmin();
+    }
+  }
+  async function unlockSecretAdmin(){
+    const code=String(el("secretAdminCode")?.value||"");
+    const button=el("unlockSecretAdmin");
+    if(!code){
+      setSecretAdminMessage("Enter the top secret admin code.","error");
+      return;
+    }
+    if(button)button.disabled=true;
+    setSecretAdminMessage("Checking the top secret code…","working");
+    try{
+      const result=await api("/api/admin/login",{method:"POST",body:{code}});
+      sessionStorage.setItem("hammyAdminSessionV1",result.sessionToken);
+      sessionStorage.setItem("hammyAdminSessionExpiresV1",String(Date.now()+(Number(result.expiresInSeconds||1800)*1000)));
+      if(el("secretAdminCode"))el("secretAdminCode").value="";
+      setSecretAdminMessage("Admin access unlocked. Opening the private panel…","success");
+      setTimeout(()=>{location.href="./admin.html"},450);
+    }catch(error){
+      setSecretAdminMessage(error.message||"The admin code is incorrect.","error");
+    }finally{
+      if(button)button.disabled=false;
+    }
+  }
+
   function bind(){
     if(!el("accountPage"))return;
     el("copyPlayerId")?.addEventListener("click",()=>copyText(meta.playerId,"Player ID copied."));
@@ -458,6 +506,16 @@
     el("cancelCloudConflict")?.addEventListener("click",()=>{pendingConflict=null;render();setChip(meta.dirty?"syncing":"online",meta.dirty?"Waiting to sync":"Cloud online")});
     el("resetLocalHammy")?.addEventListener("click",resetLocal);
     el("deleteCloudAccount")?.addEventListener("click",deleteAccount);
+    el("secretAdminTrigger")?.addEventListener("click",handleSecretAdminTap);
+    el("unlockSecretAdmin")?.addEventListener("click",unlockSecretAdmin);
+    el("secretAdminCode")?.addEventListener("keydown",event=>{
+      if(event.key==="Enter"){event.preventDefault();unlockSecretAdmin()}
+    });
+    el("hideSecretAdmin")?.addEventListener("click",()=>{
+      el("secretAdminSection")?.classList.add("hidden");
+      if(el("secretAdminCode"))el("secretAdminCode").value="";
+      secretAdminTapCount=0;
+    });
     el("redeemRewardCode")?.addEventListener("click",redeemRewardCode);
     el("rewardCodeInput")?.addEventListener("input",event=>{
       event.target.value=normalizeRewardInput(event.target.value);
