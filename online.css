@@ -61,3 +61,35 @@
 .public-gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}.gallery-profile-card{overflow:hidden}.gallery-room-title{font-weight:900;margin-top:10px}
 .gallery-base-peek{margin-top:7px;height:190px;overflow:hidden;border:2px solid var(--line);border-radius:14px}.gallery-base-peek .online-base{height:190px;margin:0;border:0;border-radius:0}.gallery-base-peek .online-base-item{min-width:55px;min-height:35px;font-size:.56rem}.gallery-base-peek .online-base-hamster{transform:translateX(-50%) scale(.72);transform-origin:center bottom}.gallery-loading{text-align:center;padding:14px;font-weight:900}#gallerySentinel{height:2px}
 @media(max-width:700px){.public-gallery-grid{grid-template-columns:1fr}.online-gallery-controls{width:100%}.online-gallery-controls select,.online-gallery-controls button{flex:1}}
+
+
+/* ===== v18 normal Home room plus Premium avatar rooms ===== */
+.premium-avatar-button{
+  cursor:pointer;
+  outline:4px solid #f0c64f;
+  outline-offset:3px;
+  box-shadow:0 0 0 7px rgba(240,198,79,.22);
+  animation:premiumAvatarPulse 2s ease-in-out infinite
+}
+.premium-avatar-button:focus-visible{outline:6px solid var(--accent);outline-offset:5px}
+.premium-avatar-hint{
+  margin-top:8px;padding:7px 9px;border:2px dashed #9a7422;border-radius:11px;
+  background:#fff0b8;color:#573f12;text-align:center;font-size:.78rem;font-weight:900
+}
+.gallery-avatar-hint{margin:9px 0 0}
+.premium-room-owner{display:grid;grid-template-columns:82px 1fr;gap:11px;align-items:center}
+.premium-room-tabs{display:flex;gap:7px;overflow-x:auto;padding:11px 0}
+.premium-room-tabs button{
+  white-space:nowrap;padding:8px 11px;border:2px solid var(--line);border-radius:999px;
+  background:var(--panel);color:var(--ink);font-weight:900
+}
+.premium-room-tabs button.active{background:var(--accent);color:#fff}
+.premium-room-title{margin:3px 0 9px}
+.premium-room-note{margin:9px 0}
+@keyframes premiumAvatarPulse{
+  0%,100%{box-shadow:0 0 0 6px rgba(240,198,79,.18)}
+  50%{box-shadow:0 0 0 10px rgba(240,198,79,.05)}
+}
+@media(max-width:600px){
+  .premium-room-owner{grid-template-columns:68px 1fr}
+}

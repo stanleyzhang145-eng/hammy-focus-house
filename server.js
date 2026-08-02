@@ -55,11 +55,36 @@ function cleanName(value){
   if(/https?:|www\.|@|discord|snapchat|instagram|tiktok/i.test(name))throw new Error("Links and social usernames are not allowed.");
   return name;
 }
+function cleanBase(input,{forceHome=false}={}){
+  const base=input&&typeof input==="object"?input:{};
+  const items=Array.isArray(base.items)?base.items.slice(0,20):[];
+  return {
+    room:forceHome?"home":(allowedRooms.has(base.room)&&base.room!=="home"?base.room:"bedroom"),
+    wall:safeColor(base.wall,forceHome?"#eee4ff":"#e7ddf8"),
+    floor:safeColor(base.floor,forceHome?"#e6c59d":"#d4b98d"),
+    items:items.filter(item=>item&&allowedTypes.has(item.type)).map(item=>({
+      type:item.type,
+      x:safeNumber(item.x,4,96,50),
+      y:safeNumber(item.y,12,92,60),
+      scale:safeNumber(item.scale,.5,1.6,1),
+      rotation:safeNumber(item.rotation,-180,180,0),
+      color:safeColor(item.color,"#a88fd5")
+    }))
+  };
+}
 function cleanProfile(input){
   if(!input||typeof input!=="object")throw new Error("Invalid profile.");
-  const stats=input.stats||{},base=input.base||{};
-  const items=Array.isArray(base.items)?base.items.slice(0,30):[];
+  const stats=input.stats||{};
   const visibility=input.visibility==="public"?"public":"unlisted";
+  const premium=Boolean(input.premium);
+  const homeBase=cleanBase(input.homeBase||input.base,{forceHome:true});
+  const seenRooms=new Set();
+  const premiumRooms=premium&&Array.isArray(input.premiumRooms)
+    ?input.premiumRooms.slice(0,12).map(room=>cleanBase(room)).filter(room=>{
+      if(!allowedRooms.has(room.room)||room.room==="home"||seenRooms.has(room.room))return false;
+      seenRooms.add(room.room);return true;
+    })
+    :[];
   return {
     nickname:cleanName(input.nickname),
     visibility,
@@ -70,7 +95,7 @@ function cleanProfile(input){
       patch:input.skinColors?.patch==="transparent"?"transparent":safeColor(input.skinColors?.patch,"#eadffc")
     },
     costume:String(input.costume||"No costume").replace(/[<>]/g,"").slice(0,40),
-    premium:Boolean(input.premium),
+    premium,
     stats:{
       practiceDays:safeNumber(stats.practiceDays,0,100000),
       totalFocusMinutes:safeNumber(stats.totalFocusMinutes,0,10000000),
@@ -78,19 +103,9 @@ function cleanProfile(input){
       lootLevel:safeNumber(stats.lootLevel,1,100000,1),
       sessionCount:safeNumber(stats.sessionCount,0,1000000)
     },
-    base:{
-      room:allowedRooms.has(base.room)?base.room:"home",
-      wall:safeColor(base.wall,"#eadffc"),
-      floor:safeColor(base.floor,"#dfbf91"),
-      items:items.filter(item=>item&&allowedTypes.has(item.type)).map(item=>({
-        type:item.type,
-        x:safeNumber(item.x,4,96,50),
-        y:safeNumber(item.y,12,92,60),
-        scale:safeNumber(item.scale,.5,1.6,1),
-        rotation:safeNumber(item.rotation,-180,180,0),
-        color:safeColor(item.color,"#a88fd5")
-      }))
-    }
+    homeBase,
+    base:homeBase,
+    premiumRooms
   };
 }
 function makeCode(profiles){
@@ -103,7 +118,14 @@ function makeCode(profiles){
   throw new Error("Could not create a friend code.");
 }
 function publicProfile(record,code){
-  return {...record.profile,code,updatedAt:record.updatedAt};
+  const stored=record.profile||{};
+  const homeBase=stored.homeBase||(stored.base?.room==="home"?stored.base:{room:"home",wall:"#eee4ff",floor:"#e6c59d",items:[]});
+  let premiumRooms=[];
+  if(stored.premium){
+    if(Array.isArray(stored.premiumRooms))premiumRooms=stored.premiumRooms.filter(room=>room&&room.room!=="home").slice(0,12);
+    else if(stored.base&&stored.base.room!=="home")premiumRooms=[stored.base];
+  }
+  return {...stored,homeBase,base:homeBase,premiumRooms:stored.premium?premiumRooms:[],code,updatedAt:record.updatedAt};
 }
 function rateLimited(req){
   const ip=req.socket.remoteAddress||"unknown";

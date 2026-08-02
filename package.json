@@ -1,8 +1,8 @@
 {
   "name": "hammy-focus-house-online",
-  "version": "17.0.0",
+  "version": "18.0.0",
   "private": true,
-  "description": "Hammy Focus House with public gallery, friend codes, and shareable links",
+  "description": "Hammy Focus House gallery with normal Home rooms and Premium avatar room collections",
   "scripts": {
     "start": "node server.js"
   },

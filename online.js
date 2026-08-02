@@ -53,6 +53,40 @@
     }
   ];
 
+
+  // v18 demo profiles always show a normal Home room first.
+  demoProfiles[0].homeBase={room:"home",wall:"#f6e4ed",floor:"#d9b98e",items:[
+    {type:"bed",x:18,y:72,scale:.78,rotation:0,color:"#e4a8c0"},
+    {type:"desk",x:21,y:42,scale:.72,rotation:0,color:"#b9895f"},
+    {type:"plant",x:82,y:72,scale:.68,rotation:0,color:"#75b879"},
+    {type:"rug",x:51,y:81,scale:.82,rotation:0,color:"#d9c5f2"}
+  ]};
+  demoProfiles[0].premiumRooms=[demoProfiles[0].base,{
+    room:"bedroom",wall:"#f3dfea",floor:"#d7b286",items:[
+      {type:"bunkBed",x:26,y:55,scale:.82,rotation:-2,color:"#bd7f9e"},
+      {type:"cinema",x:72,y:35,scale:.56,rotation:1,color:"#8c72b8"}
+    ]
+  }];
+  demoProfiles[0].base=demoProfiles[0].homeBase;
+
+  demoProfiles[1].homeBase={room:"home",wall:"#e5e1fa",floor:"#cbb18a",items:[
+    {type:"sofa",x:30,y:73,scale:.78,rotation:0,color:"#7669b7"},
+    {type:"wheel",x:72,y:63,scale:.72,rotation:0,color:"#6e9ed0"},
+    {type:"music",x:78,y:42,scale:.66,rotation:0,color:"#7656bd"},
+    {type:"lamp",x:48,y:71,scale:.64,rotation:0,color:"#e8ca5d"}
+  ]};
+  demoProfiles[1].premiumRooms=[demoProfiles[1].base,{
+    room:"rooftop",wall:"#b8d7f0",floor:"#9c8d9f",items:[
+      {type:"giantWheel",x:29,y:57,scale:.84,rotation:0,color:"#7c72ca"},
+      {type:"portal",x:75,y:49,scale:.72,rotation:0,color:"#825ed5"}
+    ]
+  }];
+  demoProfiles[1].base=demoProfiles[1].homeBase;
+
+  demoProfiles[2].homeBase=demoProfiles[2].base;
+  demoProfiles[2].premiumRooms=[];
+  demoProfiles[2].base=demoProfiles[2].homeBase;
+
   let onlineState;
   try{
     onlineState={apiUrl:"",nickname:"HammyFan",visibility:"unlisted",code:null,token:null,friends:[],...JSON.parse(localStorage.getItem(ONLINE_KEY)||"{}")};
@@ -127,18 +161,25 @@
     });
     return {room:"home",wall:"#eee4ff",floor:"#e6c59d",items:items.slice(0,20)};
   }
-  function collectPremiumBase(){
-    const room=state.premiumRoom||"bedroom";
-    const source=state.premiumDecor&&state.premiumDecor[room];
-    if(!source||typeof source!=="object")return null;
-    const items=Object.values(source).filter(Boolean).slice(0,30).map(item=>({
+  function cleanSharedBase(room,source,wall="#e7ddf8",floor="#d4b98d"){
+    const items=Object.values(source||{}).filter(Boolean).slice(0,20).map(item=>({
       type:String(item.type||"").slice(0,32),
       x:clamp(item.x,4,96),y:clamp(item.y,12,92),
       scale:clamp(item.scale,.5,1.6),rotation:clamp(item.rotation,-180,180),
       color:/^#[0-9a-f]{6}$/i.test(item.color||"")?item.color:"#8b63d9"
     })).filter(item=>itemNames[item.type]);
-    const colors=(state.roomColors&&state.roomColors[room])||{};
-    return {room,wall:colors.wall||"#e7ddf8",floor:colors.floor||"#d4b98d",items};
+    return {room,wall, floor,items};
+  }
+  function collectPremiumRooms(){
+    const result=[];
+    const decor=state.premiumDecor&&typeof state.premiumDecor==="object"?state.premiumDecor:{};
+    Object.keys(roomNames).filter(room=>room!=="home").forEach(room=>{
+      const source=decor[room];
+      if(!source||typeof source!=="object")return;
+      const colors=(state.roomColors&&state.roomColors[room])||{};
+      result.push(cleanSharedBase(room,source,colors.wall||"#e7ddf8",colors.floor||"#d4b98d"));
+    });
+    return result.slice(0,12);
   }
   function snapshotProfile(){
     const premium=Boolean(state.premium||state.premiumDemoEntitlement);
@@ -147,6 +188,7 @@
     onlineState.nickname=nickname;
     const totalMinutes=Math.round(Number(state.totalFocusMinutes)||0);
     const lootLevel=typeof getLootLevel==="function"?getLootLevel():Math.max(1,Math.floor(totalMinutes/120)+1);
+    const homeBase=collectFreeBase();
     return {
       nickname,
       visibility:el("onlineVisibility")?.value==="public"?"public":"unlisted",
@@ -161,7 +203,9 @@
         lootLevel:clamp(lootLevel,1,100000),
         sessionCount:clamp(state.sessionCount,0,1000000)
       },
-      base:(premium&&collectPremiumBase())||collectFreeBase()
+      homeBase,
+      base:homeBase,
+      premiumRooms:premium?collectPremiumRooms():[]
     };
   }
   function avatarMarkup(profile){
@@ -199,8 +243,17 @@
     el("publishOnlineProfile").textContent=hasCode?"Update shared profile":"Publish profile";
   }
 
-  function baseMarkup(profile){
-    const base=profile.base||{room:"home",items:[]};
+  function homeBaseFor(profile){
+    if(profile.homeBase&&profile.homeBase.room==="home")return profile.homeBase;
+    if(profile.base&&profile.base.room==="home")return profile.base;
+    return {room:"home",wall:"#eee4ff",floor:"#e6c59d",items:[]};
+  }
+  function premiumRoomsFor(profile){
+    if(!profile.premium||!Array.isArray(profile.premiumRooms))return [];
+    return profile.premiumRooms.filter(base=>base&&base.room&&base.room!=="home").slice(0,12);
+  }
+  function baseMarkup(profile,baseOverride=null){
+    const base=baseOverride||homeBaseFor(profile);
     const items=(Array.isArray(base.items)?base.items:[]).slice(0,30).map(item=>{
       const type=String(item.type||"");
       if(!itemNames[type])return "";
@@ -211,20 +264,69 @@
       <div class="online-base-hamster">${avatarMarkup(profile)}</div>
     </div>`;
   }
+  function showPremiumRooms(profile){
+    const premiumRooms=premiumRoomsFor(profile);
+    if(!premiumRooms.length)return;
+    const modal=el("onlineProfileModal"),content=el("onlineModalContent");
+    let activeIndex=0;
+    el("onlineModalTitle").textContent=`${profile.nickname||"Hammy Friend"}'s Premium House`;
+
+    const renderRoom=()=>{
+      const room=premiumRooms[activeIndex];
+      content.innerHTML=`<div class="premium-room-owner">
+        ${avatarMarkup(profile)}
+        <div><strong>${escapeHtml(profile.nickname||"Hammy Friend")}</strong><p class="muted">Premium room collection</p></div>
+       </div>
+       <div id="premiumRoomTabs" class="premium-room-tabs"></div>
+       <h3 id="premiumRoomTitle" class="premium-room-title">${escapeHtml(roomNames[room.room]||"Premium Room")}</h3>
+       <div id="premiumRoomCanvas">${baseMarkup(profile,room)}</div>
+       <p class="muted premium-room-note">These rooms are shown only because this player has Premium. Their normal Home room remains the main public base.</p>
+       <button id="backToHomeProfile" class="secondary">Back to Home room</button>`;
+
+      const tabs=content.querySelector("#premiumRoomTabs");
+      premiumRooms.forEach((base,index)=>{
+        const button=document.createElement("button");
+        button.className=index===activeIndex?"active":"";
+        button.textContent=roomNames[base.room]||"Premium Room";
+        button.addEventListener("click",()=>{activeIndex=index;renderRoom()});
+        tabs.appendChild(button);
+      });
+      content.querySelector("#backToHomeProfile").addEventListener("click",()=>showProfile(profile,false));
+    };
+    renderRoom();
+    modal.classList.remove("hidden");
+  }
+  function attachPremiumAvatarAction(container,profile){
+    const rooms=premiumRoomsFor(profile);
+    const avatar=container.querySelector(".online-avatar");
+    if(!avatar||!rooms.length)return;
+    avatar.classList.add("premium-avatar-button");
+    avatar.setAttribute("role","button");
+    avatar.setAttribute("tabindex","0");
+    avatar.setAttribute("aria-label",`Open ${profile.nickname||"this player's"} Premium rooms`);
+    avatar.setAttribute("title","Tap to view Premium rooms");
+    const openRooms=()=>showPremiumRooms(profile);
+    avatar.addEventListener("click",openRooms);
+    avatar.addEventListener("keydown",event=>{
+      if(event.key==="Enter"||event.key===" "){event.preventDefault();openRooms()}
+    });
+  }
   function showProfile(profile,saveFriend=false){
     const modal=el("onlineProfileModal"),content=el("onlineModalContent");
-    const stats=profile.stats||{};
+    const stats=profile.stats||{},premiumRooms=premiumRoomsFor(profile);
     el("onlineModalTitle").textContent=`${profile.nickname||"Hammy Friend"}'s profile`;
-    content.innerHTML=`${miniProfileMarkup(profile)}
+    content.innerHTML=`<div id="onlineProfileSummary">${miniProfileMarkup(profile)}</div>
+      ${premiumRooms.length?'<p class="premium-avatar-hint">Tap the hamster avatar to visit this player’s Premium rooms.</p>':""}
       <div class="online-profile-stats">
        <div class="online-profile-stat"><strong>${clamp(stats.practiceDays,0,999999)}</strong><span>Practice days</span></div>
        <div class="online-profile-stat"><strong>${clamp(stats.totalFocusMinutes,0,99999999)}</strong><span>Focus minutes</span></div>
        <div class="online-profile-stat"><strong>${clamp(stats.streak,0,999999)}</strong><span>Current streak</span></div>
        <div class="online-profile-stat"><strong>${clamp(stats.sessionCount,0,999999)}</strong><span>Sessions</span></div>
       </div>
-      <h3 style="margin-top:13px">${escapeHtml(roomNames[profile.base?.room]||"Hamster Base")}</h3>
-      ${baseMarkup(profile)}
+      <h3 style="margin-top:13px">Normal Home Room</h3>
+      ${baseMarkup(profile,homeBaseFor(profile))}
       <p class="muted" style="margin-top:8px">Updated ${profile.demo?"in demo mode":new Date(profile.updatedAt||Date.now()).toLocaleDateString()} · No chat or private information is shared.</p>`;
+    attachPremiumAvatarAction(content,profile);
     modal.classList.remove("hidden");
     if(saveFriend&&!profile.demo&&FRIEND_CODE.test(profile.code||"")){
       if(!onlineState.friends.includes(profile.code))onlineState.friends.push(profile.code);
@@ -232,6 +334,13 @@
       saveOnline();renderFriends();
     }
   }
+
+  window.HammyOnlineRooms={
+    showPremiumRooms,
+    premiumRoomsFor,
+    homeBaseFor,
+    baseMarkup
+  };
 
   async function publishProfile(){
     try{

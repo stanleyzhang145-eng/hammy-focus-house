@@ -155,3 +155,15 @@ VERSION 17 — PUBLIC GALLERY AND SHAREABLE LINKS
 - Newest, practice-day, and streak sorting.
 - Automatic load-more while scrolling.
 - No chat, comments, likes, real names, ages, schools, email, location, or task history.
+
+
+VERSION 18 — NORMAL HOME ROOM AND PREMIUM AVATAR ROOMS
+- Every public gallery card now displays the player's normal Home room.
+- Premium rooms no longer replace the normal public Home room.
+- Premium owners publish a separate collection of up to 12 Premium rooms.
+- Tapping a Premium owner's hamster avatar opens their Premium room collection.
+- Premium room tabs switch between the shared Premium rooms.
+- Free players have no Premium-room button, clickable Premium avatar, or Premium-room data.
+- Full friend-code profiles also show the normal Home room first.
+- Older online profiles are migrated safely: their normal Home room remains separate when possible.
+- The server strips Premium-room data whenever premium is false.
