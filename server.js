@@ -255,6 +255,18 @@ function serveStatic(req,res,urlPath){
 }
 
 async function handleApi(req,res,url){
+  if(req.method==="GET"&&url.pathname==="/api/health/ready"){
+    if(!databaseReady){
+      return json(res,503,{
+        ok:false,
+        version:20,
+        databaseReady:false,
+        error:String(databaseError?.message||"Database is not ready.")
+      });
+    }
+    return json(res,200,{ok:true,version:20,databaseReady:true,databaseMode:db.mode()});
+  }
+
   if(req.method==="GET"&&url.pathname==="/api/health"){
     return json(res,200,{
       ok:true,name:"Hammy Cloud server",version:20,
