@@ -1,0 +1,27 @@
+HAMMY FRIENDS ONLINE — DEPLOYMENT
+
+WHAT IS INCLUDED
+- The website game.
+- server.js: a small Node server with no third-party packages.
+- Friend-code profile publishing and viewing.
+- Public hamster stats and base snapshots.
+- No chat, email, age, location, task history, or global player search.
+- Profile update/delete protected by a secret token stored on the owner's device.
+
+LOCAL TEST
+1. Install Node.js 18 or newer.
+2. Open a terminal in this folder.
+3. Run: npm start
+4. Open: http://localhost:8080
+
+PUBLIC HOSTING
+The Online mode needs a host that can run a Node server and keep the server-data folder.
+Static-only hosts such as itch.io or basic GitHub Pages cannot run server.js.
+
+When the game and server use the same address, leave Online > Server address blank.
+When the game is on a separate static host, deploy server.js elsewhere and enter that server's HTTPS address in Online > Server setup.
+
+IMPORTANT FOR A PUBLIC RELEASE
+- The included JSON-file server is suitable for a small private test.
+- A larger public release should use a managed database, backups, abuse monitoring, HTTPS, and stronger moderation.
+- Do not add chat, real names, ages, schools, addresses, email addresses, or location sharing.

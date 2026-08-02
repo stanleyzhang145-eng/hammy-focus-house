@@ -1,0 +1,12 @@
+{
+  "name": "hammy-focus-house-online",
+  "version": "17.0.0",
+  "private": true,
+  "description": "Hammy Focus House with public gallery, friend codes, and shareable links",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
