@@ -298,17 +298,29 @@
   }
   function attachPremiumAvatarAction(container,profile){
     const rooms=premiumRoomsFor(profile);
-    const avatar=container.querySelector(".online-avatar");
-    if(!avatar||!rooms.length)return;
-    avatar.classList.add("premium-avatar-button");
-    avatar.setAttribute("role","button");
-    avatar.setAttribute("tabindex","0");
-    avatar.setAttribute("aria-label",`Open ${profile.nickname||"this player's"} Premium rooms`);
-    avatar.setAttribute("title","Tap to view Premium rooms");
-    const openRooms=()=>showPremiumRooms(profile);
-    avatar.addEventListener("click",openRooms);
-    avatar.addEventListener("keydown",event=>{
-      if(event.key==="Enter"||event.key===" "){event.preventDefault();openRooms()}
+    if(!rooms.length)return;
+    const avatars=[...container.querySelectorAll(".online-avatar")];
+    avatars.forEach(avatar=>{
+      if(avatar.dataset.premiumRoomBound==="1")return;
+      avatar.dataset.premiumRoomBound="1";
+      avatar.classList.add("premium-avatar-button");
+      avatar.setAttribute("role","button");
+      avatar.setAttribute("tabindex","0");
+      avatar.setAttribute("aria-label",`Open ${profile.nickname||"this player's"} Premium rooms`);
+      avatar.setAttribute("title","Tap to view Premium rooms");
+      const badge=document.createElement("span");
+      badge.className="premium-room-avatar-badge";
+      badge.textContent="★";
+      badge.setAttribute("aria-hidden","true");
+      avatar.appendChild(badge);
+      const openRooms=event=>{
+        event?.stopPropagation();
+        showPremiumRooms(profile);
+      };
+      avatar.addEventListener("click",openRooms);
+      avatar.addEventListener("keydown",event=>{
+        if(event.key==="Enter"||event.key===" "){event.preventDefault();openRooms(event)}
+      });
     });
   }
   function showProfile(profile,saveFriend=false){
@@ -316,7 +328,7 @@
     const stats=profile.stats||{},premiumRooms=premiumRoomsFor(profile);
     el("onlineModalTitle").textContent=`${profile.nickname||"Hammy Friend"}'s profile`;
     content.innerHTML=`<div id="onlineProfileSummary">${miniProfileMarkup(profile)}</div>
-      ${premiumRooms.length?'<p class="premium-avatar-hint">Tap the hamster avatar to visit this player’s Premium rooms.</p>':""}
+      ${premiumRooms.length?'<p class="premium-avatar-hint">Tap either hamster avatar—the profile picture or the hamster inside the Home room—to visit this player’s Premium rooms.</p>':""}
       <div class="online-profile-stats">
        <div class="online-profile-stat"><strong>${clamp(stats.practiceDays,0,999999)}</strong><span>Practice days</span></div>
        <div class="online-profile-stat"><strong>${clamp(stats.totalFocusMinutes,0,99999999)}</strong><span>Focus minutes</span></div>

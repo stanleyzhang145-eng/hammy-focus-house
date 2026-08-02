@@ -167,3 +167,17 @@ VERSION 18 — NORMAL HOME ROOM AND PREMIUM AVATAR ROOMS
 - Full friend-code profiles also show the normal Home room first.
 - Older online profiles are migrated safely: their normal Home room remains separate when possible.
 - The server strips Premium-room data whenever premium is false.
+
+
+VERSION 19 — AVATAR TAP AND CACHE FIX
+- Both hamster avatars are now clickable for Premium owners:
+  1. The profile-picture avatar.
+  2. The hamster inside the normal Home-room preview.
+- Added a gold star badge to every avatar that opens Premium rooms.
+- Free-player avatars remain normal and have no Premium action.
+- Increased touch targets for iPad and phones.
+- Added a visible Build v19 label to the Online page.
+- Added cache-busting version numbers to Premium, Online, and Gallery files.
+- Replaced cache-first service-worker behavior with network-first loading for HTML, JavaScript, and CSS.
+- The new service worker activates immediately, removes old Hammy caches, and takes control of open pages.
+- This fixes cases where Render was updated but the Home Screen app kept showing v17 or v18.

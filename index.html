@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css">
+<link rel="stylesheet" href="online.css?v=19">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -816,7 +816,7 @@ body[data-theme="night"] .focus-warning{background:#5a4d2a;color:#fff}
 body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
 </style>
-<link rel="stylesheet" href="premium.css">
+<link rel="stylesheet" href="premium.css?v=19">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -951,7 +951,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <span id="onlineConnectionChip" class="online-chip offline">Offline</span>
+  <div class="online-build-row"><span class="online-chip">Build v19</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -1441,7 +1441,7 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js"></script>
-<script src="online.js"></script>
-<script src="gallery.js"></script>
+<script src="premium.js?v=19"></script>
+<script src="online.js?v=19"></script>
+<script src="gallery.js?v=19"></script>
 </body></html>

@@ -1,8 +1,8 @@
 {
   "name": "hammy-focus-house-online",
-  "version": "18.0.0",
+  "version": "19.0.0",
   "private": true,
-  "description": "Hammy Focus House gallery with normal Home rooms and Premium avatar room collections",
+  "description": "Hammy Focus House with reliable Premium-room avatar taps and update-safe caching",
   "scripts": {
     "start": "node server.js"
   },

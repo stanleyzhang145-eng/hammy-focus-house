@@ -77,20 +77,31 @@
     const s=p.stats||{},roomsForPremium=premiumRooms(p),article=document.createElement("article");
     article.className="online-friend-card gallery-profile-card";article.dataset.galleryCode=p.code;
     article.innerHTML=`<div class="online-mini-profile">${avatar(p)}<div><strong>${esc(p.nickname)}</strong><p class="muted">${esc(p.costume||"No costume")}${p.premium?" · Premium":""}</p><div class="online-mini-stats"><div class="online-mini-stat"><strong>${clamp(s.practiceDays,0,999999)}</strong><span>Days</span></div><div class="online-mini-stat"><strong>${clamp(s.streak,0,999999)}</strong><span>Streak</span></div><div class="online-mini-stat"><strong>${clamp(s.lootLevel,1,999999)}</strong><span>Loot Lv.</span></div></div></div></div>
-      ${roomsForPremium.length?'<div class="premium-avatar-hint gallery-avatar-hint">Tap the avatar for Premium rooms</div>':""}
+      ${roomsForPremium.length?'<div class="premium-avatar-hint gallery-avatar-hint">Tap either hamster for Premium rooms</div>':""}
       <div class="gallery-room-title">Normal Home Room</div>
       <div class="gallery-base-peek">${baseView(p,homeBase(p))}</div>
       <div class="online-actions"></div>`;
 
     if(roomsForPremium.length){
-      const avatarEl=article.querySelector(".online-mini-profile .online-avatar");
-      avatarEl.classList.add("premium-avatar-button");
-      avatarEl.setAttribute("role","button");avatarEl.setAttribute("tabindex","0");
-      avatarEl.setAttribute("aria-label",`Open ${p.nickname}'s Premium rooms`);
-      const openPremium=()=>window.HammyOnlineRooms?.showPremiumRooms(p);
-      avatarEl.addEventListener("click",openPremium);
-      avatarEl.addEventListener("keydown",event=>{
-        if(event.key==="Enter"||event.key===" "){event.preventDefault();openPremium()}
+      const openPremium=event=>{
+        event?.stopPropagation();
+        window.HammyOnlineRooms?.showPremiumRooms(p);
+      };
+      article.querySelectorAll(".online-avatar").forEach(avatarEl=>{
+        avatarEl.classList.add("premium-avatar-button");
+        avatarEl.setAttribute("role","button");
+        avatarEl.setAttribute("tabindex","0");
+        avatarEl.setAttribute("aria-label",`Open ${p.nickname}'s Premium rooms`);
+        avatarEl.setAttribute("title","Tap to view Premium rooms");
+        const badge=document.createElement("span");
+        badge.className="premium-room-avatar-badge";
+        badge.textContent="★";
+        badge.setAttribute("aria-hidden","true");
+        avatarEl.appendChild(badge);
+        avatarEl.addEventListener("click",openPremium);
+        avatarEl.addEventListener("keydown",event=>{
+          if(event.key==="Enter"||event.key===" "){event.preventDefault();openPremium(event)}
+        });
       });
     }
 

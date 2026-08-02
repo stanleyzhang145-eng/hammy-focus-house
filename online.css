@@ -93,3 +93,48 @@
 @media(max-width:600px){
   .premium-room-owner{grid-template-columns:68px 1fr}
 }
+
+
+/* ===== v19 avatar click and update visibility fixes ===== */
+.online-build-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.premium-avatar-button{
+  position:relative;
+  min-width:44px;
+  min-height:44px;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:rgba(240,198,79,.35);
+}
+.premium-room-avatar-badge{
+  position:absolute;
+  right:-5px;
+  top:-5px;
+  z-index:30;
+  display:grid;
+  place-items:center;
+  width:25px;
+  height:25px;
+  border:3px solid var(--line);
+  border-radius:50%;
+  background:#ffd85f;
+  color:#5c4211;
+  font-size:.78rem;
+  font-weight:1000;
+  pointer-events:none;
+  box-shadow:0 2px 0 rgba(73,57,81,.2)
+}
+.online-base-hamster .premium-avatar-button{
+  cursor:pointer;
+  pointer-events:auto
+}
+.gallery-base-peek .premium-avatar-button{
+  outline-width:5px;
+  outline-offset:2px
+}
+.gallery-avatar-hint{
+  background:#fff0b8;
+  animation:premiumHintGlow 1.8s ease-in-out infinite
+}
+@keyframes premiumHintGlow{
+  0%,100%{box-shadow:0 0 0 0 rgba(240,198,79,.1)}
+  50%{box-shadow:0 0 0 5px rgba(240,198,79,.16)}
+}
