@@ -377,6 +377,75 @@
       toast(error.message||"Cloud account could not start.","error");
     }
   }
+
+  function setRewardMessage(message,type=""){
+    const box=el("rewardCodeMessage");if(!box)return;
+    box.textContent=message;
+    box.className=`reward-code-message${type?" "+type:""}`;
+  }
+  function normalizeRewardInput(value){
+    return String(value||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,24);
+  }
+  async function redeemRewardCode(){
+    const input=el("rewardCodeInput");
+    const button=el("redeemRewardCode");
+    const code=normalizeRewardInput(input?.value);
+    if(input)input.value=code;
+    if(!code){
+      setRewardMessage("Enter a reward code first.","error");
+      return;
+    }
+    if(syncing){
+      setRewardMessage("Wait for the current cloud sync to finish.","working");
+      return;
+    }
+
+    if(button)button.disabled=true;
+    setRewardMessage("Checking the reward code securely…","working");
+
+    try{
+      const account=await ensureAccount();
+      if(!account||!meta.accessToken)throw new Error("Connect your Hammy cloud account first.");
+
+      // Upload unsynced progress before the server adds the reward.
+      await syncNow();
+
+      const result=await api("/api/rewards/redeem",{
+        method:"POST",
+        body:{code,deviceId:deviceId()}
+      });
+
+      sessionStorage.setItem("hammyRewardNotice",JSON.stringify({
+        message:`${result.reward.title}: +${result.reward.coins} coins!`,
+        type:"success"
+      }));
+
+      if(input)input.value="";
+      applyCloudState(result.save);
+    }catch(error){
+      if(error.status===409&&error.data?.alreadyRedeemed){
+        setRewardMessage("You already redeemed this code on this Hammy account.","error");
+      }else{
+        setRewardMessage(error.message||"The reward code could not be redeemed.","error");
+      }
+    }finally{
+      if(button)button.disabled=false;
+    }
+  }
+  function showPendingRewardNotice(){
+    try{
+      const notice=JSON.parse(sessionStorage.getItem("hammyRewardNotice")||"null");
+      if(!notice)return;
+      sessionStorage.removeItem("hammyRewardNotice");
+      setTimeout(()=>{
+        setRewardMessage(notice.message,notice.type||"success");
+        toast(notice.message,notice.type||"success");
+      },350);
+    }catch{
+      sessionStorage.removeItem("hammyRewardNotice");
+    }
+  }
+
   function bind(){
     if(!el("accountPage"))return;
     el("copyPlayerId")?.addEventListener("click",()=>copyText(meta.playerId,"Player ID copied."));
@@ -389,6 +458,13 @@
     el("cancelCloudConflict")?.addEventListener("click",()=>{pendingConflict=null;render();setChip(meta.dirty?"syncing":"online",meta.dirty?"Waiting to sync":"Cloud online")});
     el("resetLocalHammy")?.addEventListener("click",resetLocal);
     el("deleteCloudAccount")?.addEventListener("click",deleteAccount);
+    el("redeemRewardCode")?.addEventListener("click",redeemRewardCode);
+    el("rewardCodeInput")?.addEventListener("input",event=>{
+      event.target.value=normalizeRewardInput(event.target.value);
+    });
+    el("rewardCodeInput")?.addEventListener("keydown",event=>{
+      if(event.key==="Enter"){event.preventDefault();redeemRewardCode()}
+    });
     document.querySelector('[data-page="account"]')?.addEventListener("click",render);
   }
 
@@ -399,4 +475,5 @@
 
   bind();
   initialize();
+  showPendingRewardNotice();
 })();

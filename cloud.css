@@ -40,3 +40,67 @@
  .cloud-sync-status{grid-template-columns:1fr}
  .cloud-compare{grid-template-columns:1fr}
 }
+
+
+/* Hammy Focus House v21 — Reward Codes */
+.reward-code-card{
+  background:linear-gradient(135deg,var(--panel),var(--soft));
+  overflow:hidden;
+  position:relative
+}
+.reward-code-card:after{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  right:-55px;
+  bottom:-70px;
+  border:3px dashed rgba(73,57,81,.2);
+  border-radius:50%;
+  pointer-events:none
+}
+.reward-code-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px
+}
+.reward-gift-icon{
+  display:grid;
+  place-items:center;
+  width:58px;
+  height:58px;
+  border:3px solid var(--line);
+  border-radius:16px;
+  background:#fff1bd;
+  font-size:1.8rem;
+  box-shadow:0 4px 0 rgba(73,57,81,.15)
+}
+.reward-code-entry{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:9px;
+  align-items:end;
+  margin-top:10px
+}
+.reward-code-entry .cloud-label{margin-top:0}
+#rewardCodeInput{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-weight:900;
+  letter-spacing:.09em
+}
+.reward-code-message{
+  margin-top:10px;
+  padding:10px 12px;
+  border:2px dashed var(--line);
+  border-radius:12px;
+  background:var(--panel);
+  font-weight:800
+}
+.reward-code-message.success{background:#d5f0dd}
+.reward-code-message.error{background:#ffd9df}
+.reward-code-message.working{background:#fff1bd}
+@media(max-width:620px){
+  .reward-code-entry{grid-template-columns:1fr}
+  .reward-code-entry button{width:100%}
+}

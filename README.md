@@ -19,3 +19,19 @@ The Blueprint automatically configures:
 After deployment, open the new Render web-service address.
 
 The moderation page is available at `/admin.html`.
+
+
+## Version 21 — Reward Codes
+
+The Account page now contains a Private Reward Codes section.
+
+Initial code:
+
+- `SUMMER27` — awards 200 coins
+- Can be redeemed once per cloud account
+- Validated by the cloud server
+- Added directly to the current cloud save
+- Protected against repeated or simultaneous redemption attempts
+
+The database records each account and redeemed code in
+`reward_code_redemptions`.

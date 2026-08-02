@@ -9,7 +9,8 @@ let pool=null;
 const mem={
   users:new Map(), sessions:new Map(), saves:new Map(), entitlements:new Map(),
   profiles:new Map(), codes:new Map(), codeByUser:new Map(), friends:new Map(),
-  reports:[], blocks:new Map(), hidden:new Map(), reactions:new Map()
+  reports:[], blocks:new Map(), hidden:new Map(), reactions:new Map(),
+  rewardRedemptions:new Map()
 };
 
 function now(){return new Date().toISOString()}
@@ -480,6 +481,108 @@ async function deleteUser(userId){
   }finally{client.release()}
 }
 
+
+async function redeemRewardCode(userId,{code,reward,deviceId="reward-code"}){
+  const normalized=String(code||"").toUpperCase();
+  const rewardData=clone(reward||{});
+  const redemptionKey=`${userId}|${normalized}`;
+
+  if(memoryMode){
+    if(mem.rewardRedemptions.has(redemptionKey)){
+      return {
+        alreadyRedeemed:true,
+        redemption:clone(mem.rewardRedemptions.get(redemptionKey)),
+        save:clone(mem.saves.get(userId)||null)
+      };
+    }
+    const current=mem.saves.get(userId)||{
+      user_id:userId,revision:0,device_id:deviceId,state:{},updated_at:now()
+    };
+    const nextState=clone(current.state||{});
+    nextState.coins=Math.max(0,Number(nextState.coins)||0)+Math.max(0,Number(rewardData.coins)||0);
+    const row={
+      user_id:userId,
+      revision:Number(current.revision||0)+1,
+      device_id:deviceId,
+      state:nextState,
+      updated_at:now()
+    };
+    const redemption={
+      user_id:userId,
+      code:normalized,
+      reward_data:rewardData,
+      redeemed_at:now()
+    };
+    mem.saves.set(userId,row);
+    mem.rewardRedemptions.set(redemptionKey,redemption);
+    return {alreadyRedeemed:false,redemption:clone(redemption),save:clone(row)};
+  }
+
+  const client=await pool.connect();
+  try{
+    await client.query("BEGIN");
+
+    // Lock the account row so two simultaneous requests cannot both grant coins.
+    await client.query(`SELECT id FROM users WHERE id=$1 FOR UPDATE`,[userId]);
+
+    const redeemed=await client.query(
+      `SELECT * FROM reward_code_redemptions WHERE user_id=$1 AND code=$2`,
+      [userId,normalized]
+    );
+    if(redeemed.rows[0]){
+      const current=await client.query(`SELECT * FROM cloud_saves WHERE user_id=$1`,[userId]);
+      await client.query("COMMIT");
+      return {
+        alreadyRedeemed:true,
+        redemption:redeemed.rows[0],
+        save:current.rows[0]||null
+      };
+    }
+
+    const currentResult=await client.query(
+      `SELECT * FROM cloud_saves WHERE user_id=$1 FOR UPDATE`,
+      [userId]
+    );
+    const current=currentResult.rows[0]||{
+      user_id:userId,revision:0,device_id:deviceId,state:{},updated_at:new Date()
+    };
+    const nextState=clone(current.state||{});
+    nextState.coins=Math.max(0,Number(nextState.coins)||0)+Math.max(0,Number(rewardData.coins)||0);
+    const nextRevision=Number(current.revision||0)+1;
+
+    const saveResult=await client.query(
+      `INSERT INTO cloud_saves(user_id,revision,device_id,state,updated_at)
+       VALUES($1,$2,$3,$4::jsonb,NOW())
+       ON CONFLICT(user_id) DO UPDATE SET
+        revision=EXCLUDED.revision,
+        device_id=EXCLUDED.device_id,
+        state=EXCLUDED.state,
+        updated_at=NOW()
+       RETURNING *`,
+      [userId,nextRevision,String(deviceId||"reward-code").slice(0,80),JSON.stringify(nextState)]
+    );
+
+    const redemptionResult=await client.query(
+      `INSERT INTO reward_code_redemptions(user_id,code,reward_data)
+       VALUES($1,$2,$3::jsonb)
+       RETURNING *`,
+      [userId,normalized,JSON.stringify(rewardData)]
+    );
+
+    await client.query("COMMIT");
+    return {
+      alreadyRedeemed:false,
+      redemption:redemptionResult.rows[0],
+      save:saveResult.rows[0]
+    };
+  }catch(error){
+    await client.query("ROLLBACK");
+    throw error;
+  }finally{
+    client.release();
+  }
+}
+
 async function accountSummary(userId){
   const user=await getUserById(userId);
   const save=await getCloudSave(userId);
@@ -492,5 +595,5 @@ module.exports={
   init,mode,createUser,findUserByPlayerId,getUserById,createSession,getSession,deleteSessionsForUser,
   getEntitlement,setEntitlement,getCloudSave,saveCloud,publishProfile,getProfileByCode,getProfileForUser,
   deleteProfile,gallery,listFriends,saveFriend,removeFriend,setReaction,addReport,blockProfile,hideProfile,
-  listReports,setReportStatus,moderateProfile,deleteUser,accountSummary
+  listReports,setReportStatus,moderateProfile,redeemRewardCode,deleteUser,accountSummary
 };

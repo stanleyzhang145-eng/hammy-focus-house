@@ -101,3 +101,15 @@ CREATE TABLE IF NOT EXISTS reactions (
 CREATE INDEX IF NOT EXISTS profiles_visibility_idx ON profiles (visibility, moderation_status, updated_at DESC);
 CREATE INDEX IF NOT EXISTS reports_status_idx ON reports (status, created_at DESC);
 CREATE INDEX IF NOT EXISTS reactions_code_idx ON reactions (profile_code);
+
+
+CREATE TABLE IF NOT EXISTS reward_code_redemptions (
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  code TEXT NOT NULL,
+  reward_data JSONB NOT NULL DEFAULT '{}'::jsonb,
+  redeemed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (user_id, code)
+);
+
+CREATE INDEX IF NOT EXISTS reward_code_redemptions_code_idx
+  ON reward_code_redemptions (code, redeemed_at DESC);

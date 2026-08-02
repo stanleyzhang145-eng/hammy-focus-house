@@ -20,6 +20,13 @@ const allowedTypes=new Set([
 const allowedRooms=new Set(["home","bedroom","kitchen","bathroom","study","music","game","garden","rooftop","aquarium","space","winter","beach"]);
 const allowedReactions=new Set(["heart","star","cozy","creative"]);
 const allowedReportReasons=new Set(["inappropriate_nickname","personal_information","unsafe_content","spam","other"]);
+const rewardCodeCatalog=new Map([
+  ["SUMMER27",{
+    title:"Summer Coin Gift",
+    description:"A sunny thank-you reward.",
+    coins:200
+  }]
+]);
 const unsafeNicknamePatterns=[
   /https?:/i,/www\./i,/@/,/discord/i,/snapchat/i,/instagram/i,/tiktok/i,/telegram/i,
   /\b(?:address|school|phone|email|location)\b/i,
@@ -48,6 +55,7 @@ function makeAccessToken(){return crypto.randomBytes(36).toString("base64url")}
 function normalizePlayerId(value){return String(value||"").toUpperCase().replace(/[^A-Z0-9]/g,"").replace(/^HF/,"HF").replace(/^HF([A-Z2-9]{4})([A-Z2-9]{4})$/,"HF-$1-$2")}
 function normalizeRecovery(value){return String(value||"").toUpperCase().replace(/[^A-Z0-9]/g,"")}
 function normalizeCode(value){return String(value||"").toUpperCase().replace(/[^A-Z2-9]/g,"").slice(0,8)}
+function normalizeRewardCode(value){return String(value||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,24)}
 
 function json(res,status,data,extraHeaders={}){
   const body=JSON.stringify(data);
@@ -259,17 +267,17 @@ async function handleApi(req,res,url){
     if(!databaseReady){
       return json(res,503,{
         ok:false,
-        version:20,
+        version:21,
         databaseReady:false,
         error:String(databaseError?.message||"Database is not ready.")
       });
     }
-    return json(res,200,{ok:true,version:20,databaseReady:true,databaseMode:db.mode()});
+    return json(res,200,{ok:true,version:21,databaseReady:true,databaseMode:db.mode()});
   }
 
   if(req.method==="GET"&&url.pathname==="/api/health"){
     return json(res,200,{
-      ok:true,name:"Hammy Cloud server",version:20,
+      ok:true,name:"Hammy Cloud server",version:21,
       databaseReady,databaseMode:databaseReady?db.mode():"not-configured",
       setupRequired:!databaseReady,
       databaseError:databaseReady?null:String(databaseError?.message||"DATABASE_URL is missing")
@@ -368,6 +376,40 @@ async function handleApi(req,res,url){
       return json(res,409,{error:"A newer cloud save already exists.",conflict:true,save:current});
     }
     return json(res,200,{saved:true,save:formatSave(result.row),premium:{active:Boolean(entitlement.active),source:entitlement.source||"none"}});
+  }
+
+
+  if(req.method==="POST"&&url.pathname==="/api/rewards/redeem"){
+    const auth=await requireAuth(req);
+    const body=await parseBody(req);
+    const code=normalizeRewardCode(body.code);
+    if(!code)return json(res,400,{error:"Enter a reward code."});
+
+    const reward=rewardCodeCatalog.get(code);
+    if(!reward)return json(res,404,{error:"That reward code is not valid."});
+
+    const result=await db.redeemRewardCode(auth.userId,{
+      code,
+      reward,
+      deviceId:String(body.deviceId||auth.deviceId||"reward-code").slice(0,80)
+    });
+
+    const save=formatSave(result.save);
+    if(result.alreadyRedeemed){
+      return json(res,409,{
+        error:"This reward code was already redeemed on this Hammy account.",
+        code,
+        alreadyRedeemed:true,
+        save
+      });
+    }
+
+    return json(res,200,{
+      redeemed:true,
+      code,
+      reward,
+      save
+    });
   }
 
   if(req.method==="POST"&&url.pathname==="/api/account/premium-preview"){
@@ -531,5 +573,5 @@ const server=http.createServer(async(req,res)=>{
     databaseReady=false;databaseError=error;
     console.error("Cloud database setup incomplete:",error.message);
   }
-  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v20 running at http://${HOST}:${PORT}`));
+  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v21 running at http://${HOST}:${PORT}`));
 })();
