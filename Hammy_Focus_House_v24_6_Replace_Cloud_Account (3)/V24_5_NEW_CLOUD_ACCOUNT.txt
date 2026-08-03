@@ -1,0 +1,35 @@
+HAMMY FOCUS HOUSE V24.5 — CREATE A BRAND-NEW CLOUD ACCOUNT
+
+NEW ACCOUNT BUTTON
+Account now includes:
+- Create new cloud account
+- Copy previous account backup
+
+WHAT IT DOES
+- Keeps current device progress
+- Creates a completely new Player ID
+- Creates a completely new recovery code
+- Creates a separate cloud save
+- Creates a separate friend list and online profile
+- Copies current coins, rooms, furniture, costumes, Premium state, and focus progress
+- Stores the previous Player ID and recovery code locally before switching
+- Does not require deleting the old account
+
+SAFETY
+- The old account is not deleted.
+- A failed new-account request leaves the current account unchanged.
+- Any in-progress cloud save finishes before the switch.
+- The new account gets a new device identifier.
+- The old account backup button is enabled when both old codes were available.
+- Up to five previous account backups are kept locally.
+
+HOW TO USE
+1. Open Account.
+2. Press Create new cloud account.
+3. Type NEW.
+4. Wait for the page to reload.
+5. Copy the new Player ID and recovery code.
+6. Use Copy previous account backup if the old account is needed later.
+
+DEPLOYMENT CHECK
+/api/health must report version 24.5.
