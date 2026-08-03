@@ -1,0 +1,43 @@
+HAMMY FOCUS HOUSE V23 — ADMIN LIVE OPERATIONS
+
+OPEN THE ADMIN PANEL
+1. Open Account.
+2. Tap Build v23 seven times.
+3. Enter the private ADMIN_ACCESS_CODE.
+4. The Live Operations dashboard opens.
+
+PLAYER REWARDS
+- Find an account using Player ID or friend code.
+- Grant up to 1,000,000 coins in one action.
+- Grant up to 100 of each fruit.
+- Grant one exclusive item per action.
+- Add a private audit note.
+- The reward is added to the newest cloud save.
+- The player receives it at the next cloud refresh.
+
+LIVE EVENTS
+- Host a random event or design a custom event.
+- Select duration, coins, fruit, and an exclusive.
+- Each account can claim an event once.
+- Events can be ended or cancelled.
+- Claim counts appear in the admin panel.
+- Active events appear on the Account page.
+
+EXCLUSIVES
+- Solar Crown
+- Aurora Aura
+- Star Trail
+- Crystal Founder Badge
+- Golden Focus Trophy
+- Neon Profile Frame
+
+AUDIT
+- Player grants are logged.
+- Event creation is logged.
+- Event status changes are logged.
+
+SAFETY
+- All admin actions require a signed admin session.
+- Rewards are validated by the server.
+- Database transactions prevent duplicate event claims.
+- Events are claim-based instead of silently changing every account.
