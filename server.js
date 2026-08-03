@@ -80,7 +80,6 @@ const unsafeNicknamePatterns=[
   /\b(?:address|school|phone|email|location)\b/i,
   /\b(?:fuck|shit|bitch|cunt|nigger|nigga|porn|sex)\b/i
 ];
-const rateMap=new Map();
 const adminLoginMap=new Map();
 const ADMIN_SESSION_SECONDS=30*60;
 let databaseReady=false;
@@ -210,27 +209,45 @@ function adminAuthorized(req){
   const bearer=authorization.startsWith("Bearer ")?authorization.slice(7).trim():"";
   return verifyAdminSession(explicitSession||bearer);
 }
-function adminLoginLimited(req){
-  const ip=req.socket.remoteAddress||"unknown";
+function clientAddress(req){
+  const forwarded=String(req.headers["x-forwarded-for"]||"")
+    .split(",")[0].trim();
+  const realIp=String(req.headers["x-real-ip"]||"").trim();
+  return forwarded||realIp||req.socket.remoteAddress||"unknown";
+}
+function adminLoginEntry(req){
+  const key=clientAddress(req);
   const current=Date.now();
   const windowMs=15*60*1000;
-  const entry=adminLoginMap.get(ip);
+  let entry=adminLoginMap.get(key);
   if(!entry||current-entry.start>windowMs){
-    adminLoginMap.set(ip,{start:current,failures:0,blockedUntil:0});
-    return false;
+    entry={start:current,failures:0,blockedUntil:0};
+    adminLoginMap.set(key,entry);
   }
+  return {key,entry,current};
+}
+function adminLoginLimited(req){
+  const {entry,current}=adminLoginEntry(req);
   return Number(entry.blockedUntil||0)>current;
 }
+function adminRetrySeconds(req){
+  const {entry,current}=adminLoginEntry(req);
+  return Math.max(0,Math.ceil((Number(entry.blockedUntil||0)-current)/1000));
+}
 function recordAdminFailure(req){
-  const ip=req.socket.remoteAddress||"unknown";
-  const current=Date.now();
-  const entry=adminLoginMap.get(ip)||{start:current,failures:0,blockedUntil:0};
+  const {key,entry,current}=adminLoginEntry(req);
   entry.failures++;
-  if(entry.failures>=5)entry.blockedUntil=current+(15*60*1000);
-  adminLoginMap.set(ip,entry);
+  // Shorter cooldown, while still slowing repeated guessing.
+  if(entry.failures>=5)entry.blockedUntil=current+(2*60*1000);
+  adminLoginMap.set(key,entry);
+  return {
+    failures:entry.failures,
+    attemptsRemaining:Math.max(0,5-entry.failures),
+    retryAfterSeconds:Math.max(0,Math.ceil((entry.blockedUntil-current)/1000))
+  };
 }
 function clearAdminFailures(req){
-  adminLoginMap.delete(req.socket.remoteAddress||"unknown");
+  adminLoginMap.delete(clientAddress(req));
 }
 
 function json(res,status,data,extraHeaders={}){
@@ -245,15 +262,6 @@ function json(res,status,data,extraHeaders={}){
     ...extraHeaders
   });
   res.end(body);
-}
-
-function rateLimited(req){
-  const ip=req.socket.remoteAddress||"unknown";
-  const current=Date.now(),windowMs=60_000;
-  const entry=rateMap.get(ip);
-  if(!entry||current-entry.start>windowMs){rateMap.set(ip,{start:current,count:1});return false}
-  entry.count++;
-  return entry.count>180;
 }
 
 function parseBody(req){
@@ -417,6 +425,18 @@ function contentType(file){
     ".sql":"text/plain; charset=utf-8"
   })[ext]||"application/octet-stream";
 }
+function sendStaticFile(res,file){
+  const updateFile=/\.(?:html|js|css)$/.test(file);
+  res.writeHead(200,{
+    "Content-Type":contentType(file),
+    "Cache-Control":updateFile?"no-store":"public, max-age=3600",
+    "X-Content-Type-Options":"nosniff",
+    "Referrer-Policy":"same-origin",
+    "X-Hammy-Version":"24.6"
+  });
+  fs.createReadStream(file).pipe(res);
+}
+
 function serveStatic(req,res,urlPath){
   let pathname=decodeURIComponent(urlPath.split("?")[0]);
   if(pathname==="/")pathname="/index.html";
@@ -426,15 +446,15 @@ function serveStatic(req,res,urlPath){
     return json(res,404,{error:"Not found."});
   }
   fs.stat(file,(error,stat)=>{
-    if(error||!stat.isFile())return json(res,404,{error:"Not found."});
-    const updateFile=/\.(?:html|js|css)$/.test(file);
-    res.writeHead(200,{
-      "Content-Type":contentType(file),
-      "Cache-Control":updateFile?"no-store":"public, max-age=3600",
-      "X-Content-Type-Options":"nosniff",
-      "Referrer-Policy":"same-origin"
-    });
-    fs.createReadStream(file).pipe(res);
+    if(!error&&stat.isFile())return sendStaticFile(res,file);
+
+    // Browser navigation must stay inside the app. This prevents an account,
+    // conflict, or installed-PWA route from becoming a raw JSON error page.
+    const acceptsHtml=String(req.headers.accept||"").includes("text/html");
+    if(req.method==="GET"&&acceptsHtml){
+      return sendStaticFile(res,path.join(ROOT,"index.html"));
+    }
+    return json(res,404,{error:"Not found."});
   });
 }
 
@@ -443,17 +463,17 @@ async function handleApi(req,res,url){
     if(!databaseReady){
       return json(res,503,{
         ok:false,
-        version:24,
+        version:24.6,
         databaseReady:false,
         error:String(databaseError?.message||"Database is not ready.")
       });
     }
-    return json(res,200,{ok:true,version:24,databaseReady:true,databaseMode:db.mode()});
+    return json(res,200,{ok:true,version:24.6,databaseReady:true,databaseMode:db.mode()});
   }
 
   if(req.method==="GET"&&url.pathname==="/api/health"){
     return json(res,200,{
-      ok:true,name:"Hammy Cloud server",version:24,
+      ok:true,name:"Hammy Cloud server",version:24.6,
       databaseReady,databaseMode:databaseReady?db.mode():"not-configured",
       setupRequired:!databaseReady,
       databaseError:databaseReady?null:String(databaseError?.message||"DATABASE_URL is missing")
@@ -747,24 +767,53 @@ async function handleApi(req,res,url){
 
   if(req.method==="POST"&&url.pathname==="/api/admin/login"){
     requireDatabase();
-    if(adminLoginLimited(req)){
-      return json(res,429,{error:"Too many incorrect attempts. Admin access is temporarily locked."});
-    }
     const body=await parseBody(req);
     const submitted=String(body.code||"").trim();
     const secret=adminSecret();
     if(!secret){
       return json(res,503,{error:"ADMIN_ACCESS_CODE is not configured."});
     }
-    if(!submitted||!safeEqual(submitted,secret)){
-      recordAdminFailure(req);
-      return json(res,401,{error:"The top secret admin code is incorrect."});
+
+    // A correct secret always clears the temporary lock immediately.
+    if(submitted&&safeEqual(submitted,secret)){
+      clearAdminFailures(req);
+      return json(res,200,{
+        authenticated:true,
+        sessionToken:createAdminSession(),
+        expiresInSeconds:ADMIN_SESSION_SECONDS
+      });
     }
-    clearAdminFailures(req);
-    return json(res,200,{
-      authenticated:true,
-      sessionToken:createAdminSession(),
-      expiresInSeconds:ADMIN_SESSION_SECONDS
+
+    if(adminLoginLimited(req)){
+      const retryAfterSeconds=adminRetrySeconds(req);
+      return json(
+        res,
+        429,
+        {
+          error:`Too many incorrect attempts. Try again in ${retryAfterSeconds} seconds.`,
+          retryAfterSeconds
+        },
+        {"Retry-After":String(retryAfterSeconds)}
+      );
+    }
+
+    const failure=recordAdminFailure(req);
+    if(failure.retryAfterSeconds>0){
+      return json(
+        res,
+        429,
+        {
+          error:`Too many incorrect attempts. Try again in ${failure.retryAfterSeconds} seconds.`,
+          retryAfterSeconds:failure.retryAfterSeconds,
+          attemptsRemaining:0
+        },
+        {"Retry-After":String(failure.retryAfterSeconds)}
+      );
+    }
+
+    return json(res,401,{
+      error:"The top secret admin code is incorrect.",
+      attemptsRemaining:failure.attemptsRemaining
     });
   }
 
@@ -1064,16 +1113,21 @@ async function handleApi(req,res,url){
 }
 
 const server=http.createServer(async(req,res)=>{
-  if(rateLimited(req))return json(res,429,{error:"Too many requests. Try again in a minute."});
   if(req.method==="OPTIONS")return json(res,204,{});
   const url=new URL(req.url,`http://${req.headers.host||"localhost"}`);
+
   try{
     if(url.pathname.startsWith("/api/"))return await handleApi(req,res,url);
     return serveStatic(req,res,url.pathname);
   }catch(error){
     console.error(error);
     const status=Number(error.status)||500;
-    return json(res,status,{error:status>=500&&error.code!=="DATABASE_REQUIRED"?"The server could not complete that request.":error.message,code:error.code||null});
+    return json(res,status,{
+      error:status>=500&&error.code!=="DATABASE_REQUIRED"
+        ?"The server could not complete that request."
+        :error.message,
+      code:error.code||null
+    });
   }
 });
 
@@ -1086,5 +1140,5 @@ const server=http.createServer(async(req,res)=>{
     databaseReady=false;databaseError=error;
     console.error("Cloud database setup incomplete:",error.message);
   }
-  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v24 running at http://${HOST}:${PORT}`));
+  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v24.6 running at http://${HOST}:${PORT}`));
 })();
