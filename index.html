@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=246">
-<link rel="stylesheet" href="cloud.css?v=246">
+<link rel="stylesheet" href="online.css?v=247">
+<link rel="stylesheet" href="cloud.css?v=247">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -817,7 +817,7 @@ body[data-theme="night"] .focus-warning{background:#5a4d2a;color:#fff}
 body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
 </style>
-<link rel="stylesheet" href="premium.css?v=246">
+<link rel="stylesheet" href="premium.css?v=247">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -977,7 +977,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v24.6">Build v24.6</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v24.7">Build v24.7</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -1150,7 +1150,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button type="button" id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v24.6 seven times whenever you need to show this section.
+   Tap Build v24.7 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -1198,7 +1198,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v24.6</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v24.7</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -1511,8 +1511,53 @@ function save(){
  const previous=localStorage.getItem("hammyV8");
  if(previous===serialized)return;
  localStorage.setItem("hammyV8",serialized);
+ if(window.__hammyApplyingCloudState)return;
  window.HammyCloud?.scheduleSave("game progress changed");
 }
+
+function normalizeGameState(nextState){
+ const next={...defaults,...JSON.parse(JSON.stringify(nextState||{}))};
+ next.foods={...defaults.foods,...(next.foods||{})};
+ next.marketInventory={...defaults.marketInventory,...(next.marketInventory||{})};
+ next.activeBoosters={...defaults.activeBoosters,...(next.activeBoosters||{})};
+ next.ownedDecorations={...defaults.ownedDecorations,...(next.ownedDecorations||{})};
+ next.placedDecorations={...defaults.placedDecorations,...(next.placedDecorations||{})};
+ next.ownedMarketThemes={...defaults.ownedMarketThemes,...(next.ownedMarketThemes||{})};
+ next.ownedFurniture={...defaults.ownedFurniture,...(next.ownedFurniture||{})};
+ next.placedFurniture={...defaults.placedFurniture,...(next.placedFurniture||{})};
+ next.practiceDays=Number(next.practiceDays||0);
+ next.totalFocusMinutes=Number(next.totalFocusMinutes||0);
+ next.sessionCount=Number(next.sessionCount||0);
+ next.lastPracticeDate=next.lastPracticeDate||"";
+ next.theme=next.theme||"lavender";
+ return next;
+}
+
+window.HammyGameState={
+ snapshot(){
+   return JSON.parse(JSON.stringify(state));
+ },
+ replace(nextState,{render=true}={}){
+   window.__hammyApplyingCloudState=true;
+   try{
+     state=normalizeGameState(nextState);
+     localStorage.setItem("hammyV8",JSON.stringify(state));
+     if(render){
+       update();
+       renderSkins();
+       renderClothing();
+       renderFruit();
+       renderFurniture();
+       renderSettings();
+       renderMarket();
+       renderDecorations();
+     }
+     return JSON.parse(JSON.stringify(state));
+   }finally{
+     window.__hammyApplyingCloudState=false;
+   }
+ }
+};
 function say(text){$("status").textContent=text;$("roomMessage").textContent=text}
 function safeSkin(){if(!skins[state.skin]||(skins[state.skin].premium&&!state.premium))state.skin="white"}
 function getLootLevel(){return Math.min(20,1+Math.floor(state.totalFocusMinutes/120))}
@@ -1838,14 +1883,14 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=246"></script>
-<script src="cloud.js?v=246"></script>
-<script src="online.js?v=246"></script>
-<script src="gallery.js?v=246"></script>
+<script src="premium.js?v=247"></script>
+<script src="cloud.js?v=247"></script>
+<script src="online.js?v=247"></script>
+<script src="gallery.js?v=247"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=246").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=247").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>

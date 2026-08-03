@@ -432,7 +432,7 @@ function sendStaticFile(res,file){
     "Cache-Control":updateFile?"no-store":"public, max-age=3600",
     "X-Content-Type-Options":"nosniff",
     "Referrer-Policy":"same-origin",
-    "X-Hammy-Version":"24.6"
+    "X-Hammy-Version":"24.7"
   });
   fs.createReadStream(file).pipe(res);
 }
@@ -463,17 +463,17 @@ async function handleApi(req,res,url){
     if(!databaseReady){
       return json(res,503,{
         ok:false,
-        version:24.6,
+        version:24.7,
         databaseReady:false,
         error:String(databaseError?.message||"Database is not ready.")
       });
     }
-    return json(res,200,{ok:true,version:24.6,databaseReady:true,databaseMode:db.mode()});
+    return json(res,200,{ok:true,version:24.7,databaseReady:true,databaseMode:db.mode()});
   }
 
   if(req.method==="GET"&&url.pathname==="/api/health"){
     return json(res,200,{
-      ok:true,name:"Hammy Cloud server",version:24.6,
+      ok:true,name:"Hammy Cloud server",version:24.7,
       databaseReady,databaseMode:databaseReady?db.mode():"not-configured",
       setupRequired:!databaseReady,
       databaseError:databaseReady?null:String(databaseError?.message||"DATABASE_URL is missing")
@@ -1140,5 +1140,5 @@ const server=http.createServer(async(req,res)=>{
     databaseReady=false;databaseError=error;
     console.error("Cloud database setup incomplete:",error.message);
   }
-  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v24.6 running at http://${HOST}:${PORT}`));
+  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v24.7 running at http://${HOST}:${PORT}`));
 })();

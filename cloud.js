@@ -195,7 +195,26 @@
   }
 
   function snapshot(){
-    try{return JSON.parse(JSON.stringify(state))}catch{return JSON.parse(localStorage.getItem(SAVE_KEY)||"{}")}
+    try{
+      if(window.HammyGameState?.snapshot){
+        return window.HammyGameState.snapshot();
+      }
+      return JSON.parse(JSON.stringify(state));
+    }catch{
+      return JSON.parse(localStorage.getItem(SAVE_KEY)||"{}");
+    }
+  }
+
+  function replaceRunningGameState(nextState,{render=true}={}){
+    const normalized=JSON.parse(JSON.stringify(nextState||{}));
+    if(window.HammyGameState?.replace){
+      return window.HammyGameState.replace(normalized,{render});
+    }
+    try{
+      state=normalized;
+    }catch{}
+    localStorage.setItem(SAVE_KEY,JSON.stringify(normalized));
+    return normalized;
   }
   function stateHash(value){
     const text=JSON.stringify(value||{});
@@ -692,9 +711,89 @@
     }
     return `${command.title||"Admin delivery"} received.`;
   }
+  function expectedDeliveryResult(beforeInput,commands){
+    let expected=JSON.parse(JSON.stringify(beforeInput||{}));
+    for(const command of commands||[]){
+      expected=applyAdminCommand(expected,command);
+    }
+    return expected;
+  }
+
+  function verifyAdminDeliveries(beforeInput,afterInput,commands){
+    const before=beforeInput||{};
+    const after=afterInput||{};
+    const expected=expectedDeliveryResult(before,commands);
+    const failures=[];
+
+    for(const command of commands||[]){
+      const payload=command?.payload||{};
+      if(command?.type==="grantReward"){
+        const reward=payload.reward||{};
+        if(Number(after.coins||0)<Number(expected.coins||0)){
+          failures.push("coins");
+        }
+        for(const key of ["apple","banana","berry","mango"]){
+          if(Number(after.foods?.[key]||0)<Number(expected.foods?.[key]||0)){
+            failures.push(key);
+          }
+        }
+        if(
+          reward.exclusiveId &&
+          !(Array.isArray(after.adminExclusives)&&
+            after.adminExclusives.includes(reward.exclusiveId))
+        ){
+          failures.push("exclusive item");
+        }
+      }
+      if(command?.type==="setCoins"&&
+        Number(after.coins||0)!==Number(payload.coins||0)
+      ){
+        failures.push("coin correction");
+      }
+      if(command?.type==="setPremium"&&
+        Boolean(after.premium)!==Boolean(payload.active)
+      ){
+        failures.push("Premium");
+      }
+      if(command?.type==="removeExclusive"&&
+        Array.isArray(after.adminExclusives)&&
+        after.adminExclusives.includes(payload.exclusiveId)
+      ){
+        failures.push("exclusive removal");
+      }
+    }
+
+    const deliveredIds=new Set(
+      (Array.isArray(after.adminCommands)?after.adminCommands:[])
+        .map(command=>String(command?.id||""))
+        .filter(Boolean)
+    );
+    for(const command of commands||[]){
+      if(command?.id&&!deliveredIds.has(String(command.id))){
+        failures.push("delivery receipt");
+      }
+    }
+
+    return {
+      ok:failures.length===0,
+      failures:[...new Set(failures)],
+      expected
+    };
+  }
+
   async function acceptAdminDeliveries(remoteSave,delivery){
-    const merged=delivery.state;
-    localStorage.setItem(SAVE_KEY,JSON.stringify(merged));
+    clearTimeout(saveTimer);
+
+    const before=snapshot();
+    const merged=replaceRunningGameState(delivery.state,{render:true});
+    const localCheck=verifyAdminDeliveries(before,merged,delivery.commands);
+
+    if(!localCheck.ok){
+      throw new Error(
+        `Admin delivery could not be applied locally: ${localCheck.failures.join(", ")}.`
+      );
+    }
+
     meta.revision=Number(remoteSave.revision)||0;
     meta.lastSyncAt=remoteSave.updatedAt||new Date().toISOString();
     meta.localUpdatedAt=new Date().toISOString();
@@ -702,31 +801,54 @@
     meta.dirty=true;
     writeMeta();
 
+    let saved;
     try{
-      await syncNow({
+      saved=await syncNow({
         force:true,
         baseRevision:Number(remoteSave.revision)||0,
         stateOverride:merged
       });
-    }catch{
-      // The merged save remains local and will retry automatically.
+    }catch(error){
+      // Keep the verified local gift and retry later instead of claiming success
+      // for a state that disappeared from the running game.
+      meta.dirty=true;
+      writeMeta();
+      setCloudActionStatus(
+        "Gift applied on this device. Cloud confirmation will retry automatically.",
+        "working"
+      );
+      scheduleSave("admin delivery confirmation");
+      saved=null;
     }
 
-    sessionStorage.setItem(
-      "hammyAdminDeliveryNotice",
-      JSON.stringify({message:deliverySummary(delivery.commands)})
-    );
-    location.reload();
+    const finalState=saved?.state||snapshot();
+    replaceRunningGameState(finalState,{render:true});
+    const finalCheck=verifyAdminDeliveries(before,finalState,delivery.commands);
+
+    if(!finalCheck.ok){
+      meta.dirty=true;
+      writeMeta();
+      throw new Error(
+        `Admin delivery verification failed: ${finalCheck.failures.join(", ")}.`
+      );
+    }
+
+    const message=deliverySummary(delivery.commands);
+    setCloudActionStatus(message,"success");
+    toast(message,"success");
+    sessionStorage.removeItem("hammyAdminDeliveryNotice");
+    return finalState;
   }
 
   function applyCloudState(remoteSave){
     if(!remoteSave?.state)return;
     meta.revision=Number(remoteSave.revision)||0;
     meta.lastSyncAt=remoteSave.updatedAt||new Date().toISOString();
-    meta.dirty=false;meta.stateHash=stateHash(remoteSave.state);
-    localStorage.setItem(SAVE_KEY,JSON.stringify(remoteSave.state));
+    meta.dirty=false;
+    meta.stateHash=stateHash(remoteSave.state);
+    replaceRunningGameState(remoteSave.state,{render:true});
     writeMeta();
-    location.reload();
+    return remoteSave.state;
   }
   function showConflict(remoteSave,type="save",pendingAuth=null){
     pendingConflict={type,remoteSave,localState:snapshot(),pendingAuth};
@@ -793,11 +915,14 @@
         syncedState.premium=true;
         syncedState.premiumDemoEntitlement=result.premium.source==="demo";
       }
-      meta.stateHash=stateHash(syncedState);meta.dirty=false;
-      if(stateHash(syncedState)!==stateHash(localState)){
-        localStorage.setItem(SAVE_KEY,JSON.stringify(syncedState));
-      }
-      writeMeta();setChip("online","Cloud online");
+      const confirmedState=result.save?.state
+        ?JSON.parse(JSON.stringify(result.save.state))
+        :syncedState;
+      meta.stateHash=stateHash(confirmedState);
+      meta.dirty=false;
+      replaceRunningGameState(confirmedState,{render:true});
+      writeMeta();
+      setChip("online","Cloud online");
       toast("Hammy progress synced.","success");
       return result.save;
     }catch(error){

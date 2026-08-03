@@ -1,0 +1,32 @@
+HAMMY FOCUS HOUSE V24.7 — ADMIN GIFT DELIVERY FIX
+
+PROBLEM
+An admin gift could be written to localStorage and produce a success
+notification while the running game still held its older in-memory state.
+The visible coin and fruit counters could therefore stay unchanged, and a
+later normal save could overwrite the delivered reward.
+
+FIX
+- index.html now exposes a HammyGameState bridge.
+- Cloud downloads replace both localStorage and the running `state` object.
+- Admin gifts are merged with unsynced local gameplay progress.
+- The running UI redraws immediately after the gift is applied.
+- Coins, fruit, Premium changes, exclusives, removals, and delivery receipts
+  are verified before the success notification appears.
+- The merged state is force-synced using the admin save revision.
+- The server-confirmed save replaces the local and running state.
+- A temporary sync failure keeps the verified gift locally and schedules a
+  retry instead of discarding it.
+- Normal saves are suppressed while a cloud state is being installed.
+- Cloud save downloads no longer depend on a full page reload.
+
+TEST
+Grant a small reward such as:
+- 10 coins
+- 1 apple
+
+The player's visible balance and apple count should change immediately when
+the delivery notification appears.
+
+DEPLOYMENT CHECK
+/api/health must report version 24.7.

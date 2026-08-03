@@ -211,3 +211,11 @@ The Account page can now permanently delete the connected cloud account and
 replace it with a completely fresh starter account. The new account is created
 and verified before deletion. Failure rolls back to the old account, while an
 interruption record allows the app to recover safely after a browser reload.
+
+
+## Version 24.7 — Verified Admin Gift Delivery
+
+Admin deliveries now update localStorage and the running game state together.
+The client verifies coin, fruit, Premium, and exclusive changes, then syncs
+the merged save and installs the server-confirmed result. The success message
+is displayed only after the reward exists in the visible game state.
