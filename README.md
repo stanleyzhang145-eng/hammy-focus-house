@@ -143,3 +143,71 @@ The Fruit Pantry also sells:
 - Grapes
 - Kiwis
 - Watermelons
+
+
+## Version 24.1 — Admin Login Hotfix
+
+- A correct `ADMIN_ACCESS_CODE` now clears the temporary lock immediately.
+- Incorrect guesses still trigger protection.
+- The cooldown was reduced from 15 minutes to 2 minutes.
+- The server uses the forwarded visitor address on Render instead of treating
+  everyone as the same reverse-proxy address.
+- The API returns the remaining cooldown in seconds.
+- The admin screen displays a countdown.
+
+
+## Version 24.2 — Global Rate-Limit Hotfix
+
+The old limiter counted every request using Render's internal proxy address.
+Images, CSS, JavaScript, page loads, and cloud polling could therefore block
+the entire website and replace the homepage with a JSON 429 error.
+
+v24.2 changes this behavior:
+
+- Static HTML, CSS, JavaScript, icons, and images are never app-rate-limited.
+- `/api/health` and `/api/health/ready` always remain reachable.
+- `/api/admin/login` uses only its dedicated password-attempt protection.
+- API reads have a separate 600-per-minute per-visitor limit.
+- API writes have a separate 120-per-minute per-visitor limit.
+- Render's forwarded visitor address is used instead of the shared proxy.
+- Expired rate-limit buckets are cleaned automatically.
+
+
+## Version 24.3 — Automatic Admin Delivery
+
+- Admin rewards now arrive in normal gameplay without opening the Online page.
+- The app checks for deliveries every 15 seconds and when it regains focus.
+- False dirty-save changes during startup were removed.
+- Admin changes merge with unsynced local progress.
+- Coin corrections, Premium-preview changes, exclusive removal, and reward
+  grants carry mergeable command records.
+- Temporary 429 API responses retry automatically once.
+- The Online tab is now labeled Friends.
+
+
+## Version 24.4 — Cloud Account Stability
+
+Cloud accounts, Player IDs, recovery codes, cross-device saves, friends, and
+automatic admin delivery are retained.
+
+The general request limiter was removed because it could block normal account
+buttons on Render. Admin incorrect-password protection remains. Cloud requests
+are combined and retried inside the app, account actions display in-app status,
+and browser navigation falls back to the Hammy interface instead of raw JSON.
+
+
+## Version 24.5 — Brand-New Cloud Account
+
+The Account page can create a completely separate cloud account without
+deleting the current one. Current device progress is uploaded to the new
+account. The previous Player ID and recovery code are stored locally as a
+backup, and the new account receives a new Player ID, recovery code, device
+identity, friend list, profile, and cloud save.
+
+
+## Version 24.6 — Replace Cloud Account
+
+The Account page can now permanently delete the connected cloud account and
+replace it with a completely fresh starter account. The new account is created
+and verified before deletion. Failure rolls back to the old account, while an
+interruption record allows the app to recover safely after a browser reload.

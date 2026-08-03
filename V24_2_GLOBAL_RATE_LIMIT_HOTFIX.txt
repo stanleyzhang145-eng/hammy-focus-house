@@ -1,0 +1,19 @@
+HAMMY FOCUS HOUSE V24.2 — GLOBAL RATE-LIMIT HOTFIX
+
+PROBLEM
+The old server limiter ran before the URL was checked and used
+req.socket.remoteAddress. On Render, many requests appeared to come from the
+same internal proxy. Every HTML page, image, script, stylesheet, and API call
+counted toward the same 180-request limit.
+
+RESULT
+The entire website could become:
+{"error":"Too many requests. Try again in a minute."}
+
+FIX
+- Static pages and assets are never application-rate-limited.
+- Health endpoints are always available.
+- Admin login keeps its separate password protection.
+- Read and write API calls use separate visitor-based buckets.
+- Forwarded visitor addresses are used on Render.
+- Redeploying v24.2 immediately clears the old in-memory limiter.

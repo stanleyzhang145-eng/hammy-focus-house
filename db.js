@@ -611,6 +611,20 @@ function applyAdminReward(stateInput,rewardInput,source="admin"){
   return state;
 }
 
+function appendAdminCommand(stateInput,type,payload={},title="Admin Delivery"){
+  const state=clone(stateInput||{});
+  if(!Array.isArray(state.adminCommands))state.adminCommands=[];
+  state.adminCommands.push({
+    id:crypto.randomUUID(),
+    type:String(type||"admin"),
+    title:String(title||"Admin Delivery").slice(0,80),
+    payload:clone(payload||{}),
+    createdAt:now()
+  });
+  state.adminCommands=state.adminCommands.slice(-100);
+  return state;
+}
+
 async function findUserByIdentifier(identifier){
   const value=String(identifier||"").trim().toUpperCase();
   if(memoryMode){
@@ -694,7 +708,13 @@ async function adminGrant(identifier,{reward,note="",deviceId="admin-panel"}){
     const current=mem.saves.get(user.id)||{
       user_id:user.id,revision:0,device_id:deviceId,state:{},updated_at:now()
     };
-    const nextState=applyAdminReward(current.state,safeReward,"admin-grant");
+    let nextState=applyAdminReward(current.state,safeReward,"admin-grant");
+    nextState=appendAdminCommand(
+      nextState,
+      "grantReward",
+      {reward:safeReward},
+      safeReward.title||"Admin Gift"
+    );
     const row={
       user_id:user.id,
       revision:Number(current.revision||0)+1,
@@ -718,7 +738,13 @@ async function adminGrant(identifier,{reward,note="",deviceId="admin-panel"}){
     const current=currentResult.rows[0]||{
       user_id:user.id,revision:0,device_id:deviceId,state:{},updated_at:new Date()
     };
-    const nextState=applyAdminReward(current.state,safeReward,"admin-grant");
+    let nextState=applyAdminReward(current.state,safeReward,"admin-grant");
+    nextState=appendAdminCommand(
+      nextState,
+      "grantReward",
+      {reward:safeReward},
+      safeReward.title||"Admin Gift"
+    );
     const nextRevision=Number(current.revision||0)+1;
     const {rows}=await client.query(
       `INSERT INTO cloud_saves(user_id,revision,device_id,state,updated_at)
@@ -973,8 +999,11 @@ async function adminSetCoins(identifier,coins){
     const current=mem.saves.get(user.id)||{
       user_id:user.id,revision:0,device_id:"admin-set-coins",state:{},updated_at:now()
     };
-    const nextState=clone(current.state||{});
+    let nextState=clone(current.state||{});
     nextState.coins=exact;
+    nextState=appendAdminCommand(
+      nextState,"setCoins",{coins:exact},"Coin Balance Correction"
+    );
     const row={
       user_id:user.id,revision:Number(current.revision||0)+1,
       device_id:"admin-set-coins",state:nextState,updated_at:now()
@@ -996,8 +1025,11 @@ async function adminSetCoins(identifier,coins){
       [user.id]
     );
     const current=currentResult.rows[0]||{revision:0,state:{}};
-    const nextState=clone(current.state||{});
+    let nextState=clone(current.state||{});
     nextState.coins=exact;
+    nextState=appendAdminCommand(
+      nextState,"setCoins",{coins:exact},"Coin Balance Correction"
+    );
     const nextRevision=Number(current.revision||0)+1;
     const {rows}=await client.query(
       `INSERT INTO cloud_saves(user_id,revision,device_id,state,updated_at)
@@ -1029,10 +1061,13 @@ async function adminRemoveExclusive(identifier,exclusiveId){
     const current=mem.saves.get(user.id)||{
       user_id:user.id,revision:0,device_id:"admin-remove-exclusive",state:{},updated_at:now()
     };
-    const nextState=clone(current.state||{});
+    let nextState=clone(current.state||{});
     nextState.adminExclusives=(Array.isArray(nextState.adminExclusives)?nextState.adminExclusives:[])
       .filter(item=>item!==id);
     if(nextState.equippedAdminExclusive===id)nextState.equippedAdminExclusive=null;
+    nextState=appendAdminCommand(
+      nextState,"removeExclusive",{exclusiveId:id},"Exclusive Item Removed"
+    );
     const row={
       user_id:user.id,revision:Number(current.revision||0)+1,
       device_id:"admin-remove-exclusive",state:nextState,updated_at:now()
@@ -1054,10 +1089,13 @@ async function adminRemoveExclusive(identifier,exclusiveId){
       [user.id]
     );
     const current=currentResult.rows[0]||{revision:0,state:{}};
-    const nextState=clone(current.state||{});
+    let nextState=clone(current.state||{});
     nextState.adminExclusives=(Array.isArray(nextState.adminExclusives)?nextState.adminExclusives:[])
       .filter(item=>item!==id);
     if(nextState.equippedAdminExclusive===id)nextState.equippedAdminExclusive=null;
+    nextState=appendAdminCommand(
+      nextState,"removeExclusive",{exclusiveId:id},"Exclusive Item Removed"
+    );
     const nextRevision=Number(current.revision||0)+1;
     const {rows}=await client.query(
       `INSERT INTO cloud_saves(user_id,revision,device_id,state,updated_at)
@@ -1088,16 +1126,20 @@ async function adminSetPremium(identifier,active){
     active:enabled,source:enabled?"admin-preview":"none"
   });
   const current=await getCloudSave(user.id);
-  if(current){
-    const state=clone(current.state||{});
-    state.premium=enabled;
-    state.premiumDemoEntitlement=enabled;
-    await saveCloud(user.id,{
-      baseRevision:Number(current.revision)||0,
-      deviceId:"admin-premium",
-      state,force:true
-    });
-  }
+  let state=clone(current?.state||{});
+  state.premium=enabled;
+  state.premiumDemoEntitlement=enabled;
+  state=appendAdminCommand(
+    state,
+    "setPremium",
+    {active:enabled},
+    enabled?"Premium Preview Granted":"Premium Preview Revoked"
+  );
+  await saveCloud(user.id,{
+    baseRevision:Number(current?.revision)||0,
+    deviceId:"admin-premium",
+    state,force:true
+  });
   await addAudit(
     enabled?"player_premium_preview_granted":"player_premium_preview_revoked",
     {targetUserId:user.id,targetPlayerId:user.player_id,details:{active:enabled}}

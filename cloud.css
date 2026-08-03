@@ -311,3 +311,66 @@
   .market-daily,.player-announcement{align-items:stretch;display:grid}
   .rainbow-banner{left:20%;font-size:.75rem}
 }
+
+
+/* Hammy Focus House v24.4 — cloud account stability */
+.cloud-warning{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.cloud-warning p{margin:4px 0 0}
+.cloud-action-message{
+  margin-top:10px;
+  min-height:44px;
+  padding:10px 12px;
+  border:2px dashed var(--line);
+  border-radius:13px;
+  background:var(--soft);
+  font-weight:800;
+}
+.cloud-action-message.working{background:#fff4c9}
+.cloud-action-message.success{background:#dff5e5}
+.cloud-action-message.error{background:#ffe0e5}
+@media(max-width:680px){
+  .cloud-warning{display:grid;align-items:stretch}
+  .cloud-warning button{width:100%}
+}
+
+
+/* Hammy Focus House v24.5 — new cloud identity */
+.new-cloud-account-card{
+  background:linear-gradient(135deg,#f2e9ff,#fff9d8);
+}
+.new-cloud-explanation{
+  margin:10px 0;
+  padding:11px;
+  border:2px dashed var(--line);
+  border-radius:13px;
+  background:#fff;
+}
+.new-cloud-explanation p{margin:5px 0 0}
+
+
+/* Hammy Focus House v24.6 — permanent account replacement */
+.replace-cloud-account-card{
+  border-color:#8e3348;
+  background:linear-gradient(135deg,#fff1f3,#fff9dc);
+}
+.replace-account-warning{
+  margin:10px 0 12px;
+  padding:11px;
+  border:3px solid #8e3348;
+  border-radius:14px;
+  background:#fff;
+}
+.replace-account-warning p{margin:5px 0 0}
+.danger-chip{
+  background:#ffdce3;
+  color:#7f293d;
+}
+.danger-primary{
+  background:#a83850;
+  border-color:#5f2635;
+}

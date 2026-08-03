@@ -110,9 +110,32 @@
       await loadAll();
       message("Admin Command Center unlocked.","success");
     }catch(error){
-      message(error.message||"The admin code is incorrect.","error");
+      const retry=Math.max(0,Number(error.data?.retryAfterSeconds)||0);
+      if(error.status===429&&retry>0){
+        let remaining=retry;
+        el("adminLogin").disabled=true;
+        message(`Too many incorrect attempts. Try again in ${remaining} seconds. A correct code will unlock immediately after this hotfix is deployed.`,"error");
+        const countdown=setInterval(()=>{
+          remaining--;
+          if(remaining<=0){
+            clearInterval(countdown);
+            el("adminLogin").disabled=false;
+            message("Admin login is ready. Enter the private code.","");
+          }else{
+            message(`Too many incorrect attempts. Try again in ${remaining} seconds.`,"error");
+          }
+        },1000);
+      }else{
+        const attempts=error.data?.attemptsRemaining;
+        message(
+          attempts===undefined
+            ?(error.message||"The admin code is incorrect.")
+            :`${error.message} ${attempts} attempt${attempts===1?"":"s"} remaining before a short cooldown.`,
+          "error"
+        );
+      }
     }finally{
-      el("adminLogin").disabled=false;
+      if(!el("adminLogin").disabled)el("adminLogin").disabled=false;
     }
   }
   async function verifySession(){

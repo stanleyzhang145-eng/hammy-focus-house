@@ -1,0 +1,27 @@
+HAMMY FOCUS HOUSE V24.3 — AUTOMATIC ADMIN DELIVERY
+
+WHAT WAS HAPPENING
+- Admin changes were written to the cloud save.
+- The normal game redraw called save() even when nothing changed.
+- That made the local save look dirty immediately.
+- New cloud changes could then be treated as conflicts instead of deliveries.
+- Players felt forced to open the Online/Cloud area.
+
+WHAT CHANGED
+- Normal redraws no longer create false save changes.
+- The game checks for admin deliveries every 15 seconds on every page.
+- It also checks when the browser tab or Home Screen app becomes active.
+- Admin gifts merge into local gameplay before syncing back to the cloud.
+- Unsynced local progress is preserved.
+- Exact coin corrections, Premium changes, reward grants, and exclusive removal
+  use mergeable server commands.
+- Temporary 429 responses retry once automatically.
+- The Online navigation label is now Friends because cloud delivery is automatic.
+- Admin deliveries display a success notification after they arrive.
+
+IMPORTANT DEPLOYMENT CHECK
+After uploading and deploying, open:
+/api/health
+
+It must report version 24.3. If it reports an older version, Render is still
+running an older GitHub commit.
