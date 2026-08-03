@@ -1,0 +1,50 @@
+HAMMY FOCUS HOUSE V24 — ADMIN COMMAND CENTER + MARKET
+
+WHY THE HAMSTER WAS FLYING
+v23 added this CSS rule:
+#hamster { position: relative; }
+
+The hamster already used absolute positioning inside the room. The new rule
+overrode that and caused the hamster to move with the page layout. v24 removes
+the incorrect rule and restores the floor position.
+
+MORE ADMIN TOOLS
+- Search by Player ID, friend code, or nickname.
+- Grant coins, fruit, and exclusives.
+- Set an exact coin balance.
+- Grant or revoke Premium preview.
+- Remove an incorrectly granted exclusive.
+- Create private reward codes.
+- Add code start/end times and maximum total uses.
+- Enable or disable custom codes.
+- Publish or schedule announcements.
+- Schedule custom events.
+- View expanded economy statistics.
+- Export the audit log as JSON.
+
+MORE THINGS TO BUY
+Hammy Market:
+- Cozy Cocoa
+- Joy Cookie
+- Hammy Snack Pack
+- Coin Booster
+- Fruit Charm
+- Star Garland
+- Focus Banner
+- Flower Trio
+- Mini Fountain
+- Cloud Beanbag
+- Forest Hideaway theme
+- Candy Cottage theme
+- Starry Space theme
+- Daily discounted item
+
+Fruit Pantry:
+- Apples
+- Bananas
+- Berries
+- Mangoes
+- Peaches
+- Grapes
+- Kiwis
+- Watermelons
