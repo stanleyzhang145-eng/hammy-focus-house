@@ -1,0 +1,6 @@
+ANDROID HOME-SCREEN ICON CHANGING
+
+Create one launcher <activity-alias> for each icon in AndroidManifest.xml.
+A native Capacitor plugin can enable the selected alias and disable the previous alias.
+
+The web version cannot directly replace an already-installed Android launcher icon.

@@ -1,0 +1,41 @@
+HAMMY FOCUS HOUSE V24.6 — DELETE OLD ACCOUNT + FRESH CLOUD ACCOUNT
+
+NEW DESTRUCTIVE ACCOUNT ACTION
+Account now includes:
+- Delete old account and create fresh account
+
+WHAT IT DOES
+1. Verifies the currently connected old cloud account.
+2. Creates a completely fresh starter save.
+3. Creates a new Player ID and recovery code.
+4. Verifies that the new cloud account works.
+5. Permanently deletes the old account.
+6. Clears local old progress and Premium preview.
+7. Switches the app to the new account.
+8. Reloads and shows the new Player ID and recovery code.
+
+FRESH ACCOUNT START
+- White starter hamster
+- 40 coins
+- Starter fruit
+- Starter clothing
+- No purchased furniture
+- No Premium entitlement
+- No admin exclusives
+- No old friends or public profile
+- No old focus statistics
+
+SAFETY
+- Requires typing REPLACE and a second confirmation.
+- The new account is verified before the old account is deleted.
+- If old-account deletion fails, the unused new account is deleted as rollback.
+- A pending replacement record protects against a browser interruption.
+- If interruption happens after old deletion, the new account is recovered.
+- If interruption happens before old deletion, the unused new account is removed.
+- The old recovery backup is removed after successful permanent deletion.
+
+IMPORTANT
+This action cannot recover the old account after deletion.
+
+DEPLOYMENT CHECK
+/api/health must report version 24.6.
