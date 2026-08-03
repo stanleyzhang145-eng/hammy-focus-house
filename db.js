@@ -11,6 +11,7 @@ const mem={
   profiles:new Map(), codes:new Map(), codeByUser:new Map(), friends:new Map(),
   reports:[], blocks:new Map(), hidden:new Map(), reactions:new Map(),
   rewardRedemptions:new Map(), events:new Map(), eventClaims:new Map(),
+  rewardCodes:new Map(), announcements:new Map(),
   audit:[], eventSequence:0, auditSequence:0
 };
 
@@ -927,33 +928,538 @@ async function updateAdminEventStatus(eventId,status){
   return rows[0]||null;
 }
 
+
+async function searchAdminPlayers(query,limit=25){
+  const value=String(query||"").trim().toLowerCase();
+  const safeLimit=Math.max(1,Math.min(50,Number(limit)||25));
+  if(memoryMode){
+    const results=[];
+    for(const user of mem.users.values()){
+      const profile=mem.profiles.get(user.id);
+      const code=mem.codeByUser.get(user.id)||null;
+      const haystack=[user.player_id,code,profile?.nickname].filter(Boolean).join(" ").toLowerCase();
+      if(value&&!haystack.includes(value))continue;
+      const summary=await adminPlayerSummary(user.player_id);
+      if(summary)results.push(summary);
+      if(results.length>=safeLimit)break;
+    }
+    return results;
+  }
+  const {rows}=await pool.query(
+    `SELECT u.player_id
+     FROM users u
+     LEFT JOIN friend_codes f ON f.user_id=u.id
+     LEFT JOIN profiles p ON p.user_id=u.id
+     WHERE $1='' OR LOWER(u.player_id) LIKE '%'||$1||'%'
+       OR LOWER(COALESCE(f.code,'')) LIKE '%'||$1||'%'
+       OR LOWER(COALESCE(p.nickname,'')) LIKE '%'||$1||'%'
+     ORDER BY u.updated_at DESC LIMIT $2`,
+    [value,safeLimit]
+  );
+  const results=[];
+  for(const row of rows){
+    const summary=await adminPlayerSummary(row.player_id);
+    if(summary)results.push(summary);
+  }
+  return results;
+}
+
+async function adminSetCoins(identifier,coins){
+  const user=await findUserByIdentifier(identifier);
+  if(!user)return null;
+  const exact=Math.max(0,Math.min(1000000000,Number(coins)||0));
+
+  if(memoryMode){
+    const current=mem.saves.get(user.id)||{
+      user_id:user.id,revision:0,device_id:"admin-set-coins",state:{},updated_at:now()
+    };
+    const nextState=clone(current.state||{});
+    nextState.coins=exact;
+    const row={
+      user_id:user.id,revision:Number(current.revision||0)+1,
+      device_id:"admin-set-coins",state:nextState,updated_at:now()
+    };
+    mem.saves.set(user.id,row);
+    await addAudit("player_coins_set",{
+      targetUserId:user.id,targetPlayerId:user.player_id,
+      details:{coins:exact,revision:row.revision}
+    });
+    return {save:clone(row),player:await adminPlayerSummary(user.player_id)};
+  }
+
+  const client=await pool.connect();
+  try{
+    await client.query("BEGIN");
+    await client.query(`SELECT id FROM users WHERE id=$1 FOR UPDATE`,[user.id]);
+    const currentResult=await client.query(
+      `SELECT * FROM cloud_saves WHERE user_id=$1 FOR UPDATE`,
+      [user.id]
+    );
+    const current=currentResult.rows[0]||{revision:0,state:{}};
+    const nextState=clone(current.state||{});
+    nextState.coins=exact;
+    const nextRevision=Number(current.revision||0)+1;
+    const {rows}=await client.query(
+      `INSERT INTO cloud_saves(user_id,revision,device_id,state,updated_at)
+       VALUES($1,$2,'admin-set-coins',$3::jsonb,NOW())
+       ON CONFLICT(user_id) DO UPDATE SET
+        revision=EXCLUDED.revision,device_id=EXCLUDED.device_id,
+        state=EXCLUDED.state,updated_at=NOW()
+       RETURNING *`,
+      [user.id,nextRevision,JSON.stringify(nextState)]
+    );
+    await client.query(
+      `INSERT INTO admin_audit_log(action,target_user_id,target_player_id,details)
+       VALUES('player_coins_set',$1,$2,$3::jsonb)`,
+      [user.id,user.player_id,JSON.stringify({coins:exact,revision:nextRevision})]
+    );
+    await client.query("COMMIT");
+    return {save:rows[0],player:await adminPlayerSummary(user.player_id)};
+  }catch(error){
+    await client.query("ROLLBACK");throw error;
+  }finally{client.release()}
+}
+
+async function adminRemoveExclusive(identifier,exclusiveId){
+  const user=await findUserByIdentifier(identifier);
+  if(!user)return null;
+  const id=String(exclusiveId||"");
+
+  if(memoryMode){
+    const current=mem.saves.get(user.id)||{
+      user_id:user.id,revision:0,device_id:"admin-remove-exclusive",state:{},updated_at:now()
+    };
+    const nextState=clone(current.state||{});
+    nextState.adminExclusives=(Array.isArray(nextState.adminExclusives)?nextState.adminExclusives:[])
+      .filter(item=>item!==id);
+    if(nextState.equippedAdminExclusive===id)nextState.equippedAdminExclusive=null;
+    const row={
+      user_id:user.id,revision:Number(current.revision||0)+1,
+      device_id:"admin-remove-exclusive",state:nextState,updated_at:now()
+    };
+    mem.saves.set(user.id,row);
+    await addAudit("player_exclusive_removed",{
+      targetUserId:user.id,targetPlayerId:user.player_id,
+      details:{exclusiveId:id,revision:row.revision}
+    });
+    return {save:clone(row),player:await adminPlayerSummary(user.player_id)};
+  }
+
+  const client=await pool.connect();
+  try{
+    await client.query("BEGIN");
+    await client.query(`SELECT id FROM users WHERE id=$1 FOR UPDATE`,[user.id]);
+    const currentResult=await client.query(
+      `SELECT * FROM cloud_saves WHERE user_id=$1 FOR UPDATE`,
+      [user.id]
+    );
+    const current=currentResult.rows[0]||{revision:0,state:{}};
+    const nextState=clone(current.state||{});
+    nextState.adminExclusives=(Array.isArray(nextState.adminExclusives)?nextState.adminExclusives:[])
+      .filter(item=>item!==id);
+    if(nextState.equippedAdminExclusive===id)nextState.equippedAdminExclusive=null;
+    const nextRevision=Number(current.revision||0)+1;
+    const {rows}=await client.query(
+      `INSERT INTO cloud_saves(user_id,revision,device_id,state,updated_at)
+       VALUES($1,$2,'admin-remove-exclusive',$3::jsonb,NOW())
+       ON CONFLICT(user_id) DO UPDATE SET
+        revision=EXCLUDED.revision,device_id=EXCLUDED.device_id,
+        state=EXCLUDED.state,updated_at=NOW()
+       RETURNING *`,
+      [user.id,nextRevision,JSON.stringify(nextState)]
+    );
+    await client.query(
+      `INSERT INTO admin_audit_log(action,target_user_id,target_player_id,details)
+       VALUES('player_exclusive_removed',$1,$2,$3::jsonb)`,
+      [user.id,user.player_id,JSON.stringify({exclusiveId:id,revision:nextRevision})]
+    );
+    await client.query("COMMIT");
+    return {save:rows[0],player:await adminPlayerSummary(user.player_id)};
+  }catch(error){
+    await client.query("ROLLBACK");throw error;
+  }finally{client.release()}
+}
+
+async function adminSetPremium(identifier,active){
+  const user=await findUserByIdentifier(identifier);
+  if(!user)return null;
+  const enabled=Boolean(active);
+  const entitlement=await setEntitlement(user.id,{
+    active:enabled,source:enabled?"admin-preview":"none"
+  });
+  const current=await getCloudSave(user.id);
+  if(current){
+    const state=clone(current.state||{});
+    state.premium=enabled;
+    state.premiumDemoEntitlement=enabled;
+    await saveCloud(user.id,{
+      baseRevision:Number(current.revision)||0,
+      deviceId:"admin-premium",
+      state,force:true
+    });
+  }
+  await addAudit(
+    enabled?"player_premium_preview_granted":"player_premium_preview_revoked",
+    {targetUserId:user.id,targetPlayerId:user.player_id,details:{active:enabled}}
+  );
+  return {entitlement,player:await adminPlayerSummary(user.player_id)};
+}
+
+async function createAdminRewardCode(input){
+  const row={
+    code:String(input.code||"").toUpperCase(),
+    title:String(input.title||"Reward Code"),
+    description:String(input.description||"Special Hammy reward."),
+    reward_data:clone(input.reward||{}),
+    max_redemptions:input.maxRedemptions==null?null:Number(input.maxRedemptions),
+    starts_at:input.startsAt||now(),
+    ends_at:input.endsAt||null,
+    status:"active",
+    created_at:now()
+  };
+  if(memoryMode){
+    if(mem.rewardCodes.has(row.code)){
+      const error=new Error("That reward code already exists.");
+      error.code="DUPLICATE_CODE";throw error;
+    }
+    mem.rewardCodes.set(row.code,row);
+    await addAudit("reward_code_created",{details:{
+      code:row.code,title:row.title,reward:row.reward_data,
+      maxRedemptions:row.max_redemptions,endsAt:row.ends_at
+    }});
+    return clone(row);
+  }
+  try{
+    const {rows}=await pool.query(
+      `INSERT INTO admin_reward_codes(
+        code,title,description,reward_data,max_redemptions,starts_at,ends_at,status
+       ) VALUES($1,$2,$3,$4::jsonb,$5,$6,$7,'active') RETURNING *`,
+      [row.code,row.title,row.description,JSON.stringify(row.reward_data),
+       row.max_redemptions,row.starts_at,row.ends_at]
+    );
+    await addAudit("reward_code_created",{details:{
+      code:row.code,title:row.title,reward:row.reward_data,
+      maxRedemptions:row.max_redemptions,endsAt:row.ends_at
+    }});
+    return rows[0];
+  }catch(error){
+    if(error.code==="23505"){
+      const duplicate=new Error("That reward code already exists.");
+      duplicate.code="DUPLICATE_CODE";throw duplicate;
+    }
+    throw error;
+  }
+}
+
+async function listAdminRewardCodes(limit=100){
+  const safeLimit=Math.max(1,Math.min(300,Number(limit)||100));
+  if(memoryMode){
+    return clone([...mem.rewardCodes.values()]
+      .sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))
+      .slice(0,safeLimit)
+      .map(row=>({
+        ...row,
+        redemption_count:[...mem.rewardRedemptions.values()]
+          .filter(item=>item.code===row.code).length
+      })));
+  }
+  const {rows}=await pool.query(
+    `SELECT c.*,
+      (SELECT COUNT(*)::int FROM reward_code_redemptions r WHERE r.code=c.code)
+      redemption_count
+     FROM admin_reward_codes c
+     ORDER BY c.created_at DESC LIMIT $1`,
+    [safeLimit]
+  );
+  return rows;
+}
+
+async function updateAdminRewardCodeStatus(code,status){
+  const safeStatus=status==="active"?"active":"disabled";
+  if(memoryMode){
+    const row=mem.rewardCodes.get(code);if(!row)return null;
+    row.status=safeStatus;
+    await addAudit("reward_code_status_changed",{details:{code,status:safeStatus}});
+    return clone(row);
+  }
+  const {rows}=await pool.query(
+    `UPDATE admin_reward_codes SET status=$2 WHERE code=$1 RETURNING *`,
+    [code,safeStatus]
+  );
+  if(rows[0])await addAudit("reward_code_status_changed",{details:{code,status:safeStatus}});
+  return rows[0]||null;
+}
+
+async function redeemManagedRewardCode(userId,code,deviceId="reward-code"){
+  const normalized=String(code||"").toUpperCase();
+  if(memoryMode){
+    const row=mem.rewardCodes.get(normalized);
+    if(!row)return {notFound:true};
+    const currentTime=Date.now();
+    if(row.status!=="active"||
+      new Date(row.starts_at).getTime()>currentTime||
+      (row.ends_at&&new Date(row.ends_at).getTime()<=currentTime)){
+      return {inactive:true};
+    }
+    const key=`${userId}|${normalized}`;
+    if(mem.rewardRedemptions.has(key)){
+      return {
+        alreadyRedeemed:true,
+        save:clone(mem.saves.get(userId)||null),
+        codeRow:clone(row)
+      };
+    }
+    const count=[...mem.rewardRedemptions.values()]
+      .filter(item=>item.code===normalized).length;
+    if(row.max_redemptions!=null&&count>=Number(row.max_redemptions)){
+      return {limitReached:true};
+    }
+    const current=mem.saves.get(userId)||{
+      user_id:userId,revision:0,device_id:deviceId,state:{},updated_at:now()
+    };
+    const nextState=applyAdminReward(current.state,row.reward_data,`reward-code:${normalized}`);
+    const save={
+      user_id:userId,revision:Number(current.revision||0)+1,
+      device_id:deviceId,state:nextState,updated_at:now()
+    };
+    const redemption={
+      user_id:userId,code:normalized,
+      reward_data:clone(row.reward_data),redeemed_at:now()
+    };
+    mem.saves.set(userId,save);
+    mem.rewardRedemptions.set(key,redemption);
+    return {redeemed:true,save:clone(save),codeRow:clone(row),redemption:clone(redemption)};
+  }
+
+  const client=await pool.connect();
+  try{
+    await client.query("BEGIN");
+    const codeResult=await client.query(
+      `SELECT * FROM admin_reward_codes WHERE code=$1 FOR UPDATE`,
+      [normalized]
+    );
+    const row=codeResult.rows[0];
+    if(!row){await client.query("ROLLBACK");return {notFound:true}}
+    const currentTime=Date.now();
+    if(row.status!=="active"||
+      new Date(row.starts_at).getTime()>currentTime||
+      (row.ends_at&&new Date(row.ends_at).getTime()<=currentTime)){
+      await client.query("ROLLBACK");return {inactive:true};
+    }
+    const redeemedResult=await client.query(
+      `SELECT * FROM reward_code_redemptions WHERE user_id=$1 AND code=$2`,
+      [userId,normalized]
+    );
+    if(redeemedResult.rows[0]){
+      const saveResult=await client.query(
+        `SELECT * FROM cloud_saves WHERE user_id=$1`,[userId]
+      );
+      await client.query("COMMIT");
+      return {alreadyRedeemed:true,save:saveResult.rows[0]||null,codeRow:row};
+    }
+    if(row.max_redemptions!=null){
+      const countResult=await client.query(
+        `SELECT COUNT(*)::int count FROM reward_code_redemptions WHERE code=$1`,
+        [normalized]
+      );
+      if(Number(countResult.rows[0].count)>=Number(row.max_redemptions)){
+        await client.query("ROLLBACK");return {limitReached:true};
+      }
+    }
+    await client.query(`SELECT id FROM users WHERE id=$1 FOR UPDATE`,[userId]);
+    const currentResult=await client.query(
+      `SELECT * FROM cloud_saves WHERE user_id=$1 FOR UPDATE`,[userId]
+    );
+    const current=currentResult.rows[0]||{revision:0,state:{}};
+    const nextState=applyAdminReward(current.state,row.reward_data,`reward-code:${normalized}`);
+    const nextRevision=Number(current.revision||0)+1;
+    const saveResult=await client.query(
+      `INSERT INTO cloud_saves(user_id,revision,device_id,state,updated_at)
+       VALUES($1,$2,$3,$4::jsonb,NOW())
+       ON CONFLICT(user_id) DO UPDATE SET
+        revision=EXCLUDED.revision,device_id=EXCLUDED.device_id,
+        state=EXCLUDED.state,updated_at=NOW()
+       RETURNING *`,
+      [userId,nextRevision,String(deviceId||"reward-code").slice(0,80),
+       JSON.stringify(nextState)]
+    );
+    const redemptionResult=await client.query(
+      `INSERT INTO reward_code_redemptions(user_id,code,reward_data)
+       VALUES($1,$2,$3::jsonb) RETURNING *`,
+      [userId,normalized,JSON.stringify(row.reward_data||{})]
+    );
+    await client.query("COMMIT");
+    return {
+      redeemed:true,save:saveResult.rows[0],
+      codeRow:row,redemption:redemptionResult.rows[0]
+    };
+  }catch(error){
+    await client.query("ROLLBACK");throw error;
+  }finally{client.release()}
+}
+
+async function createAnnouncement(input){
+  const row={
+    id:input.id,
+    title:String(input.title||"Hammy News"),
+    message:String(input.message||""),
+    priority:["normal","important","celebration"].includes(input.priority)
+      ?input.priority:"normal",
+    starts_at:input.startsAt||now(),
+    ends_at:input.endsAt,
+    status:"active",
+    created_at:now()
+  };
+  if(memoryMode){
+    for(const item of mem.announcements.values()){
+      if(item.status==="active")item.status="ended";
+    }
+    mem.announcements.set(row.id,row);
+    await addAudit("announcement_created",{details:{
+      id:row.id,title:row.title,priority:row.priority,endsAt:row.ends_at
+    }});
+    return clone(row);
+  }
+  const client=await pool.connect();
+  try{
+    await client.query("BEGIN");
+    await client.query(
+      `UPDATE admin_announcements SET status='ended' WHERE status='active'`
+    );
+    const {rows}=await client.query(
+      `INSERT INTO admin_announcements(
+        id,title,message,priority,starts_at,ends_at,status
+       ) VALUES($1,$2,$3,$4,$5,$6,'active') RETURNING *`,
+      [row.id,row.title,row.message,row.priority,row.starts_at,row.ends_at]
+    );
+    await client.query(
+      `INSERT INTO admin_audit_log(action,details)
+       VALUES('announcement_created',$1::jsonb)`,
+      [JSON.stringify({
+        id:row.id,title:row.title,priority:row.priority,endsAt:row.ends_at
+      })]
+    );
+    await client.query("COMMIT");
+    return rows[0];
+  }catch(error){
+    await client.query("ROLLBACK");throw error;
+  }finally{client.release()}
+}
+
+async function listAnnouncements(limit=100){
+  const safeLimit=Math.max(1,Math.min(200,Number(limit)||100));
+  if(memoryMode){
+    return clone([...mem.announcements.values()]
+      .sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))
+      .slice(0,safeLimit));
+  }
+  const {rows}=await pool.query(
+    `SELECT * FROM admin_announcements ORDER BY created_at DESC LIMIT $1`,
+    [safeLimit]
+  );
+  return rows;
+}
+
+async function getActiveAnnouncement(){
+  const current=Date.now();
+  if(memoryMode){
+    return clone([...mem.announcements.values()]
+      .filter(row=>row.status==="active"&&
+        new Date(row.starts_at).getTime()<=current&&
+        new Date(row.ends_at).getTime()>current)
+      .sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))[0]||null);
+  }
+  const {rows}=await pool.query(
+    `SELECT * FROM admin_announcements
+     WHERE status='active' AND starts_at<=NOW() AND ends_at>NOW()
+     ORDER BY created_at DESC LIMIT 1`
+  );
+  return rows[0]||null;
+}
+
+async function updateAnnouncementStatus(id,status){
+  const safeStatus=status==="active"?"active":"ended";
+  if(memoryMode){
+    const row=mem.announcements.get(id);if(!row)return null;
+    row.status=safeStatus;
+    if(safeStatus==="ended")row.ends_at=now();
+    await addAudit("announcement_status_changed",{details:{id,status:safeStatus}});
+    return clone(row);
+  }
+  const {rows}=await pool.query(
+    `UPDATE admin_announcements SET status=$2,
+      ends_at=CASE WHEN $2='ended' THEN NOW() ELSE ends_at END
+     WHERE id=$1 RETURNING *`,
+    [id,safeStatus]
+  );
+  if(rows[0])await addAudit("announcement_status_changed",{details:{id,status:safeStatus}});
+  return rows[0]||null;
+}
+
 async function adminStats(){
   if(memoryMode){
+    const saveStates=[...mem.saves.values()].map(row=>row.state||{});
     return {
       users:mem.users.size,
       cloudSaves:mem.saves.size,
-      publicProfiles:[...mem.profiles.values()].filter(profile=>profile.visibility==="public"&&profile.moderation_status==="active").length,
+      publicProfiles:[...mem.profiles.values()]
+        .filter(profile=>profile.visibility==="public"&&profile.moderation_status==="active").length,
       openReports:mem.reports.filter(report=>report.status==="open").length,
-      activeEvents:[...mem.events.values()].filter(event=>event.status==="active"&&new Date(event.ends_at).getTime()>Date.now()).length,
+      activeEvents:[...mem.events.values()]
+        .filter(event=>event.status==="active"&&
+          new Date(event.starts_at).getTime()<=Date.now()&&
+          new Date(event.ends_at).getTime()>Date.now()).length,
       totalEventClaims:mem.eventClaims.size,
-      totalAdminActions:mem.audit.length
+      totalAdminActions:mem.audit.length,
+      premiumAccounts:[...mem.entitlements.values()].filter(row=>row.active).length,
+      totalCoins:saveStates.reduce((sum,state)=>sum+Math.max(0,Number(state.coins)||0),0),
+      totalFocusMinutes:saveStates.reduce((sum,state)=>sum+
+        Math.max(0,Number(state.totalFocusMinutes)||0),0),
+      rewardCodeRedemptions:mem.rewardRedemptions.size,
+      activeRewardCodes:[...mem.rewardCodes.values()]
+        .filter(row=>row.status==="active").length,
+      activeAnnouncements:[...mem.announcements.values()]
+        .filter(row=>row.status==="active"&&
+          new Date(row.starts_at).getTime()<=Date.now()&&
+          new Date(row.ends_at).getTime()>Date.now()).length
     };
   }
   const {rows}=await pool.query(
     `SELECT
       (SELECT COUNT(*)::int FROM users) users,
       (SELECT COUNT(*)::int FROM cloud_saves) cloud_saves,
-      (SELECT COUNT(*)::int FROM profiles WHERE visibility='public' AND moderation_status='active') public_profiles,
+      (SELECT COUNT(*)::int FROM profiles
+        WHERE visibility='public' AND moderation_status='active') public_profiles,
       (SELECT COUNT(*)::int FROM reports WHERE status='open') open_reports,
-      (SELECT COUNT(*)::int FROM admin_events WHERE status='active' AND ends_at>NOW()) active_events,
+      (SELECT COUNT(*)::int FROM admin_events
+        WHERE status='active' AND starts_at<=NOW() AND ends_at>NOW()) active_events,
       (SELECT COUNT(*)::int FROM event_claims) total_event_claims,
-      (SELECT COUNT(*)::int FROM admin_audit_log) total_admin_actions`
+      (SELECT COUNT(*)::int FROM admin_audit_log) total_admin_actions,
+      (SELECT COUNT(*)::int FROM premium_entitlements WHERE active=TRUE) premium_accounts,
+      (SELECT COALESCE(SUM(GREATEST(
+        0,COALESCE((state->>'coins')::bigint,0)
+      )),0)::bigint FROM cloud_saves) total_coins,
+      (SELECT COALESCE(SUM(GREATEST(
+        0,COALESCE((state->>'totalFocusMinutes')::numeric,0)
+      )),0)::numeric FROM cloud_saves) total_focus_minutes,
+      (SELECT COUNT(*)::int FROM reward_code_redemptions) reward_code_redemptions,
+      (SELECT COUNT(*)::int FROM admin_reward_codes
+        WHERE status='active') active_reward_codes,
+      (SELECT COUNT(*)::int FROM admin_announcements
+        WHERE status='active' AND starts_at<=NOW() AND ends_at>NOW())
+        active_announcements`
   );
   const row=rows[0];
   return {
-    users:row.users,cloudSaves:row.cloud_saves,publicProfiles:row.public_profiles,
-    openReports:row.open_reports,activeEvents:row.active_events,
-    totalEventClaims:row.total_event_claims,totalAdminActions:row.total_admin_actions
+    users:row.users,cloudSaves:row.cloud_saves,
+    publicProfiles:row.public_profiles,openReports:row.open_reports,
+    activeEvents:row.active_events,totalEventClaims:row.total_event_claims,
+    totalAdminActions:row.total_admin_actions,premiumAccounts:row.premium_accounts,
+    totalCoins:Number(row.total_coins)||0,
+    totalFocusMinutes:Number(row.total_focus_minutes)||0,
+    rewardCodeRedemptions:row.reward_code_redemptions,
+    activeRewardCodes:row.active_reward_codes,
+    activeAnnouncements:row.active_announcements
   };
 }
 
@@ -979,7 +1485,11 @@ module.exports={
   getEntitlement,setEntitlement,getCloudSave,saveCloud,publishProfile,getProfileByCode,getProfileForUser,
   deleteProfile,gallery,listFriends,saveFriend,removeFriend,setReaction,addReport,blockProfile,hideProfile,
   listReports,setReportStatus,moderateProfile,redeemRewardCode,
-  findUserByIdentifier,adminPlayerSummary,adminGrant,createAdminEvent,listAdminEvents,
-  getActiveEvent,claimAdminEvent,updateAdminEventStatus,adminStats,listAudit,addAudit,
-  deleteUser,accountSummary
+  findUserByIdentifier,searchAdminPlayers,adminPlayerSummary,adminGrant,
+  adminSetCoins,adminRemoveExclusive,adminSetPremium,
+  createAdminEvent,listAdminEvents,getActiveEvent,claimAdminEvent,updateAdminEventStatus,
+  createAdminRewardCode,listAdminRewardCodes,updateAdminRewardCodeStatus,
+  redeemManagedRewardCode,createAnnouncement,listAnnouncements,
+  getActiveAnnouncement,updateAnnouncementStatus,
+  adminStats,listAudit,addAudit,deleteUser,accountSummary
 };

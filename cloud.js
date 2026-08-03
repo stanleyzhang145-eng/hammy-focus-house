@@ -12,6 +12,7 @@
   let pendingConflict=null;
   let initialized=false;
   let activeEvent=null;
+  let activeAnnouncement=null;
   let eventCountdownTimer=null;
 
   const exclusiveCatalog={
@@ -197,6 +198,41 @@
     });
     applyExclusiveVisual();
   }
+
+  function announcementDismissKey(id){return `hammyAnnouncementDismissed:${id}`}
+  function renderAnnouncement(){
+    const banner=el("playerAnnouncement");
+    if(!banner)return;
+    const visible=activeAnnouncement&&activeAnnouncement.status==="active"&&
+      new Date(activeAnnouncement.startsAt).getTime()<=Date.now()&&
+      new Date(activeAnnouncement.endsAt).getTime()>Date.now()&&
+      localStorage.getItem(announcementDismissKey(activeAnnouncement.id))!=="1";
+    banner.classList.toggle("hidden",!visible);
+    if(!visible)return;
+    banner.dataset.priority=activeAnnouncement.priority||"normal";
+    el("announcementPriorityLabel").textContent={
+      important:"IMPORTANT HAMMY NEWS",
+      celebration:"HAMMY CELEBRATION",
+      normal:"HAMMY NEWS"
+    }[activeAnnouncement.priority]||"HAMMY NEWS";
+    el("announcementTitle").textContent=activeAnnouncement.title;
+    el("announcementText").textContent=activeAnnouncement.message;
+  }
+  async function loadAnnouncement(){
+    try{
+      const data=await api("/api/announcements/active");
+      activeAnnouncement=data.announcement||null;
+      renderAnnouncement();
+    }catch{
+      activeAnnouncement=null;
+      renderAnnouncement();
+    }
+  }
+  function dismissAnnouncement(){
+    if(activeAnnouncement)localStorage.setItem(announcementDismissKey(activeAnnouncement.id),"1");
+    renderAnnouncement();
+  }
+
   function eventIcon(type){
     return ({
       coin_shower:"🪙",fruit_festival:"🍓",cozy_weekend:"🛏️",
@@ -711,22 +747,23 @@
     el("rewardCodeInput")?.addEventListener("keydown",event=>{
       if(event.key==="Enter"){event.preventDefault();redeemRewardCode()}
     });
+    el("dismissAnnouncement")?.addEventListener("click",dismissAnnouncement);
     el("claimLiveEvent")?.addEventListener("click",claimActiveEvent);
     document.querySelector('[data-page="account"]')?.addEventListener("click",async()=>{
       render();
       await refreshServerUpdates();
-      await loadActiveEvent();
+      await Promise.all([loadActiveEvent(),loadAnnouncement()]);
     });
   }
 
   window.HammyCloud={
     authHeaders,api,ensureAccount,scheduleSave,syncNow,getMeta:()=>({...meta}),
     isSignedIn:()=>Boolean(meta.accessToken),baseUrl,
-    loadActiveEvent,renderExclusiveCollection
+    loadActiveEvent,loadAnnouncement,renderExclusiveCollection
   };
 
   bind();
-  initialize().then(()=>loadActiveEvent()).catch(()=>{});
+  initialize().then(()=>Promise.all([loadActiveEvent(),loadAnnouncement()])).catch(()=>{});
   showPendingRewardNotice();
   showPendingEventNotice();
   renderExclusiveCollection();

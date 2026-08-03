@@ -152,3 +152,33 @@ CREATE INDEX IF NOT EXISTS event_claims_user_idx
 
 CREATE INDEX IF NOT EXISTS admin_audit_log_created_idx
   ON admin_audit_log (created_at DESC);
+
+
+CREATE TABLE IF NOT EXISTS admin_reward_codes (
+  code TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  reward_data JSONB NOT NULL DEFAULT '{}'::jsonb,
+  max_redemptions INTEGER,
+  starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  ends_at TIMESTAMPTZ,
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS admin_announcements (
+  id UUID PRIMARY KEY,
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  priority TEXT NOT NULL DEFAULT 'normal',
+  starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  ends_at TIMESTAMPTZ NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS admin_reward_codes_status_idx
+  ON admin_reward_codes (status, starts_at, ends_at);
+
+CREATE INDEX IF NOT EXISTS admin_announcements_active_idx
+  ON admin_announcements (status, priority, starts_at, ends_at);

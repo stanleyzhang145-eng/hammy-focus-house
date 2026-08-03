@@ -110,6 +110,29 @@ function cleanPlayerIdentifier(value){return String(value||"").trim().toUpperCas
 function cleanAdminText(value,max=120){
   return String(value||"").trim().replace(/[<>]/g,"").replace(/\s+/g," ").slice(0,max);
 }
+function safeIsoDate(value,fallback){
+  const date=new Date(value);
+  return Number.isNaN(date.getTime())?fallback:date.toISOString();
+}
+function adminRewardCodeView(row){
+  if(!row)return null;
+  return {
+    code:row.code,title:row.title,description:row.description,
+    reward:row.reward_data||{},
+    maxRedemptions:row.max_redemptions==null?null:Number(row.max_redemptions),
+    redemptionCount:Number(row.redemption_count)||0,
+    startsAt:row.starts_at,endsAt:row.ends_at,status:row.status,
+    createdAt:row.created_at
+  };
+}
+function announcementView(row){
+  if(!row)return null;
+  return {
+    id:row.id,title:row.title,message:row.message,priority:row.priority,
+    startsAt:row.starts_at,endsAt:row.ends_at,status:row.status,
+    createdAt:row.created_at
+  };
+}
 function cleanAdminReward(input){
   const reward=input&&typeof input==="object"?input:{};
   const exclusiveId=adminExclusiveCatalog.has(String(reward.exclusiveId||""))?String(reward.exclusiveId):null;
@@ -420,17 +443,17 @@ async function handleApi(req,res,url){
     if(!databaseReady){
       return json(res,503,{
         ok:false,
-        version:23,
+        version:24,
         databaseReady:false,
         error:String(databaseError?.message||"Database is not ready.")
       });
     }
-    return json(res,200,{ok:true,version:23,databaseReady:true,databaseMode:db.mode()});
+    return json(res,200,{ok:true,version:24,databaseReady:true,databaseMode:db.mode()});
   }
 
   if(req.method==="GET"&&url.pathname==="/api/health"){
     return json(res,200,{
-      ok:true,name:"Hammy Cloud server",version:23,
+      ok:true,name:"Hammy Cloud server",version:24,
       databaseReady,databaseMode:databaseReady?db.mode():"not-configured",
       setupRequired:!databaseReady,
       databaseError:databaseReady?null:String(databaseError?.message||"DATABASE_URL is missing")
@@ -538,30 +561,43 @@ async function handleApi(req,res,url){
     const code=normalizeRewardCode(body.code);
     if(!code)return json(res,400,{error:"Enter a reward code."});
 
-    const reward=rewardCodeCatalog.get(code);
-    if(!reward)return json(res,404,{error:"That reward code is not valid."});
-
-    const result=await db.redeemRewardCode(auth.userId,{
-      code,
-      reward,
-      deviceId:String(body.deviceId||auth.deviceId||"reward-code").slice(0,80)
-    });
-
-    const save=formatSave(result.save);
-    if(result.alreadyRedeemed){
-      return json(res,409,{
-        error:"This reward code was already redeemed on this Hammy account.",
-        code,
-        alreadyRedeemed:true,
-        save
+    const builtInReward=rewardCodeCatalog.get(code);
+    if(builtInReward){
+      const result=await db.redeemRewardCode(auth.userId,{
+        code,reward:builtInReward,
+        deviceId:String(body.deviceId||auth.deviceId||"reward-code").slice(0,80)
+      });
+      if(result.alreadyRedeemed){
+        return json(res,409,{
+          error:"This reward code was already redeemed on this Hammy account.",
+          code,alreadyRedeemed:true,save:formatSave(result.save)
+        });
+      }
+      return json(res,200,{
+        redeemed:true,code,reward:builtInReward,save:formatSave(result.save)
       });
     }
 
+    const result=await db.redeemManagedRewardCode(
+      auth.userId,code,
+      String(body.deviceId||auth.deviceId||"reward-code").slice(0,80)
+    );
+    if(result.notFound)return json(res,404,{error:"That reward code is not valid."});
+    if(result.inactive)return json(res,410,{error:"That reward code is not active right now."});
+    if(result.limitReached)return json(res,410,{error:"That reward code reached its redemption limit."});
+    if(result.alreadyRedeemed){
+      return json(res,409,{
+        error:"This reward code was already redeemed on this Hammy account.",
+        code,alreadyRedeemed:true,save:formatSave(result.save)
+      });
+    }
+    const row=result.codeRow;
     return json(res,200,{
-      redeemed:true,
-      code,
-      reward,
-      save
+      redeemed:true,code,
+      reward:{
+        title:row.title,description:row.description,...(row.reward_data||{})
+      },
+      save:formatSave(result.save)
     });
   }
 
@@ -572,6 +608,12 @@ async function handleApi(req,res,url){
     return json(res,200,{premium:{active:true,source:entitlement.source}});
   }
 
+
+  if(req.method==="GET"&&url.pathname==="/api/announcements/active"){
+    requireDatabase();
+    const announcement=await db.getActiveAnnouncement();
+    return json(res,200,{announcement:announcementView(announcement)});
+  }
 
   if(req.method==="GET"&&url.pathname==="/api/events/active"){
     requireDatabase();
@@ -745,6 +787,13 @@ async function handleApi(req,res,url){
     return json(res,200,{exclusives:[...adminExclusiveCatalog.entries()].map(([id,item])=>({id,...item}))});
   }
 
+  if(url.pathname==="/api/admin/player-search"&&req.method==="GET"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const query=cleanAdminText(url.searchParams.get("q")||"",40);
+    return json(res,200,{players:await db.searchAdminPlayers(query,25)});
+  }
+
   const adminPlayerMatch=url.pathname.match(/^\/api\/admin\/players\/([A-Z0-9-]{4,24})$/i);
   if(adminPlayerMatch&&req.method==="GET"){
     requireDatabase();
@@ -768,6 +817,50 @@ async function handleApi(req,res,url){
     });
     return result?json(res,200,{granted:true,save:formatSave(result.save),player:result.player})
       :json(res,404,{error:"Player ID or friend code was not found."});
+  }
+
+  const adminCoinSetMatch=url.pathname.match(/^\/api\/admin\/players\/([A-Z0-9-]{4,24})\/coins$/i);
+  if(adminCoinSetMatch&&req.method==="PATCH"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const result=await db.adminSetCoins(
+      cleanPlayerIdentifier(adminCoinSetMatch[1]),
+      safeNumber(body.coins,0,1000000000,0)
+    );
+    return result?json(res,200,{
+      updated:true,save:formatSave(result.save),player:result.player
+    }):json(res,404,{error:"Player ID or friend code was not found."});
+  }
+
+  const adminPremiumMatch=url.pathname.match(/^\/api\/admin\/players\/([A-Z0-9-]{4,24})\/premium$/i);
+  if(adminPremiumMatch&&req.method==="PATCH"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const result=await db.adminSetPremium(
+      cleanPlayerIdentifier(adminPremiumMatch[1]),body.active===true
+    );
+    return result?json(res,200,{updated:true,player:result.player})
+      :json(res,404,{error:"Player ID or friend code was not found."});
+  }
+
+  const adminExclusiveRemoveMatch=url.pathname.match(
+    /^\/api\/admin\/players\/([A-Z0-9-]{4,24})\/exclusives\/([a-z0-9_]{3,40})$/i
+  );
+  if(adminExclusiveRemoveMatch&&req.method==="DELETE"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const exclusiveId=String(adminExclusiveRemoveMatch[2]).toLowerCase();
+    if(!adminExclusiveCatalog.has(exclusiveId)){
+      return json(res,400,{error:"Unknown exclusive item."});
+    }
+    const result=await db.adminRemoveExclusive(
+      cleanPlayerIdentifier(adminExclusiveRemoveMatch[1]),exclusiveId
+    );
+    return result?json(res,200,{
+      removed:true,save:formatSave(result.save),player:result.player
+    }):json(res,404,{error:"Player ID or friend code was not found."});
   }
 
   if(url.pathname==="/api/admin/events"&&req.method==="GET"){
@@ -806,12 +899,14 @@ async function handleApi(req,res,url){
     const reward=cleanAdminReward(body.reward);
     const hasReward=reward.coins>0||Object.values(reward.fruits).some(value=>value>0)||Boolean(reward.exclusiveId);
     if(!hasReward)return json(res,400,{error:"The event needs a reward."});
+    const requestedStart=safeIsoDate(body.startsAt,now());
+    const startsMs=Math.max(Date.now(),new Date(requestedStart).getTime());
     const event=await db.createAdminEvent({
       id:crypto.randomUUID(),
       eventType:cleanAdminText(body.eventType||"custom",30)||"custom",
       title,description,reward,
-      startsAt:now(),
-      endsAt:new Date(Date.now()+(durationMinutes*60*1000)).toISOString()
+      startsAt:new Date(startsMs).toISOString(),
+      endsAt:new Date(startsMs+(durationMinutes*60*1000)).toISOString()
     });
     return json(res,201,{event:publicEvent(event)});
   }
@@ -824,6 +919,108 @@ async function handleApi(req,res,url){
     const status=["active","ended","cancelled"].includes(body.status)?body.status:"ended";
     const event=await db.updateAdminEventStatus(adminEventMatch[1],status);
     return event?json(res,200,{event:publicEvent(event)}):json(res,404,{error:"Event not found."});
+  }
+
+  if(url.pathname==="/api/admin/reward-codes"&&req.method==="GET"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const codes=await db.listAdminRewardCodes(150);
+    return json(res,200,{codes:codes.map(adminRewardCodeView)});
+  }
+
+  if(url.pathname==="/api/admin/reward-codes"&&req.method==="POST"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const code=normalizeRewardCode(body.code);
+    const title=cleanAdminText(body.title,60);
+    const description=cleanAdminText(body.description,140);
+    if(code.length<4)return json(res,400,{error:"Reward codes need at least four letters or numbers."});
+    if(rewardCodeCatalog.has(code)){
+      return json(res,409,{error:"That code is reserved by the built-in reward catalog."});
+    }
+    if(title.length<3||description.length<3){
+      return json(res,400,{error:"Enter a title and description."});
+    }
+    const reward=cleanAdminReward(body.reward);
+    const hasReward=reward.coins>0||
+      Object.values(reward.fruits).some(value=>value>0)||
+      Boolean(reward.exclusiveId);
+    if(!hasReward)return json(res,400,{error:"The code needs a reward."});
+    const startsAt=safeIsoDate(body.startsAt,now());
+    const endsAt=body.endsAt?safeIsoDate(body.endsAt,null):null;
+    if(endsAt&&new Date(endsAt).getTime()<=new Date(startsAt).getTime()){
+      return json(res,400,{error:"The code end time must be after its start time."});
+    }
+    try{
+      const row=await db.createAdminRewardCode({
+        code,title,description,reward,
+        maxRedemptions:body.maxRedemptions==null||body.maxRedemptions===""
+          ?null:safeNumber(body.maxRedemptions,1,1000000,1),
+        startsAt,endsAt
+      });
+      return json(res,201,{code:adminRewardCodeView(row)});
+    }catch(error){
+      if(error.code==="DUPLICATE_CODE")return json(res,409,{error:error.message});
+      throw error;
+    }
+  }
+
+  const adminRewardCodeMatch=url.pathname.match(
+    /^\/api\/admin\/reward-codes\/([A-Z0-9]{4,24})$/
+  );
+  if(adminRewardCodeMatch&&req.method==="PATCH"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const row=await db.updateAdminRewardCodeStatus(
+      adminRewardCodeMatch[1],body.status==="active"?"active":"disabled"
+    );
+    return row?json(res,200,{code:adminRewardCodeView(row)})
+      :json(res,404,{error:"Reward code not found."});
+  }
+
+  if(url.pathname==="/api/admin/announcements"&&req.method==="GET"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const rows=await db.listAnnouncements(100);
+    return json(res,200,{announcements:rows.map(announcementView)});
+  }
+
+  if(url.pathname==="/api/admin/announcements"&&req.method==="POST"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const title=cleanAdminText(body.title,50);
+    const message=cleanAdminText(body.message,180);
+    const priority=["normal","important","celebration"].includes(body.priority)
+      ?body.priority:"normal";
+    const durationMinutes=safeNumber(body.durationMinutes,5,10080,60);
+    if(title.length<3||message.length<3){
+      return json(res,400,{error:"Enter an announcement title and message."});
+    }
+    const requestedStart=safeIsoDate(body.startsAt,now());
+    const startsMs=Math.max(Date.now(),new Date(requestedStart).getTime());
+    const row=await db.createAnnouncement({
+      id:crypto.randomUUID(),title,message,priority,
+      startsAt:new Date(startsMs).toISOString(),
+      endsAt:new Date(startsMs+(durationMinutes*60*1000)).toISOString()
+    });
+    return json(res,201,{announcement:announcementView(row)});
+  }
+
+  const adminAnnouncementMatch=url.pathname.match(
+    /^\/api\/admin\/announcements\/([0-9a-f-]{36})$/i
+  );
+  if(adminAnnouncementMatch&&req.method==="PATCH"){
+    requireDatabase();
+    if(!adminAuthorized(req))return json(res,401,{error:"Admin session is missing, incorrect, or expired."});
+    const body=await parseBody(req);
+    const row=await db.updateAnnouncementStatus(
+      adminAnnouncementMatch[1],body.status==="active"?"active":"ended"
+    );
+    return row?json(res,200,{announcement:announcementView(row)})
+      :json(res,404,{error:"Announcement not found."});
   }
 
   if(url.pathname==="/api/admin/audit"&&req.method==="GET"){
@@ -889,5 +1086,5 @@ const server=http.createServer(async(req,res)=>{
     databaseReady=false;databaseError=error;
     console.error("Cloud database setup incomplete:",error.message);
   }
-  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v23 running at http://${HOST}:${PORT}`));
+  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v24 running at http://${HOST}:${PORT}`));
 })();

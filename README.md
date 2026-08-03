@@ -87,3 +87,59 @@ Random event templates:
 
 Admin reward grants and event claims update the latest cloud save using
 database transactions and revision increments.
+
+
+## Version 24 — Admin Command Center + Hammy Market
+
+### Hamster position fix
+
+v23 accidentally applied `position: relative` to the main hamster while adding
+exclusive effects. That overrode the room's original absolute positioning and
+could make the hamster appear to float or move into the page layout.
+
+v24 removes that override and keeps the hamster grounded at the room floor.
+
+### More admin tools
+
+- Player search by Player ID, friend code, or nickname
+- Set an exact coin balance
+- Grant or revoke Premium preview
+- Remove incorrectly granted exclusive items
+- Create private reward codes from the admin panel
+- Set code start/end times and maximum uses
+- Enable or disable custom reward codes
+- Publish player announcements
+- Schedule announcements and choose priority
+- Expanded account and economy analytics
+- Export the admin audit log as JSON
+- Schedule custom live events
+
+### More ways to spend coins
+
+The Hammy Market adds:
+
+- Cozy Cocoa
+- Joy Cookie
+- Hammy Snack Pack
+- Coin Booster for the next completed focus session
+- Fruit Charm for the next completed focus session
+- Star Garland
+- Focus Banner
+- Flower Trio
+- Mini Fountain
+- Cloud Beanbag
+- Forest Hideaway theme
+- Candy Cottage theme
+- Starry Space theme
+- Daily discounted item
+
+The Fruit Pantry also sells:
+
+- Apples
+- Bananas
+- Berries
+- Mangoes
+- Peaches
+- Grapes
+- Kiwis
+- Watermelons

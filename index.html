@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=23">
-<link rel="stylesheet" href="cloud.css?v=23">
+<link rel="stylesheet" href="online.css?v=24">
+<link rel="stylesheet" href="cloud.css?v=24">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -817,7 +817,7 @@ body[data-theme="night"] .focus-warning{background:#5a4d2a;color:#fff}
 body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
 </style>
-<link rel="stylesheet" href="premium.css?v=23">
+<link rel="stylesheet" href="premium.css?v=24">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -830,11 +830,20 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
  </div>
 </header>
 <nav class="nav">
- <button class="active" data-page="home">Home</button><button data-page="focus">Focus</button><button data-page="fruit">Fruit</button><button data-page="furniture">Furniture</button><button data-page="hamsters">Hamsters</button><button data-page="clothing">Clothing</button><button data-page="settings">Settings</button><button data-page="account">Account</button><button data-page="online">Online</button>
+ <button class="active" data-page="home">Home</button><button data-page="focus">Focus</button><button data-page="fruit">Fruit</button><button data-page="market">Market</button><button data-page="furniture">Furniture</button><button data-page="hamsters">Hamsters</button><button data-page="clothing">Clothing</button><button data-page="settings">Settings</button><button data-page="account">Account</button><button data-page="online">Online</button>
 </nav>
 <main>
 <section id="homePage" class="page">
+ <section id="playerAnnouncement" class="player-announcement hidden">
+  <div><span id="announcementPriorityLabel">HAMMY NEWS</span><h3 id="announcementTitle">Hammy News</h3><p id="announcementText"></p></div>
+  <button id="dismissAnnouncement" class="secondary">Dismiss</button>
+ </section>
  <div id="room" class="room"><div class="wall"></div><div class="floor"></div><div class="window"></div>
+  <div id="starGarlandDecor" class="market-decoration star-garland hidden"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+  <div id="rainbowBannerDecor" class="market-decoration rainbow-banner hidden">FOCUS!</div>
+  <div id="flowerPotDecor" class="market-decoration flower-pot hidden"><span class="flower a"></span><span class="flower b"></span><span class="flower c"></span><span class="decor-pot"></span></div>
+  <div id="miniFountainDecor" class="market-decoration mini-fountain hidden"><span class="water-spray"></span><span class="fountain-bowl"></span></div>
+  <div id="cloudBeanbagDecor" class="market-decoration cloud-beanbag hidden"><span></span><span></span><span></span></div>
 
   <div id="bedPlaced" class="furniture-item bed2d hidden"><button class="furniture-button" data-furniture-use="bed">Sleep</button><div class="frame"></div><div class="pillow"></div></div>
   <div id="sofaPlaced" class="furniture-item sofa2d hidden"><button class="furniture-button" data-furniture-use="sofa">Sit</button><div class="back"></div><div class="seat"></div></div>
@@ -927,6 +936,20 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 </section>
 <section id="fruitPage" class="page hidden"><h2>Fruit pantry</h2><div id="fruitGrid" class="grid grid2" style="margin-top:12px"></div></section>
 
+<section id="marketPage" class="page hidden">
+ <div class="row"><div><h2>Hammy Market</h2><p class="muted">Spend focus coins on snacks, boosters, decorations, fruit, and new themes.</p></div><span class="market-wallet">🪙 <strong id="marketCoins">0</strong></span></div>
+ <section class="market-daily card">
+  <div><span class="market-kicker">DAILY SPECIAL</span><h3 id="dailySpecialName">Loading special…</h3><p id="dailySpecialDescription" class="muted"></p></div>
+  <button id="buyDailySpecial" class="primary">Buy</button>
+ </section>
+ <h3 class="market-section-title">Snacks and Boosters</h3>
+ <div id="consumableMarketGrid" class="market-grid"></div>
+ <h3 class="market-section-title">Room Decorations</h3>
+ <div id="decorationMarketGrid" class="market-grid"></div>
+ <h3 class="market-section-title">Theme Licenses</h3>
+ <div id="themeMarketGrid" class="market-grid"></div>
+</section>
+
 <section id="furniturePage" class="page hidden">
  <div class="row"><div><h2>Furniture Shop</h2><p class="muted">Buy furniture, place it in the house, then tap its action button.</p></div></div>
  <div id="furnitureGrid" class="grid grid2" style="margin-top:12px"></div>
@@ -954,7 +977,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v23">Build v23</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v24">Build v24</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -1078,7 +1101,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v23 seven times whenever you need to show this section.
+   Tap Build v24 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -1126,7 +1149,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v23</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v24</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -1226,9 +1249,9 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"white",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0},clothes:["shirt","hoodie"],equipped:null,ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false}};
+const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"white",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},clothes:["shirt","hoodie"],equipped:null,marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},activeBoosters:{coinBooster:0,fruitCharm:0},ownedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},placedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},ownedMarketThemes:{forest:false,candy:false,space:false},ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false}};
 let state;
-try{state={...defaults,...JSON.parse(localStorage.getItem("hammyV8")||localStorage.getItem("hammyV5")||"{}")};state.foods={...defaults.foods,...(state.foods||{})};state.ownedFurniture={...defaults.ownedFurniture,...(state.ownedFurniture||{})};state.placedFurniture={...defaults.placedFurniture,...(state.placedFurniture||{})};state.practiceDays=Number(state.practiceDays||0);state.totalFocusMinutes=Number(state.totalFocusMinutes||0);state.sessionCount=Number(state.sessionCount||0);state.lastPracticeDate=state.lastPracticeDate||"";state.theme=state.theme||"lavender"}catch{state=structuredClone(defaults)}
+try{state={...defaults,...JSON.parse(localStorage.getItem("hammyV8")||localStorage.getItem("hammyV5")||"{}")};state.foods={...defaults.foods,...(state.foods||{})};state.marketInventory={...defaults.marketInventory,...(state.marketInventory||{})};state.activeBoosters={...defaults.activeBoosters,...(state.activeBoosters||{})};state.ownedDecorations={...defaults.ownedDecorations,...(state.ownedDecorations||{})};state.placedDecorations={...defaults.placedDecorations,...(state.placedDecorations||{})};state.ownedMarketThemes={...defaults.ownedMarketThemes,...(state.ownedMarketThemes||{})};state.ownedFurniture={...defaults.ownedFurniture,...(state.ownedFurniture||{})};state.placedFurniture={...defaults.placedFurniture,...(state.placedFurniture||{})};state.practiceDays=Number(state.practiceDays||0);state.totalFocusMinutes=Number(state.totalFocusMinutes||0);state.sessionCount=Number(state.sessionCount||0);state.lastPracticeDate=state.lastPracticeDate||"";state.theme=state.theme||"lavender"}catch{state=structuredClone(defaults)}
 const skins={
  white:{name:"White Hamster",fur:"#fff",fur2:"#f7f5f1",patch:"transparent",premium:false},
  orange:{name:"Orange Hamster",fur:"#e89a3f",fur2:"#fff0d1",patch:"transparent",premium:true},
@@ -1258,7 +1281,16 @@ const clothes={
  royalPajamas:{name:"Royal Pajamas",type:"pajamas",color:"#8a4a96",days:180},
  focusLegend:{name:"Focus Legend Jacket",type:"jacket",color:"#d06a55",days:365}
 };
-const fruits={apple:{name:"Apple",color:"#df5260"},banana:{name:"Banana",color:"#f2cf4d"},berry:{name:"Berry",color:"#8065c4"},mango:{name:"Mango",color:"#efa443"}};
+const fruits={
+ apple:{name:"Apple",color:"#df5260",cost:8,hunger:15,happy:5},
+ banana:{name:"Banana",color:"#f2cf4d",cost:9,hunger:17,happy:4},
+ berry:{name:"Berry",color:"#8065c4",cost:10,hunger:12,happy:8},
+ mango:{name:"Mango",color:"#efa443",cost:12,hunger:20,happy:6},
+ peach:{name:"Peach",color:"#f39b7f",cost:11,hunger:18,happy:7},
+ grape:{name:"Grape",color:"#7557a8",cost:10,hunger:13,happy:9},
+ kiwi:{name:"Kiwi",color:"#7cad54",cost:13,hunger:19,happy:6},
+ watermelon:{name:"Watermelon",color:"#e85f72",cost:15,hunger:25,happy:5}
+};
 
 const themes={
  lavender:{name:"Lavender House",swatches:["#f5effd","#8b63d9","#eee4ff","#e6c59d"]},
@@ -1266,7 +1298,10 @@ const themes={
  sunset:{name:"Sunset Peach",swatches:["#fff1e7","#e47d68","#ffe0d3","#d6a374"]},
  ocean:{name:"Ocean Blue",swatches:["#e8f5fb","#4d98c4","#d7eef9","#d9bf92"]},
  strawberry:{name:"Strawberry Pink",swatches:["#fff0f5","#d9678d","#fce1ea","#dbb08c"]},
- night:{name:"Cozy Night",swatches:["#17182a","#9885ed","#323655","#5d4760"]}
+ night:{name:"Cozy Night",swatches:["#17182a","#9885ed","#323655","#5d4760"]},
+ forest:{name:"Forest Hideaway",swatches:["#eaf4e1","#5b8f55","#d8ecd1","#a9825e"],market:true},
+ candy:{name:"Candy Cottage",swatches:["#fff0f6","#de6b9a","#ffe0ec","#e4b27e"],market:true},
+ space:{name:"Starry Space",swatches:["#15152c","#7f69d9","#28284d","#514267"],market:true}
 };
 function applyTheme(){
  if(!themes[state.theme])state.theme="lavender";
@@ -1278,7 +1313,7 @@ function renderSettings(){
  const grid=$("themeGrid");
  if(!grid)return;
  grid.innerHTML="";
- Object.entries(themes).forEach(([key,t])=>{
+ Object.entries(themes).filter(([key,t])=>!t.market||state.ownedMarketThemes[key]).forEach(([key,t])=>{
    const button=document.createElement("button");
    button.type="button";
    button.className="theme-card"+(state.theme===key?" selected":"");
@@ -1291,6 +1326,117 @@ function renderSettings(){
      say(t.name+" theme selected.");
    });
    grid.appendChild(button);
+ });
+}
+
+
+const marketConsumables={
+ cozyCocoa:{name:"Cozy Cocoa",icon:"☕",cost:18,description:"Use for +25 energy.",use:"energy"},
+ joyCookie:{name:"Joy Cookie",icon:"🍪",cost:20,description:"Use for +25 happiness.",use:"happy"},
+ snackPack:{name:"Hammy Snack Pack",icon:"🥪",cost:24,description:"Use to lower hunger by 30.",use:"hunger"},
+ coinBooster:{name:"Coin Booster",icon:"🪙",cost:90,description:"Your next completed focus session earns 50% more coins.",use:"coinBooster"},
+ fruitCharm:{name:"Fruit Charm",icon:"🍇",cost:75,description:"Your next completed focus session drops 2 extra fruit.",use:"fruitCharm"}
+};
+const marketDecorations={
+ starGarland:{name:"Star Garland",icon:"★",cost:120,description:"A glowing star string across the wall.",element:"starGarlandDecor"},
+ rainbowBanner:{name:"Focus Banner",icon:"🌈",cost:100,description:"A colourful FOCUS banner.",element:"rainbowBannerDecor"},
+ flowerPot:{name:"Flower Trio",icon:"🌼",cost:85,description:"Three cheerful room flowers.",element:"flowerPotDecor"},
+ miniFountain:{name:"Mini Fountain",icon:"⛲",cost:220,description:"A tiny animated water fountain.",element:"miniFountainDecor"},
+ cloudBeanbag:{name:"Cloud Beanbag",icon:"☁",cost:145,description:"A soft cloud-shaped seat.",element:"cloudBeanbagDecor"}
+};
+const marketThemes={
+ forest:{name:"Forest Hideaway",icon:"🌲",cost:180,description:"Green walls and a woodland floor."},
+ candy:{name:"Candy Cottage",icon:"🍬",cost:200,description:"A bright pink candy-house theme."},
+ space:{name:"Starry Space",icon:"🌌",cost:240,description:"A dark space room with violet accents."}
+};
+function spendCoins(cost){
+ if(state.coins<cost){say("You need more focus coins.");return false}
+ state.coins-=cost;return true;
+}
+function useMarketConsumable(key){
+ const item=marketConsumables[key];
+ if(!item||state.marketInventory[key]<=0)return;
+ state.marketInventory[key]--;
+ if(item.use==="energy")state.energy=Math.min(100,state.energy+25);
+ if(item.use==="happy")state.happy=Math.min(100,state.happy+25);
+ if(item.use==="hunger")state.hunger=Math.max(0,state.hunger-30);
+ if(item.use==="coinBooster")state.activeBoosters.coinBooster++;
+ if(item.use==="fruitCharm")state.activeBoosters.fruitCharm++;
+ say(item.name+" used.");
+ update();renderMarket();
+}
+function renderDecorations(){
+ Object.entries(marketDecorations).forEach(([key,item])=>{
+   const node=$(item.element);
+   if(node)node.classList.toggle("hidden",!state.placedDecorations[key]);
+ });
+}
+function dailySpecial(){
+ const keys=[...Object.keys(marketConsumables),...Object.keys(marketDecorations)];
+ const day=Math.floor(Date.now()/86400000);
+ const key=keys[day%keys.length];
+ const source=marketConsumables[key]||marketDecorations[key];
+ return {key,source,type:marketConsumables[key]?"consumable":"decoration",cost:Math.max(5,Math.floor(source.cost*.75))};
+}
+function buyDailySpecial(){
+ const deal=dailySpecial(),item=deal.source;
+ if(deal.type==="decoration"&&state.ownedDecorations[deal.key]){say("You already own today's decoration.");return}
+ if(!spendCoins(deal.cost))return;
+ if(deal.type==="consumable")state.marketInventory[deal.key]++;
+ else{state.ownedDecorations[deal.key]=true;state.placedDecorations[deal.key]=true}
+ say(item.name+" bought from the daily special.");
+ update();renderMarket();renderDecorations();
+}
+function marketCard(item,buttonText,onClick,extra=""){
+ const card=document.createElement("article");
+ card.className="market-card";
+ card.innerHTML=`<span class="market-item-icon">${item.icon}</span><div><strong>${item.name}</strong><p>${item.description}</p>${extra}</div>`;
+ const button=document.createElement("button");button.className="primary";button.textContent=buttonText;button.addEventListener("click",onClick);
+ card.appendChild(button);return card;
+}
+function renderMarket(){
+ if(!$("consumableMarketGrid"))return;
+ $("marketCoins").textContent=state.coins;
+ const deal=dailySpecial();
+ $("dailySpecialName").textContent=deal.source.name+" — "+deal.cost+" coins";
+ $("dailySpecialDescription").textContent="25% daily discount. Changes each day.";
+ $("buyDailySpecial").textContent=deal.type==="decoration"&&state.ownedDecorations[deal.key]?"Owned":"Buy "+deal.cost;
+ $("buyDailySpecial").disabled=deal.type==="decoration"&&state.ownedDecorations[deal.key];
+
+ const consumables=$("consumableMarketGrid");consumables.innerHTML="";
+ Object.entries(marketConsumables).forEach(([key,item])=>{
+   const owned=state.marketInventory[key]||0;
+   const active=state.activeBoosters[key]||0;
+   const card=marketCard(item,`Buy ${item.cost}`,()=>{
+     if(!spendCoins(item.cost))return;
+     state.marketInventory[key]++;say(item.name+" bought.");update();renderMarket();
+   },`<p class="market-owned">Owned: ${owned}${active?` · Active: ${active}`:""}</p>`);
+   const use=document.createElement("button");use.className="secondary";use.textContent="Use";use.disabled=owned<=0;
+   use.addEventListener("click",()=>useMarketConsumable(key));card.appendChild(use);consumables.appendChild(card);
+ });
+ const decorations=$("decorationMarketGrid");decorations.innerHTML="";
+ Object.entries(marketDecorations).forEach(([key,item])=>{
+   const owned=state.ownedDecorations[key],placed=state.placedDecorations[key];
+   decorations.appendChild(marketCard(item,!owned?`Buy ${item.cost}`:placed?"Store":"Place",()=>{
+     if(!owned){
+       if(!spendCoins(item.cost))return;
+       state.ownedDecorations[key]=true;state.placedDecorations[key]=true;say(item.name+" bought and placed.");
+     }else{
+       state.placedDecorations[key]=!state.placedDecorations[key];say(item.name+(state.placedDecorations[key]?" placed.":" stored."));
+     }
+     update();renderMarket();renderDecorations();
+   },`<p class="market-owned">${owned?(placed?"Placed in room":"Owned"):`${item.cost} coins`}</p>`));
+ });
+ const themeGrid=$("themeMarketGrid");themeGrid.innerHTML="";
+ Object.entries(marketThemes).forEach(([key,item])=>{
+   const owned=state.ownedMarketThemes[key];
+   themeGrid.appendChild(marketCard(item,!owned?`Buy ${item.cost}`:state.theme===key?"Selected":"Use",()=>{
+     if(!owned){
+       if(!spendCoins(item.cost))return;
+       state.ownedMarketThemes[key]=true;
+     }
+     state.theme=key;applyTheme();update();renderSettings();renderMarket();say(item.name+" selected.");
+   },`<p class="market-owned">${owned?"Owned":item.cost+" coins"}</p>`));
  });
 }
 
@@ -1326,6 +1472,8 @@ function update(){
  $("happyText").textContent=state.happy+"%";$("hungerText").textContent=state.hunger+"%";$("energyText").textContent=state.energy+"%";
  $("happyBar").style.width=state.happy+"%";$("hungerBar").style.width=state.hunger+"%";$("energyBar").style.width=state.energy+"%";
  Object.entries(furniture).forEach(([k,f])=>$(f.placed).classList.toggle("hidden",!state.placedFurniture[k]));
+ renderDecorations();
+ if($("marketCoins"))$("marketCoins").textContent=state.coins;
  document.querySelectorAll(".clothing").forEach(e=>{e.classList.remove("on");e.style.removeProperty("--cloth")});
  if(state.equipped&&clothes[state.equipped]){const c=clothes[state.equipped],el=$(c.type);if(el){el.classList.add("on");el.style.setProperty("--cloth",c.color)}}
  save();
@@ -1498,7 +1646,16 @@ function renderClothing(){
 }
 function renderFruit(){
  $("fruitGrid").innerHTML="";
- Object.entries(fruits).forEach(([key,f])=>{const card=document.createElement("div");card.className="card row";card.innerHTML=`<div class="row"><div class="fruit-dot" style="--fruit:${f.color}"></div><div><strong>${f.name}</strong><p class="muted">Owned: ${state.foods[key]}</p></div></div>`;const b=document.createElement("button");b.className="secondary";b.textContent="Feed";b.disabled=state.foods[key]<=0;b.addEventListener("click",()=>{state.foods[key]--;state.hunger=Math.max(0,state.hunger-15);state.happy=Math.min(100,state.happy+5);update();renderFruit();say("Nibbles ate "+f.name+".")});card.appendChild(b);$("fruitGrid").appendChild(card)})
+ Object.entries(fruits).forEach(([key,f])=>{
+   const card=document.createElement("div");card.className="card fruit-shop-card";
+   card.innerHTML=`<div class="row"><div class="fruit-dot" style="--fruit:${f.color}"></div><div><strong>${f.name}</strong><p class="muted">Owned: ${state.foods[key]} · ${f.cost} coins each</p></div></div>`;
+   const actions=document.createElement("div");actions.className="fruit-actions";
+   const buy=document.createElement("button");buy.className="primary";buy.textContent=`Buy ${f.cost}`;
+   buy.addEventListener("click",()=>{if(!spendCoins(f.cost))return;state.foods[key]++;update();renderFruit();renderMarket();say(f.name+" bought.")});
+   const feed=document.createElement("button");feed.className="secondary";feed.textContent="Feed";feed.disabled=state.foods[key]<=0;
+   feed.addEventListener("click",()=>{state.foods[key]--;state.hunger=Math.max(0,state.hunger-f.hunger);state.happy=Math.min(100,state.happy+f.happy);update();renderFruit();say("Nibbles ate "+f.name+".")});
+   actions.append(buy,feed);card.appendChild(actions);$("fruitGrid").appendChild(card);
+ });
 }
 function fmt(n){return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0")}
 function timerView(){$("timerText").textContent=fmt(remaining)}
@@ -1556,13 +1713,21 @@ function chooseLoot(minutes){
 function completeFocus(){
  if(!focusActive||focusFailedByLeaving)return;
  clearInterval(timer);timer=null;focusActive=false;const minutes=Math.max(1,total/60),oldDays=state.practiceDays,newDay=updatePracticeDay();state.totalFocusMinutes+=minutes;state.sessionCount++;
- const loot=chooseLoot(minutes),durationBonus=Math.floor(minutes*2),levelBonus=getLootLevel()*2,coins=loot.coins+durationBonus+levelBonus;state.coins+=coins;
- const fruitKeys=Object.keys(fruits),drops=[];for(let i=0;i<loot.fruit;i++){const key=fruitKeys[Math.floor(Math.random()*fruitKeys.length)];state.foods[key]++;drops.push(fruits[key].name)}
+ const loot=chooseLoot(minutes),durationBonus=Math.floor(minutes*2),levelBonus=getLootLevel()*2;
+ const baseCoins=loot.coins+durationBonus+levelBonus;
+ const boosted=state.activeBoosters.coinBooster>0;
+ const coins=boosted?Math.floor(baseCoins*1.5):baseCoins;
+ if(boosted)state.activeBoosters.coinBooster--;
+ state.coins+=coins;
+ const extraFruit=state.activeBoosters.fruitCharm>0?2:0;
+ if(extraFruit)state.activeBoosters.fruitCharm--;
+ const fruitTotal=loot.fruit+extraFruit;
+ const fruitKeys=Object.keys(fruits),drops=[];for(let i=0;i<fruitTotal;i++){const key=fruitKeys[Math.floor(Math.random()*fruitKeys.length)];state.foods[key]++;drops.push(fruits[key].name)}
  const newlyUnlocked=Object.entries(clothes).filter(([k,c])=>c.days>oldDays&&c.days<=state.practiceDays).map(([k,c])=>{if(!state.clothes.includes(k))state.clothes.push(k);return c.name});
  state.happy=Math.min(100,state.happy+Math.min(15,4+Math.floor(minutes/10)));update();renderFruit();renderClothing();renderFurniture();
  const h=$("hamster");h.classList.remove("celebrating");void h.offsetWidth;h.classList.add("celebrating");setTimeout(()=>h.classList.remove("celebrating"),2500);
  $("reward").className=`card loot-card ${loot.key}`;$("reward").classList.remove("hidden");
- $("reward").innerHTML=`<span class="loot-name">${loot.name} loot</span><span class="loot-spark a"></span><span class="loot-spark b"></span><span class="loot-spark c"></span><h3 style="margin-top:10px">Focus complete!</h3><p><strong>${coins} coins</strong> and ${loot.fruit} fruit drop${loot.fruit===1?"":"s"}: ${drops.join(", ")}.</p><p class="muted">Longer sessions and Loot Level ${getLootLevel()} improve rarity.${newDay?" Today counted as a new practice day.":" You already earned today's practice day."}</p>${newlyUnlocked.length?`<p><strong>New costume unlocked:</strong> ${newlyUnlocked.join(", ")}</p>`:""}`;
+ $("reward").innerHTML=`<span class="loot-name">${loot.name} loot</span><span class="loot-spark a"></span><span class="loot-spark b"></span><span class="loot-spark c"></span><h3 style="margin-top:10px">Focus complete!</h3><p><strong>${coins} coins</strong> and ${fruitTotal} fruit drop${fruitTotal===1?"":"s"}: ${drops.join(", ")}.${boosted?" Coin Booster applied.":""}${extraFruit?" Fruit Charm added 2 fruit.":""}</p><p class="muted">Longer sessions and Loot Level ${getLootLevel()} improve rarity.${newDay?" Today counted as a new practice day.":" You already earned today's practice day."}</p>${newlyUnlocked.length?`<p><strong>New costume unlocked:</strong> ${newlyUnlocked.join(", ")}</p>`:""}`;
  $("startBtn").disabled=false;$("pauseBtn").disabled=true;$("cancelBtn").disabled=true;say(loot.name+" loot earned!");
 }
 function failFocusForLeaving(){
@@ -1608,6 +1773,7 @@ $("useCustomTask").addEventListener("click",()=>{
  }
 });
 
+$("buyDailySpecial").addEventListener("click",buyDailySpecial);
 $("startBtn").addEventListener("click",startFocus);$("pauseBtn").addEventListener("click",pauseFocus);$("cancelBtn").addEventListener("click",cancelFocus);$("duration").addEventListener("change",()=>{if(!timer){remaining=Number($("duration").value);timerView()}});
 safeSkin();applyTheme();
 if(localStorage.getItem("hammyFocusFailed")==="1"){
@@ -1615,16 +1781,16 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
  $("timerTask").textContent="Previous session failed";
  localStorage.removeItem("hammyFocusFailed");
 }
-update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
+update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=23"></script>
-<script src="cloud.js?v=23"></script>
-<script src="online.js?v=23"></script>
-<script src="gallery.js?v=23"></script>
+<script src="premium.js?v=24"></script>
+<script src="cloud.js?v=24"></script>
+<script src="online.js?v=24"></script>
+<script src="gallery.js?v=24"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=23").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=24").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>

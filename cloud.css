@@ -213,7 +213,6 @@
   grid-column:1/-1;padding:18px;border:2px dashed var(--line);border-radius:13px;
   text-align:center;background:var(--soft)
 }
-#hamster{position:relative}
 .admin-exclusive-visual{
   position:absolute;z-index:95;left:50%;top:-15%;transform:translateX(-50%);
   display:grid;place-items:center;pointer-events:none;font-size:2rem;font-weight:1000;
@@ -236,4 +235,79 @@
   .exclusive-collection-grid,.live-event-details{grid-template-columns:1fr}
   .exclusive-item{grid-template-columns:48px 1fr}
   .exclusive-item button,.exclusive-owned-label{grid-column:1/-1;width:100%;text-align:center}
+}
+
+
+/* Hammy Focus House v24 — grounded hamster, announcements, and market */
+.room>#hamster:not(.running):not([class*="furn-"]){
+  bottom:45px;
+}
+
+.player-announcement{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:12px;padding:12px 14px;border:3px solid var(--line);
+  border-radius:18px;background:linear-gradient(135deg,#fff9d8,#f0e5ff);
+  box-shadow:0 5px 0 rgba(73,57,81,.13)
+}
+.player-announcement[data-priority="important"]{background:linear-gradient(135deg,#ffe1bf,#ffd5dc)}
+.player-announcement[data-priority="celebration"]{background:linear-gradient(135deg,#fff1a9,#e9d8ff)}
+.player-announcement span{display:inline-block;font-size:.68rem;font-weight:1000;letter-spacing:.08em}
+.player-announcement h3{margin:3px 0}.player-announcement p{margin:0}
+
+.market-wallet{
+  display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border:3px solid var(--line);
+  border-radius:999px;background:#fff1bd;font-weight:900
+}
+.market-daily{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;
+  background:linear-gradient(135deg,#fff2aa,#eadcff)
+}
+.market-kicker{
+  display:inline-block;margin-bottom:4px;padding:4px 8px;border:2px solid var(--line);
+  border-radius:999px;background:#fff;font-size:.68rem;font-weight:1000;letter-spacing:.08em
+}
+.market-section-title{margin:18px 0 8px}
+.market-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.market-card{
+  display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;
+  padding:11px;border:3px solid var(--line);border-radius:16px;background:var(--panel);
+  box-shadow:0 4px 0 rgba(73,57,81,.1)
+}
+.market-item-icon{
+  display:grid;place-items:center;width:56px;height:56px;border:2px solid var(--line);
+  border-radius:15px;background:var(--soft);font-size:1.75rem
+}
+.market-card p{margin:4px 0 0;font-size:.8rem}
+.market-owned{font-weight:900;color:var(--accent)}
+.fruit-shop-card{display:grid;gap:10px}
+.fruit-actions{display:flex;gap:8px;flex-wrap:wrap}
+.fruit-actions button{flex:1}
+
+.market-decoration{position:absolute;z-index:7;pointer-events:none}
+.star-garland{left:7%;right:30%;top:25px;display:flex;justify-content:space-around;color:#ffd85f;font-size:1.5rem}
+.star-garland:before{content:"";position:absolute;left:0;right:0;top:11px;border-top:3px solid var(--line);z-index:-1}
+.rainbow-banner{left:28%;top:44px;padding:8px 18px;border:4px solid var(--line);border-radius:12px;background:linear-gradient(90deg,#ff9ca8,#ffd66d,#91d7a0,#8dc6ef,#bd9be8);font-weight:1000;transform:rotate(-2deg)}
+.flower-pot{left:8%;bottom:31%;width:80px;height:92px}
+.flower-pot .decor-pot{position:absolute;left:21px;bottom:0;width:42px;height:35px;border:4px solid var(--line);border-radius:7px 7px 16px 16px;background:#c77d55}
+.flower-pot .flower{position:absolute;width:24px;height:24px;border:3px solid var(--line);border-radius:50%;background:#ffd66d}
+.flower-pot .flower:after{content:"";position:absolute;left:8px;top:18px;width:4px;height:45px;background:#65a766;z-index:-1}
+.flower-pot .flower.a{left:5px;top:18px}
+.flower-pot .flower.b{left:29px;top:2px;background:#ef8eaa}
+.flower-pot .flower.c{right:2px;top:22px;background:#8bc9ee}
+.mini-fountain{right:7%;bottom:29%;width:110px;height:90px}
+.fountain-bowl{position:absolute;left:10px;right:10px;bottom:0;height:35px;border:4px solid var(--line);border-radius:50%;background:#8acbe8}
+.water-spray{position:absolute;left:50%;bottom:23px;width:45px;height:55px;transform:translateX(-50%);border:6px solid #8bd8f4;border-bottom:0;border-radius:50% 50% 0 0;animation:fountainPulse 1.2s ease-in-out infinite}
+.cloud-beanbag{left:18%;bottom:24%;width:130px;height:62px}
+.cloud-beanbag span{position:absolute;bottom:0;border:4px solid var(--line);border-radius:50%;background:#f7f6ff}
+.cloud-beanbag span:nth-child(1){left:0;width:70px;height:52px}
+.cloud-beanbag span:nth-child(2){left:38px;width:82px;height:62px}
+.cloud-beanbag span:nth-child(3){right:0;width:58px;height:45px}
+@keyframes fountainPulse{50%{transform:translateX(-50%) scaleY(.78);opacity:.7}}
+
+@media(max-width:720px){
+  .market-grid{grid-template-columns:1fr}
+  .market-card{grid-template-columns:52px 1fr}
+  .market-card button{grid-column:1/-1;width:100%}
+  .market-daily,.player-announcement{align-items:stretch;display:grid}
+  .rainbow-banner{left:20%;font-size:.75rem}
 }
