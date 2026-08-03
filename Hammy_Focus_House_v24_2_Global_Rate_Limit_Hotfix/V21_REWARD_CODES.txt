@@ -1,0 +1,20 @@
+HAMMY FOCUS HOUSE V21 — REWARD CODES
+
+CURRENT CODE
+SUMMER27 = 200 coins
+
+HOW IT WORKS
+- Open Account.
+- Find Private Reward Codes.
+- Enter SUMMER27.
+- Press Redeem code.
+- The current local save syncs first.
+- The cloud server verifies the code.
+- The server adds 200 coins and creates a one-time redemption record.
+- The refreshed cloud save opens automatically.
+
+SECURITY
+- Rewards are granted by server.js, not browser JavaScript.
+- Each code can be redeemed once per cloud account.
+- Simultaneous requests are serialized by the database transaction.
+- Editing local browser values does not create a valid redemption.
