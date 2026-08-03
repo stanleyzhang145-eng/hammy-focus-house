@@ -1,0 +1,39 @@
+HAMMY FOCUS HOUSE V24.4 — CLOUD ACCOUNT STABILITY
+
+CLOUD ACCOUNTS ARE KEPT
+- Automatic guest cloud accounts remain.
+- Player IDs remain.
+- Recovery codes remain.
+- Cross-device cloud saves remain.
+- Save conflict choices remain.
+- Admin gifts and automatic cloud delivery remain.
+- Friends and public profiles remain.
+
+TOO MANY REQUESTS FIX
+- The general website/API request limiter was removed.
+- Admin incorrect-password protection remains.
+- Static pages and browser routes always return the Hammy app.
+- Unknown browser routes fall back to index.html instead of raw JSON.
+- Cloud GET requests are combined when several buttons request the same data.
+- Account creation, health checks, save pulls, and save uploads use single-flight protection.
+- Background cloud checks were reduced from every 15 seconds to every 45 seconds.
+- Temporary 429/502/503/504 responses retry safely inside the app.
+- The app explains when an older deployed server is still returning the old error.
+- Account buttons are explicit type="button" controls.
+
+SAVE CHOICE FIX
+- Use cloud save stays inside the game.
+- Keep this device waits for the upload to finish.
+- A failed upload keeps the conflict panel open so it can be retried.
+- Repeated clicks cannot start duplicate account or save requests.
+
+ACCOUNT FIXES
+- Saved Player ID and recovery code can restore an account even when the access token is missing.
+- Delete cloud account verifies the saved account before deletion.
+- A Retry connection button is available inside Account.
+- Manual Sync now displays success or failure inside Account.
+
+DEPLOYMENT CHECK
+After deployment open /api/health.
+It must show version 24.4.
+The old exact sentence "Too many requests. Try again in a minute." is not present in v24.4.

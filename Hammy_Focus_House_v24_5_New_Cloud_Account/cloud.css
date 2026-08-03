@@ -1,0 +1,353 @@
+
+/* Hammy Focus House v20 — Cloud accounts */
+.cloud-heading,.cloud-card-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cloud-chip-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.cloud-chip{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border:2px solid var(--line);border-radius:999px;background:var(--soft);font-size:.8rem;font-weight:900}
+.cloud-chip.online{background:#c9f0d1}.cloud-chip.offline{background:#ffd5dc}.cloud-chip.syncing{background:#ffe9a8}.cloud-chip.conflict{background:#ffd08c}
+.cloud-warning{margin-top:11px;padding:11px 13px;border:3px solid #9a7422;border-radius:14px;background:#fff1bd;color:#563f12;font-weight:800}
+.cloud-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.cloud-card{border:3px solid var(--line);border-radius:18px;padding:13px;background:var(--panel);box-shadow:0 4px 0 rgba(73,57,81,.12)}
+.cloud-label{display:grid;gap:6px;margin-top:10px;font-weight:900}
+.cloud-label input{width:100%;padding:11px;border:3px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);font:inherit;text-transform:uppercase}
+.cloud-identity{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;margin-top:11px;padding:10px;border:2px solid var(--line);border-radius:13px;background:var(--soft)}
+.cloud-identity span,.cloud-identity strong{display:block}.cloud-identity strong{margin-top:3px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.05em;overflow-wrap:anywhere}
+.cloud-identity.recovery{background:#fff1bd}
+.cloud-secret-note{margin-top:8px;font-size:.78rem;color:#6f5d36}
+.cloud-sync-status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:11px}
+.cloud-sync-status div{padding:8px;border:2px solid var(--line);border-radius:11px;background:var(--soft);text-align:center}
+.cloud-sync-status span,.cloud-sync-status strong{display:block}.cloud-sync-status span{font-size:.7rem}.cloud-sync-status strong{margin-top:3px}
+.cloud-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.cloud-wide{width:100%;margin-top:11px}
+.cloud-conflict{margin-top:12px;border-color:#9a7422;background:#fff8dd}
+.cloud-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:11px}
+.cloud-compare div{padding:11px;border:2px solid var(--line);border-radius:13px;background:var(--panel)}
+.cloud-compare strong,.cloud-compare span{display:block}.cloud-compare span{margin-top:5px;font-size:.84rem}
+.cloud-danger-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:11px}
+.cloud-danger-grid>div{padding:11px;border:2px solid var(--line);border-radius:13px;background:var(--soft)}
+.cloud-danger-grid button{margin-top:9px}
+.cloud-toast{position:fixed;left:50%;bottom:22px;z-index:12000;transform:translateX(-50%);max-width:min(92vw,560px);padding:11px 14px;border:3px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:0 7px 0 rgba(73,57,81,.22);font-weight:900;text-align:center}
+.cloud-toast.error{background:#ffd9df}.cloud-toast.success{background:#d5f0dd}
+.cloud-db-status{margin-top:8px;font-size:.78rem}
+.reaction-strip{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.reaction-button{display:flex;align-items:center;gap:5px;padding:8px 10px;border:2px solid var(--line);border-radius:999px;background:var(--panel);font-weight:900}
+.reaction-button.selected{background:var(--accent);color:#fff}
+.profile-safety-panel{margin-top:12px;padding:11px;border:2px dashed var(--line);border-radius:14px;background:var(--soft)}
+.profile-safety-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.profile-safety-actions select{flex:1;min-width:170px;padding:9px;border:2px solid var(--line);border-radius:11px;background:var(--panel);color:var(--ink);font:inherit}
+.admin-link-note{font-size:.75rem;margin-top:8px}
+@media(max-width:720px){
+ .cloud-grid,.cloud-danger-grid{grid-template-columns:1fr}
+ .cloud-sync-status{grid-template-columns:1fr}
+ .cloud-compare{grid-template-columns:1fr}
+}
+
+
+/* Hammy Focus House v21 — Reward Codes */
+.reward-code-card{
+  background:linear-gradient(135deg,var(--panel),var(--soft));
+  overflow:hidden;
+  position:relative
+}
+.reward-code-card:after{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  right:-55px;
+  bottom:-70px;
+  border:3px dashed rgba(73,57,81,.2);
+  border-radius:50%;
+  pointer-events:none
+}
+.reward-code-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px
+}
+.reward-gift-icon{
+  display:grid;
+  place-items:center;
+  width:58px;
+  height:58px;
+  border:3px solid var(--line);
+  border-radius:16px;
+  background:#fff1bd;
+  font-size:1.8rem;
+  box-shadow:0 4px 0 rgba(73,57,81,.15)
+}
+.reward-code-entry{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:9px;
+  align-items:end;
+  margin-top:10px
+}
+.reward-code-entry .cloud-label{margin-top:0}
+#rewardCodeInput{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-weight:900;
+  letter-spacing:.09em
+}
+.reward-code-message{
+  margin-top:10px;
+  padding:10px 12px;
+  border:2px dashed var(--line);
+  border-radius:12px;
+  background:var(--panel);
+  font-weight:800
+}
+.reward-code-message.success{background:#d5f0dd}
+.reward-code-message.error{background:#ffd9df}
+.reward-code-message.working{background:#fff1bd}
+@media(max-width:620px){
+  .reward-code-entry{grid-template-columns:1fr}
+  .reward-code-entry button{width:100%}
+}
+
+
+/* Hammy Focus House v22 — Top Secret Admin */
+.secret-build-trigger{
+  font:inherit;
+  color:var(--ink);
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none
+}
+.secret-build-trigger:active{transform:translateY(1px)}
+.secret-admin-card{
+  border-color:#4d385f;
+  background:
+    radial-gradient(circle at 92% 12%,rgba(255,216,95,.23),transparent 130px),
+    linear-gradient(135deg,#33273e,#5c4270);
+  color:#fff;
+  position:relative;
+  overflow:hidden
+}
+.secret-admin-card .muted{color:#eadff2}
+.secret-admin-card .cloud-label input{
+  background:#fff;
+  color:#30243a
+}
+.secret-admin-heading{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center
+}
+.secret-lock{
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:62px;
+  height:62px;
+  border:3px solid #f6d96f;
+  border-radius:18px;
+  background:#211a29;
+  font-size:2rem;
+  box-shadow:0 0 0 5px rgba(246,217,111,.12)
+}
+.secret-admin-message{
+  margin-top:10px;
+  padding:10px 12px;
+  border:2px dashed #d9c5e5;
+  border-radius:12px;
+  background:rgba(255,255,255,.09);
+  font-weight:900
+}
+.secret-admin-message.success{background:#275c3d}
+.secret-admin-message.error{background:#7d2d3d}
+.secret-admin-message.working{background:#6c5522}
+
+
+/* Hammy Focus House v23 — Live events and exclusive collection */
+.live-event-card{
+  background:
+    radial-gradient(circle at 90% 12%,rgba(255,235,151,.55),transparent 150px),
+    linear-gradient(135deg,#fff5c9,#f1e1ff);
+  border-color:#755692
+}
+.live-event-heading,.exclusive-collection-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap
+}
+.live-event-kicker{
+  display:inline-block;margin-bottom:4px;padding:4px 8px;border:2px solid var(--line);
+  border-radius:999px;background:#fff;font-size:.7rem;font-weight:1000;letter-spacing:.08em
+}
+.live-event-icon{
+  display:grid;place-items:center;width:68px;height:68px;border:3px solid var(--line);
+  border-radius:20px;background:#fff;font-size:2rem;box-shadow:0 5px 0 rgba(73,57,81,.14)
+}
+.live-event-details{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px
+}
+.live-event-details>div{
+  padding:10px;border:2px solid var(--line);border-radius:13px;background:rgba(255,255,255,.7)
+}
+.live-event-details span,.live-event-details strong{display:block}
+.live-event-details span{font-size:.75rem}.live-event-details strong{margin-top:4px}
+.live-event-message{
+  margin-top:9px;padding:9px 11px;border:2px dashed var(--line);border-radius:11px;
+  background:rgba(255,255,255,.6);font-weight:800
+}
+.exclusive-count{
+  display:inline-flex;gap:5px;align-items:center;padding:6px 10px;border:2px solid var(--line);
+  border-radius:999px;background:var(--soft);font-weight:800
+}
+.exclusive-collection-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
+.exclusive-item{
+  display:grid;grid-template-columns:52px 1fr auto;gap:9px;align-items:center;
+  padding:10px;border:2px solid var(--line);border-radius:14px;background:var(--soft)
+}
+.exclusive-item.equipped{background:#fff1bd;box-shadow:0 0 0 4px rgba(240,198,79,.18)}
+.exclusive-item-icon{
+  display:grid;place-items:center;width:52px;height:52px;border:2px solid var(--line);
+  border-radius:14px;background:var(--panel);font-size:1.65rem
+}
+.exclusive-item p{margin:4px 0 0;font-size:.78rem}
+.exclusive-owned-label{
+  padding:6px 8px;border:2px solid var(--line);border-radius:999px;background:var(--panel);
+  font-size:.72rem;font-weight:900
+}
+.exclusive-empty{
+  grid-column:1/-1;padding:18px;border:2px dashed var(--line);border-radius:13px;
+  text-align:center;background:var(--soft)
+}
+.admin-exclusive-visual{
+  position:absolute;z-index:95;left:50%;top:-15%;transform:translateX(-50%);
+  display:grid;place-items:center;pointer-events:none;font-size:2rem;font-weight:1000;
+  filter:drop-shadow(0 3px 1px rgba(0,0,0,.18))
+}
+#hamster[data-admin-exclusive="solar_crown"] .admin-exclusive-visual{color:#f4c84c;font-size:2.4rem}
+#hamster[data-admin-exclusive="star_trail"] .admin-exclusive-visual{
+  left:82%;top:7%;color:#ffd85f;animation:exclusiveStarSpin 2.2s linear infinite
+}
+#hamster[data-admin-exclusive="aurora_aura"]{
+  filter:drop-shadow(0 0 8px #87e9e3) drop-shadow(0 0 15px #b692ff)
+}
+#hamster[data-admin-exclusive="aurora_aura"] .admin-exclusive-visual{color:#9ff0e8;animation:exclusivePulse 1.5s ease-in-out infinite}
+#hamster[data-admin-exclusive="neon_frame"]{
+  outline:5px solid #85f3e8;outline-offset:8px;border-radius:42%;box-shadow:0 0 22px #9d79f4
+}
+@keyframes exclusiveStarSpin{to{transform:translateX(-50%) rotate(360deg)}}
+@keyframes exclusivePulse{50%{transform:translateX(-50%) scale(1.3);opacity:.55}}
+@media(max-width:720px){
+  .exclusive-collection-grid,.live-event-details{grid-template-columns:1fr}
+  .exclusive-item{grid-template-columns:48px 1fr}
+  .exclusive-item button,.exclusive-owned-label{grid-column:1/-1;width:100%;text-align:center}
+}
+
+
+/* Hammy Focus House v24 — grounded hamster, announcements, and market */
+.room>#hamster:not(.running):not([class*="furn-"]){
+  bottom:45px;
+}
+
+.player-announcement{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:12px;padding:12px 14px;border:3px solid var(--line);
+  border-radius:18px;background:linear-gradient(135deg,#fff9d8,#f0e5ff);
+  box-shadow:0 5px 0 rgba(73,57,81,.13)
+}
+.player-announcement[data-priority="important"]{background:linear-gradient(135deg,#ffe1bf,#ffd5dc)}
+.player-announcement[data-priority="celebration"]{background:linear-gradient(135deg,#fff1a9,#e9d8ff)}
+.player-announcement span{display:inline-block;font-size:.68rem;font-weight:1000;letter-spacing:.08em}
+.player-announcement h3{margin:3px 0}.player-announcement p{margin:0}
+
+.market-wallet{
+  display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border:3px solid var(--line);
+  border-radius:999px;background:#fff1bd;font-weight:900
+}
+.market-daily{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;
+  background:linear-gradient(135deg,#fff2aa,#eadcff)
+}
+.market-kicker{
+  display:inline-block;margin-bottom:4px;padding:4px 8px;border:2px solid var(--line);
+  border-radius:999px;background:#fff;font-size:.68rem;font-weight:1000;letter-spacing:.08em
+}
+.market-section-title{margin:18px 0 8px}
+.market-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.market-card{
+  display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;
+  padding:11px;border:3px solid var(--line);border-radius:16px;background:var(--panel);
+  box-shadow:0 4px 0 rgba(73,57,81,.1)
+}
+.market-item-icon{
+  display:grid;place-items:center;width:56px;height:56px;border:2px solid var(--line);
+  border-radius:15px;background:var(--soft);font-size:1.75rem
+}
+.market-card p{margin:4px 0 0;font-size:.8rem}
+.market-owned{font-weight:900;color:var(--accent)}
+.fruit-shop-card{display:grid;gap:10px}
+.fruit-actions{display:flex;gap:8px;flex-wrap:wrap}
+.fruit-actions button{flex:1}
+
+.market-decoration{position:absolute;z-index:7;pointer-events:none}
+.star-garland{left:7%;right:30%;top:25px;display:flex;justify-content:space-around;color:#ffd85f;font-size:1.5rem}
+.star-garland:before{content:"";position:absolute;left:0;right:0;top:11px;border-top:3px solid var(--line);z-index:-1}
+.rainbow-banner{left:28%;top:44px;padding:8px 18px;border:4px solid var(--line);border-radius:12px;background:linear-gradient(90deg,#ff9ca8,#ffd66d,#91d7a0,#8dc6ef,#bd9be8);font-weight:1000;transform:rotate(-2deg)}
+.flower-pot{left:8%;bottom:31%;width:80px;height:92px}
+.flower-pot .decor-pot{position:absolute;left:21px;bottom:0;width:42px;height:35px;border:4px solid var(--line);border-radius:7px 7px 16px 16px;background:#c77d55}
+.flower-pot .flower{position:absolute;width:24px;height:24px;border:3px solid var(--line);border-radius:50%;background:#ffd66d}
+.flower-pot .flower:after{content:"";position:absolute;left:8px;top:18px;width:4px;height:45px;background:#65a766;z-index:-1}
+.flower-pot .flower.a{left:5px;top:18px}
+.flower-pot .flower.b{left:29px;top:2px;background:#ef8eaa}
+.flower-pot .flower.c{right:2px;top:22px;background:#8bc9ee}
+.mini-fountain{right:7%;bottom:29%;width:110px;height:90px}
+.fountain-bowl{position:absolute;left:10px;right:10px;bottom:0;height:35px;border:4px solid var(--line);border-radius:50%;background:#8acbe8}
+.water-spray{position:absolute;left:50%;bottom:23px;width:45px;height:55px;transform:translateX(-50%);border:6px solid #8bd8f4;border-bottom:0;border-radius:50% 50% 0 0;animation:fountainPulse 1.2s ease-in-out infinite}
+.cloud-beanbag{left:18%;bottom:24%;width:130px;height:62px}
+.cloud-beanbag span{position:absolute;bottom:0;border:4px solid var(--line);border-radius:50%;background:#f7f6ff}
+.cloud-beanbag span:nth-child(1){left:0;width:70px;height:52px}
+.cloud-beanbag span:nth-child(2){left:38px;width:82px;height:62px}
+.cloud-beanbag span:nth-child(3){right:0;width:58px;height:45px}
+@keyframes fountainPulse{50%{transform:translateX(-50%) scaleY(.78);opacity:.7}}
+
+@media(max-width:720px){
+  .market-grid{grid-template-columns:1fr}
+  .market-card{grid-template-columns:52px 1fr}
+  .market-card button{grid-column:1/-1;width:100%}
+  .market-daily,.player-announcement{align-items:stretch;display:grid}
+  .rainbow-banner{left:20%;font-size:.75rem}
+}
+
+
+/* Hammy Focus House v24.4 — cloud account stability */
+.cloud-warning{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.cloud-warning p{margin:4px 0 0}
+.cloud-action-message{
+  margin-top:10px;
+  min-height:44px;
+  padding:10px 12px;
+  border:2px dashed var(--line);
+  border-radius:13px;
+  background:var(--soft);
+  font-weight:800;
+}
+.cloud-action-message.working{background:#fff4c9}
+.cloud-action-message.success{background:#dff5e5}
+.cloud-action-message.error{background:#ffe0e5}
+@media(max-width:680px){
+  .cloud-warning{display:grid;align-items:stretch}
+  .cloud-warning button{width:100%}
+}
+
+
+/* Hammy Focus House v24.5 — new cloud identity */
+.new-cloud-account-card{
+  background:linear-gradient(135deg,#f2e9ff,#fff9d8);
+}
+.new-cloud-explanation{
+  margin:10px 0;
+  padding:11px;
+  border:2px dashed var(--line);
+  border-radius:13px;
+  background:#fff;
+}
+.new-cloud-explanation p{margin:5px 0 0}
