@@ -1,0 +1,1 @@
+Use README.md and ONE_CLICK_RENDER_SETUP.txt. render.yaml automatically creates and connects the web service and PostgreSQL database.

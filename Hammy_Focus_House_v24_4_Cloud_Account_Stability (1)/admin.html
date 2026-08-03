@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2f2540">
+<title>Hammy Admin Command Center</title>
+<link rel="stylesheet" href="admin.css?v=244">
+</head>
+<body>
+<main class="admin-shell">
+ <header>
+  <div>
+   <h1>Hammy Admin Command Center</h1>
+   <p>Top Secret player management, rewards, codes, news, events, moderation, and audits.</p>
+  </div>
+  <span class="build">Build v24.4</span>
+ </header>
+
+ <section id="adminLoginPanel" class="panel admin-login-panel">
+  <div class="admin-lock">🔐</div>
+  <label>Top secret admin code
+   <input id="adminCode" type="password" autocomplete="off" maxlength="160"
+    placeholder="Enter private admin code">
+  </label>
+  <button id="adminLogin">Unlock command center</button>
+  <a class="back-link" href="./">Return to Hammy</a>
+ </section>
+
+ <div id="adminMessage" class="message">Enter the private top secret code.</div>
+
+ <section id="adminWorkspace" class="hidden">
+  <nav class="admin-tabs" aria-label="Admin sections">
+   <button class="active" data-admin-tab="dashboard">Dashboard</button>
+   <button data-admin-tab="players">Players</button>
+   <button data-admin-tab="events">Events</button>
+   <button data-admin-tab="codes">Codes & News</button>
+   <button data-admin-tab="moderation">Moderation</button>
+   <button data-admin-tab="audit">Audit</button>
+  </nav>
+
+  <section id="adminToolsPanel" class="panel admin-toolbar">
+   <button id="refreshEverything">Refresh everything</button>
+   <button id="adminLogout" class="secondary">Lock command center</button>
+   <a class="back-link" href="./">Return to Hammy</a>
+  </section>
+
+  <section class="admin-page active" data-admin-page="dashboard">
+   <div id="statsGrid" class="stats-grid">
+    <article><span>Accounts</span><strong id="statUsers">—</strong></article>
+    <article><span>Premium previews</span><strong id="statPremium">—</strong></article>
+    <article><span>Total coins</span><strong id="statCoins">—</strong></article>
+    <article><span>Focus minutes</span><strong id="statFocus">—</strong></article>
+    <article><span>Public profiles</span><strong id="statProfiles">—</strong></article>
+    <article><span>Open reports</span><strong id="statReports">—</strong></article>
+    <article><span>Active events</span><strong id="statEvents">—</strong></article>
+    <article><span>Event claims</span><strong id="statClaims">—</strong></article>
+    <article><span>Active codes</span><strong id="statCodes">—</strong></article>
+    <article><span>Code redemptions</span><strong id="statRedemptions">—</strong></article>
+    <article><span>Announcements</span><strong id="statAnnouncements">—</strong></article>
+    <article><span>Admin actions</span><strong id="statActions">—</strong></article>
+   </div>
+
+   <section class="panel dashboard-guide">
+    <h2>Command Center</h2>
+    <p>Use Players for account corrections and gifts. Use Events for claim-once global rewards. Use Codes & News for private codes and announcements. Every sensitive action is recorded.</p>
+    <div class="quick-actions">
+     <button data-go-tab="players">Manage players</button>
+     <button data-go-tab="events">Host an event</button>
+     <button data-go-tab="codes">Create reward code</button>
+     <button data-go-tab="moderation" class="secondary">Review reports</button>
+    </div>
+   </section>
+  </section>
+
+  <section class="admin-page" data-admin-page="players">
+   <section class="panel">
+    <div class="section-heading">
+     <div>
+      <h2>Search Players</h2>
+      <p>Search Player ID, friend code, or public nickname.</p>
+     </div>
+    </div>
+    <div class="search-row">
+     <input id="playerSearchInput" type="text" maxlength="40" autocomplete="off"
+      placeholder="Player ID, friend code, or nickname">
+     <button id="searchPlayers">Search</button>
+    </div>
+    <div id="playerSearchResults" class="player-search-results"></div>
+   </section>
+
+   <div class="two-column">
+    <section class="panel">
+     <h2>Selected Player</h2>
+     <div id="playerLookupResult" class="player-result empty-result">No player selected.</div>
+    </section>
+
+    <section class="panel">
+     <h2>Give Custom Reward</h2>
+     <p>Add coins, fruit, and one exclusive to the latest cloud save.</p>
+     <label>Gift title
+      <input id="grantTitle" type="text" maxlength="80" value="Admin Gift">
+     </label>
+     <div class="form-grid compact">
+      <label>Coins
+       <input id="grantCoins" type="number" min="0" max="1000000" value="0">
+      </label>
+      <label>Exclusive
+       <select id="grantExclusive"><option value="">No exclusive item</option></select>
+      </label>
+      <label>Apples<input id="grantApple" type="number" min="0" max="100" value="0"></label>
+      <label>Bananas<input id="grantBanana" type="number" min="0" max="100" value="0"></label>
+      <label>Berries<input id="grantBerry" type="number" min="0" max="100" value="0"></label>
+      <label>Mangoes<input id="grantMango" type="number" min="0" max="100" value="0"></label>
+     </div>
+     <label>Private audit note
+      <input id="grantNote" type="text" maxlength="160" placeholder="Reason for this gift">
+     </label>
+     <button id="grantPlayerReward" class="reward-button" disabled>Grant reward</button>
+    </section>
+   </div>
+
+   <div class="two-column">
+    <section class="panel correction-panel">
+     <h2>Account Corrections</h2>
+     <p>These replace or change existing account values. Confirm carefully.</p>
+     <label>Set exact coin balance
+      <input id="setCoinBalance" type="number" min="0" max="1000000000" value="0">
+     </label>
+     <button id="setPlayerCoins" class="secondary" disabled>Set exact coins</button>
+     <div class="button-pair">
+      <button id="grantPremiumPreview" disabled>Grant Premium preview</button>
+      <button id="revokePremiumPreview" class="secondary" disabled>Revoke Premium preview</button>
+     </div>
+    </section>
+
+    <section class="panel">
+     <h2>Remove Exclusive</h2>
+     <p>Only items currently owned by the selected player appear here.</p>
+     <label>Owned exclusive
+      <select id="removeExclusiveSelect"><option value="">No owned exclusives</option></select>
+     </label>
+     <button id="removePlayerExclusive" class="secondary danger-button" disabled>Remove selected exclusive</button>
+    </section>
+   </div>
+  </section>
+
+  <section class="admin-page" data-admin-page="events">
+   <div class="two-column">
+    <section class="panel random-event-panel">
+     <h2>Host a Random Event</h2>
+     <p>The server selects a tested event. Starting a new event ends the currently active event.</p>
+     <label>Duration
+      <select id="randomEventDuration">
+       <option value="15">15 minutes</option><option value="30">30 minutes</option>
+       <option value="60" selected>1 hour</option><option value="180">3 hours</option>
+       <option value="720">12 hours</option><option value="1440">1 day</option>
+       <option value="4320">3 days</option>
+      </select>
+     </label>
+     <button id="hostRandomEvent">🎲 Host random event</button>
+    </section>
+
+    <section class="panel">
+     <h2>Create or Schedule an Event</h2>
+     <div class="form-grid">
+      <label>Event title<input id="eventTitle" type="text" maxlength="40" placeholder="Hammy Celebration"></label>
+      <label>Duration in minutes<input id="eventDuration" type="number" min="5" max="10080" value="60"></label>
+     </div>
+     <label>Description<input id="eventDescription" type="text" maxlength="140" placeholder="A special reward is ready to claim!"></label>
+     <label>Start time
+      <input id="eventStartsAt" type="datetime-local">
+     </label>
+     <p class="input-help">Leave start time empty to begin immediately.</p>
+     <div class="form-grid compact">
+      <label>Coins<input id="eventCoins" type="number" min="0" max="1000000" value="100"></label>
+      <label>Exclusive<select id="eventExclusive"><option value="">No exclusive item</option></select></label>
+      <label>Apples<input id="eventApple" type="number" min="0" max="100" value="0"></label>
+      <label>Bananas<input id="eventBanana" type="number" min="0" max="100" value="0"></label>
+      <label>Berries<input id="eventBerry" type="number" min="0" max="100" value="0"></label>
+      <label>Mangoes<input id="eventMango" type="number" min="0" max="100" value="0"></label>
+     </div>
+     <button id="createCustomEvent">Create event</button>
+    </section>
+   </div>
+
+   <section class="panel" style="margin-top:12px">
+    <div class="section-heading">
+     <div><h2>Current and Recent Events</h2><p>Each account may claim an active event once.</p></div>
+     <button id="refreshEvents" class="secondary">Refresh events</button>
+    </div>
+    <div id="eventsList" class="events-list"></div>
+   </section>
+  </section>
+
+  <section class="admin-page" data-admin-page="codes">
+   <div class="two-column">
+    <section class="panel code-builder-panel">
+     <h2>Create Private Reward Code</h2>
+     <div class="form-grid">
+      <label>Code<input id="codeName" type="text" maxlength="24" autocomplete="off" placeholder="WEEKEND24"></label>
+      <label>Title<input id="codeTitle" type="text" maxlength="60" placeholder="Weekend Gift"></label>
+     </div>
+     <label>Description<input id="codeDescription" type="text" maxlength="140" placeholder="A private weekend reward."></label>
+     <div class="form-grid">
+      <label>Start time<input id="codeStartsAt" type="datetime-local"></label>
+      <label>End time<input id="codeEndsAt" type="datetime-local"></label>
+      <label>Maximum total uses<input id="codeMaxUses" type="number" min="1" max="1000000" placeholder="Unlimited"></label>
+      <label>Coins<input id="codeCoins" type="number" min="0" max="1000000" value="100"></label>
+     </div>
+     <div class="form-grid compact">
+      <label>Exclusive<select id="codeExclusive"><option value="">No exclusive item</option></select></label>
+      <label>Apples<input id="codeApple" type="number" min="0" max="100" value="0"></label>
+      <label>Bananas<input id="codeBanana" type="number" min="0" max="100" value="0"></label>
+      <label>Berries<input id="codeBerry" type="number" min="0" max="100" value="0"></label>
+      <label>Mangoes<input id="codeMango" type="number" min="0" max="100" value="0"></label>
+     </div>
+     <button id="createRewardCode">Create reward code</button>
+    </section>
+
+    <section class="panel announcement-panel">
+     <h2>Publish Announcement</h2>
+     <label>Title<input id="announcementTitle" type="text" maxlength="50" placeholder="Hammy News"></label>
+     <label>Message<input id="announcementMessage" type="text" maxlength="180" placeholder="Something exciting is happening!"></label>
+     <div class="form-grid">
+      <label>Priority
+       <select id="announcementPriority">
+        <option value="normal">Normal</option>
+        <option value="important">Important</option>
+        <option value="celebration">Celebration</option>
+       </select>
+      </label>
+      <label>Duration in minutes<input id="announcementDuration" type="number" min="5" max="10080" value="60"></label>
+      <label>Start time<input id="announcementStartsAt" type="datetime-local"></label>
+     </div>
+     <button id="publishAnnouncement">Publish announcement</button>
+     <p class="input-help">Publishing a new announcement ends the previous active announcement.</p>
+    </section>
+   </div>
+
+   <section class="panel" style="margin-top:12px">
+    <div class="section-heading">
+     <div><h2>Reward Codes</h2><p>Built-in SUMMER27 remains available separately.</p></div>
+     <button id="refreshCodes" class="secondary">Refresh codes</button>
+    </div>
+    <div id="rewardCodesList" class="management-list"></div>
+   </section>
+
+   <section class="panel" style="margin-top:12px">
+    <div class="section-heading">
+     <div><h2>Announcements</h2><p>Current and previous player-facing messages.</p></div>
+     <button id="refreshAnnouncements" class="secondary">Refresh announcements</button>
+    </div>
+    <div id="announcementsList" class="management-list"></div>
+   </section>
+  </section>
+
+  <section class="admin-page" data-admin-page="moderation">
+   <section class="panel moderation-toolbar">
+    <label>Report status
+     <select id="reportStatus">
+      <option value="open">Open</option><option value="reviewed">Reviewed</option>
+      <option value="dismissed">Dismissed</option><option value="all">All</option>
+     </select>
+    </label>
+    <button id="loadReports">Refresh reports</button>
+   </section>
+   <section id="reportList" class="report-list"></section>
+  </section>
+
+  <section class="admin-page" data-admin-page="audit">
+   <section class="panel">
+    <div class="section-heading">
+     <div><h2>Admin Audit Log</h2><p>Recent grants, corrections, codes, news, and events.</p></div>
+     <div class="button-pair">
+      <button id="refreshAudit" class="secondary">Refresh log</button>
+      <button id="exportAudit" class="secondary">Export JSON</button>
+     </div>
+    </div>
+    <div id="auditList" class="audit-list"></div>
+   </section>
+  </section>
+ </section>
+</main>
+<script src="admin.js?v=244"></script>
+</body>
+</html>

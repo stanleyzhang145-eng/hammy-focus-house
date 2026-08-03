@@ -1,0 +1,18 @@
+HAMMY FOCUS HOUSE V24.1 — ADMIN LOGIN HOTFIX
+
+PROBLEM
+v24 checked the temporary lock before checking whether the entered code was
+correct. After five wrong attempts, even the correct code was blocked for
+15 minutes.
+
+FIX
+- The correct private code is checked first.
+- A correct code clears the lock immediately.
+- Wrong guesses are still protected.
+- Cooldown reduced to 2 minutes.
+- Render forwarded visitor addresses are handled correctly.
+- A retry countdown is shown in the admin panel.
+
+DEPLOYMENT
+Replace the v24 files with this package and redeploy. Redeployment also clears
+the old in-memory lock immediately.
