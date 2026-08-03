@@ -1,0 +1,10 @@
+HAMMY FOCUS HOUSE — ONE-CLICK RENDER
+
+This package automates the server, database, connection, secrets, commands,
+schema setup, and automatic deployments.
+
+The only account action that cannot be automated is approving the deployment
+inside the owner's GitHub and Render accounts.
+
+Use the Deploy to Render button in README.md after these files are uploaded to
+the repository root.
