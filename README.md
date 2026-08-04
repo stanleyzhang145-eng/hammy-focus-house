@@ -239,3 +239,11 @@ Admin exclusives now auto-equip when granted and all six built-in exclusives
 have visible room or hamster artwork. Existing owned items also display once
 unless the player deliberately unequips them. Unknown custom exclusive IDs
 remain visible using a fallback special-item card and effect.
+
+
+## Version 25 — Real Breed Visuals
+
+The breed system now changes actual hamster anatomy instead of mainly scaling
+one model. Each breed has its own face, ear, muzzle, fur, paw, foot, marking,
+and tail design. Breed details are shared by the home hamster, color cards,
+clothing previews, and Premium room previews.

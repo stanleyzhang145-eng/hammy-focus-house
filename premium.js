@@ -301,7 +301,7 @@
   function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
 
   function hamsterCoreMarkup(id="premiumHamster"){
-    return `<div id="${id}" class="hamster premium-skin" aria-hidden="true"><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span><span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span><span class="clothes" id="premiumCostumeLayer"></span></div>`;
+    return `<div id="${id}" class="hamster premium-skin" aria-hidden="true"><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span>${typeof breedDetailMarkup==="function"?breedDetailMarkup():""}<span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span><span class="clothes" id="premiumCostumeLayer"></span></div>`;
   }
 
   function furnitureSvg(key,color){

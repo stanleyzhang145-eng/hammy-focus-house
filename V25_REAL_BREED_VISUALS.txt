@@ -1,0 +1,67 @@
+HAMMY FOCUS HOUSE V25 — REAL BREED VISUALS
+
+This update rebuilds the six breed models in game code. It is not a generated
+picture and does not replace the interactive hamster.
+
+CLASSIC SYRIAN
+- Medium round ears
+- Broad balanced face
+- Sturdy short paws
+- Short rounded coat
+- Classic round tail
+
+TEDDY BEAR
+- Wide plush head
+- Tiny partly-hidden ears
+- Full side mane
+- Crown fur tuft
+- Large fluffy cheeks
+- Short compact muzzle
+- Small pom-pom tail
+
+LONG-HAIRED
+- Shaggy side fur
+- Long lower fur skirt
+- Ear tufts
+- Chin ruff
+- Crown wisps
+- Fuller plume-like tail
+
+WINTER DWARF
+- Tiny ears
+- Close-set eyes
+- Short blunt muzzle
+- Compact fused head/body shape
+- Small paws and feet
+- Nearly hidden tail
+- Visible dorsal stripe
+
+SATIN SYRIAN
+- Alert angular ears
+- Narrower tapered head
+- Pointed muzzle
+- Sleek oval body
+- Longer slim front paws
+- Two visible glossy coat highlights
+
+FLOPPY-EAR FANTASY
+- Large genuinely folded-down ears
+- Visible ear crease lines
+- Longer pear-shaped face
+- Long muzzle
+- Three-line whiskers on both sides
+- Broad hind feet
+- Low sideways tail
+
+The same anatomy is used in:
+- The home room
+- Breed color previews
+- Clothing previews
+- Premium room previews
+
+The colors still remain identical in every breed section. White Classic Syrian
+is the only free selection. All other breed/color combinations require
+Premium.
+
+DEPLOYMENT CHECK
+/api/health must report version 25.

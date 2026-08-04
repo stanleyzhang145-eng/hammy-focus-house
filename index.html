@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=249">
-<link rel="stylesheet" href="cloud.css?v=249">
+<link rel="stylesheet" href="online.css?v=25">
+<link rel="stylesheet" href="cloud.css?v=25">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -91,8 +91,8 @@ h1{font-size:1.25rem}.muted{color:#786d83;font-size:.9rem}
 .particle:before,.particle:after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:#f17691}.particle:before{left:-11px}.particle:after{top:-11px}
 .msg{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:40;border:3px solid var(--line);border-radius:999px;padding:7px 12px;background:white;font-size:.87rem;text-align:center;width:max-content;max-width:92%}
 .skin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.skin{position:relative;border:3px solid var(--line);border-radius:18px;padding:12px;background:white;text-align:center;min-height:280px}
-.skin.selected{outline:5px solid var(--accent)}.skin-preview{position:relative;height:195px;transform:scale(.7);transform-origin:top center;margin-bottom:-55px}
+.skin{position:relative;border:3px solid var(--line);border-radius:18px;padding:12px;background:white;text-align:center;min-height:325px}
+.skin.selected{outline:5px solid var(--accent)}.skin-preview{position:relative;height:220px;transform:scale(.7);transform-origin:top center;margin-bottom:-28px}
 .badge{position:absolute;top:9px;border:2px solid var(--line);border-radius:999px;padding:4px 8px;font-size:.72rem;font-weight:900;z-index:30}
 .badge.left{left:9px;background:#96d49b}.badge.right{right:9px;background:#fff}.premium{background:#ffd66d!important}
 .fruit-dot{width:48px;height:48px;border:4px solid var(--line);border-radius:50%;background:var(--fruit);position:relative}.fruit-dot:after{content:"";position:absolute;right:-2px;top:-8px;width:20px;height:13px;border:3px solid var(--line);border-radius:70% 15%;background:#6eaf74}
@@ -893,55 +893,538 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
   border-radius:50%;
   background:var(--swatch);
 }
-.hamster[data-breed="teddy"]{scale:1.04}
+.hamster
+/* ===== v24.10 genuinely different breed silhouettes ===== */
+.breed-detail{
+  display:none;
+  position:absolute;
+  pointer-events:none;
+}
+
+/* The classic Syrian remains the clean base model. */
+.hamster[data-breed="normal"] .head{
+  left:34px;
+  right:34px;
+  top:36px;
+  height:136px;
+  border-radius:48% 48% 46% 46%;
+}
+.hamster[data-breed="normal"] .body{
+  left:29px;
+  right:29px;
+  top:82px;
+  height:151px;
+  border-radius:48% 48% 42% 42%;
+}
+.hamster[data-breed="normal"] .muzzle{
+  width:90px;
+  height:57px;
+  top:106px;
+}
+.hamster[data-breed="normal"] .tail{
+  width:49px;
+  height:43px;
+  right:13px;
+  top:133px;
+}
+
+/* Teddy Bear: plush square-round face, hidden ears and a full mane. */
 .hamster[data-breed="teddy"] .body{
-  transform:scaleX(1.12) scaleY(1.04);
-  transform-origin:50% 80%;
-  border-radius:50% 50% 44% 44%;
+  left:17px;
+  right:17px;
+  top:79px;
+  height:158px;
+  border-radius:52% 52% 39% 39%;
 }
-.hamster[data-breed="teddy"] .cheek{transform:scale(1.22)}
-.hamster[data-breed="teddy"] .ear{scale:.86}
-.hamster[data-breed="longcoat"] .body,
-.hamster[data-breed="longcoat"] .head{
-  filter:drop-shadow(-4px 5px 0 var(--fur2)) drop-shadow(4px 5px 0 var(--fur));
+.hamster[data-breed="teddy"] .head{
+  left:23px;
+  right:23px;
+  top:35px;
+  height:145px;
+  border-radius:52% 52% 45% 45%;
 }
-.hamster[data-breed="longcoat"] .body::after{
-  content:"";
-  position:absolute;
-  left:18px;
-  right:18px;
-  bottom:-8px;
-  height:20px;
+.hamster[data-breed="teddy"] .ear{
+  top:31px;
+  width:44px;
+  height:42px;
+  animation:none!important;
+  z-index:4;
+}
+.hamster[data-breed="teddy"] .ear.l{left:31px;transform:rotate(-16deg)}
+.hamster[data-breed="teddy"] .ear.r{right:31px;transform:rotate(16deg)}
+.hamster[data-breed="teddy"] .ear:after{inset:9px}
+.hamster[data-breed="teddy"] .muzzle{
+  top:110px;
+  width:103px;
+  height:53px;
+  border-radius:48% 48% 54% 54%;
+}
+.hamster[data-breed="teddy"] .eye{
+  top:87px;
+  width:19px;
+  height:23px;
+}
+.hamster[data-breed="teddy"] .eye.l{left:62px}
+.hamster[data-breed="teddy"] .eye.r{right:62px}
+.hamster[data-breed="teddy"] .cheek{
+  top:117px;
+  width:36px;
+  height:24px;
+}
+.hamster[data-breed="teddy"] .cheek.l{left:36px}
+.hamster[data-breed="teddy"] .cheek.r{right:36px}
+.hamster[data-breed="teddy"] .paw{
+  top:149px;
+  width:53px;
+  height:47px;
+}
+.hamster[data-breed="teddy"] .paw.l{left:26px}
+.hamster[data-breed="teddy"] .paw.r{right:26px}
+.hamster[data-breed="teddy"] .tail{
+  right:7px;
+  top:142px;
+  width:37px;
+  height:35px;
+  box-shadow:5px 2px 0 var(--fur2);
+}
+.hamster[data-breed="teddy"] .crown-tuft{
+  display:block;
+  left:50%;
+  top:26px;
+  width:72px;
+  height:29px;
+  transform:translateX(-50%);
+  z-index:7;
   background:
-    radial-gradient(circle at 10px 0,var(--fur) 0 9px,transparent 10px)
-    0 0/28px 20px repeat-x;
-  pointer-events:none;
+    radial-gradient(circle at 13px 20px,var(--fur) 0 13px,transparent 14px),
+    radial-gradient(circle at 35px 12px,var(--fur) 0 16px,transparent 17px),
+    radial-gradient(circle at 58px 20px,var(--fur) 0 13px,transparent 14px);
+  filter:drop-shadow(0 -3px 0 var(--line));
 }
-.hamster[data-breed="dwarf"]{scale:.84}
-.hamster[data-breed="dwarf"] .ear{scale:.78}
-.hamster[data-breed="dwarf"] .body{border-radius:53% 53% 48% 48%}
-.hamster[data-breed="satin"] .body::before,
-.hamster[data-breed="satin"] .head::before{
+.hamster[data-breed="teddy"] .mane{
+  display:block;
+  top:70px;
+  width:48px;
+  height:90px;
+  z-index:4;
+  background:
+    radial-gradient(circle at 24px 13px,var(--fur) 0 19px,transparent 20px),
+    radial-gradient(circle at 22px 42px,var(--fur) 0 23px,transparent 24px),
+    radial-gradient(circle at 24px 73px,var(--fur) 0 20px,transparent 21px);
+  filter:drop-shadow(0 0 0 var(--line));
+}
+.hamster[data-breed="teddy"] .mane.l{left:7px}
+.hamster[data-breed="teddy"] .mane.r{right:7px;transform:scaleX(-1)}
+.hamster[data-breed="teddy"] .chin-fluff{
+  display:block;
+  left:50%;
+  top:151px;
+  width:72px;
+  height:24px;
+  transform:translateX(-50%);
+  z-index:8;
+  background:
+    radial-gradient(circle at 13px 3px,var(--fur2) 0 12px,transparent 13px),
+    radial-gradient(circle at 35px 8px,var(--fur2) 0 15px,transparent 16px),
+    radial-gradient(circle at 58px 3px,var(--fur2) 0 12px,transparent 13px);
+}
+
+/* Long-Haired: shaggy side skirt, chin ruff, ear tufts and plume tail. */
+.hamster[data-breed="longcoat"] .body{
+  left:20px;
+  right:20px;
+  top:78px;
+  height:163px;
+  border-radius:48% 48% 35% 35%;
+}
+.hamster[data-breed="longcoat"] .head{
+  left:31px;
+  right:31px;
+  top:33px;
+  height:139px;
+  border-radius:46% 46% 49% 49%;
+}
+.hamster[data-breed="longcoat"] .ear{
+  top:11px;
+  width:59px;
+  height:65px;
+}
+.hamster[data-breed="longcoat"] .ear:before{
   content:"";
   position:absolute;
-  inset:8px 16px auto 25px;
-  height:34%;
-  border-radius:50%;
-  background:linear-gradient(115deg,rgba(255,255,255,.72),rgba(255,255,255,0));
-  pointer-events:none;
-  z-index:2;
+  left:50%;
+  bottom:-13px;
+  width:28px;
+  height:28px;
+  transform:translateX(-50%) rotate(45deg);
+  background:var(--fur);
+  border-right:4px solid var(--line);
+  border-bottom:4px solid var(--line);
 }
-.hamster[data-breed="floppy"] .ear.l{
-  transform:translate(-6px,18px) rotate(-38deg) scale(1.08);
+.hamster[data-breed="longcoat"] .tail{
+  right:-1px;
+  top:133px;
+  width:70px;
+  height:54px;
+  border-radius:65% 35% 65% 35%;
+  transform:rotate(-12deg);
+  box-shadow:
+    10px 7px 0 -2px var(--fur2),
+    15px 10px 0 -4px var(--fur);
 }
-.hamster[data-breed="floppy"] .ear.r{
-  transform:translate(6px,18px) rotate(38deg) scale(1.08);
+.hamster[data-breed="longcoat"] .flank-fur{
+  display:block;
+  top:125px;
+  width:59px;
+  height:111px;
+  z-index:3;
+  background:
+    radial-gradient(ellipse at 25px 12px,
+      var(--fur) 0 20px,var(--line) 21px 24px,transparent 25px),
+    radial-gradient(ellipse at 25px 43px,
+      var(--fur) 0 24px,var(--line) 25px 28px,transparent 29px),
+    radial-gradient(ellipse at 24px 78px,
+      var(--fur) 0 25px,var(--line) 26px 29px,transparent 30px),
+    radial-gradient(ellipse at 26px 104px,
+      var(--fur2) 0 20px,var(--line) 21px 24px,transparent 25px);
+}
+.hamster[data-breed="longcoat"] .flank-fur.l{left:2px}
+.hamster[data-breed="longcoat"] .flank-fur.r{right:2px;transform:scaleX(-1)}
+.hamster[data-breed="longcoat"] .chin-fluff{
+  display:block;
+  left:50%;
+  top:148px;
+  width:91px;
+  height:39px;
+  transform:translateX(-50%);
+  z-index:9;
+  background:
+    radial-gradient(circle at 13px 8px,var(--fur2) 0 14px,transparent 15px),
+    radial-gradient(circle at 33px 17px,var(--fur2) 0 19px,transparent 20px),
+    radial-gradient(circle at 58px 18px,var(--fur2) 0 20px,transparent 21px),
+    radial-gradient(circle at 79px 8px,var(--fur2) 0 14px,transparent 15px);
+}
+.hamster[data-breed="longcoat"] .crown-tuft{
+  display:block;
+  left:50%;
+  top:23px;
+  width:52px;
+  height:31px;
+  transform:translateX(-50%) rotate(-4deg);
+  z-index:7;
+  background:
+    linear-gradient(63deg,transparent 42%,var(--fur) 43% 71%,transparent 72%) 0 0/18px 31px,
+    linear-gradient(117deg,transparent 42%,var(--fur2) 43% 71%,transparent 72%) 17px 0/18px 31px,
+    linear-gradient(63deg,transparent 42%,var(--fur) 43% 71%,transparent 72%) 34px 0/18px 31px;
+}
+
+/* Winter Dwarf: fused compact outline, dorsal stripe, tiny ears and short face. */
+.hamster[data-breed="dwarf"] .body{
+  left:37px;
+  right:37px;
+  top:91px;
+  height:139px;
+  border-radius:53% 53% 48% 48%;
+}
+.hamster[data-breed="dwarf"] .head{
+  left:43px;
+  right:43px;
+  top:55px;
+  height:119px;
+  border-radius:52% 52% 49% 49%;
+}
+.hamster[data-breed="dwarf"] .ear{
+  top:42px;
+  width:39px;
+  height:38px;
+  animation:none!important;
+}
+.hamster[data-breed="dwarf"] .ear.l{left:48px;transform:rotate(-8deg)}
+.hamster[data-breed="dwarf"] .ear.r{right:48px;transform:rotate(8deg)}
+.hamster[data-breed="dwarf"] .ear:after{inset:8px}
+.hamster[data-breed="dwarf"] .muzzle{
+  top:113px;
+  width:72px;
+  height:46px;
+}
+.hamster[data-breed="dwarf"] .eye{
+  top:94px;
+  width:15px;
+  height:20px;
+}
+.hamster[data-breed="dwarf"] .eye.l{left:76px}
+.hamster[data-breed="dwarf"] .eye.r{right:76px}
+.hamster[data-breed="dwarf"] .cheek{
+  top:124px;
+  width:21px;
+  height:14px;
+}
+.hamster[data-breed="dwarf"] .cheek.l{left:64px}
+.hamster[data-breed="dwarf"] .cheek.r{right:64px}
+.hamster[data-breed="dwarf"] .paw{
+  top:151px;
+  width:35px;
+  height:34px;
+}
+.hamster[data-breed="dwarf"] .paw.l{left:53px}
+.hamster[data-breed="dwarf"] .paw.r{right:53px}
+.hamster[data-breed="dwarf"] .leg{
+  width:46px;
+  height:37px;
+  bottom:17px;
+}
+.hamster[data-breed="dwarf"] .leg.l{left:57px}
+.hamster[data-breed="dwarf"] .leg.r{right:57px}
+.hamster[data-breed="dwarf"] .foot{
+  width:49px;
+  height:22px;
+}
+.hamster[data-breed="dwarf"] .foot.l{left:47px}
+.hamster[data-breed="dwarf"] .foot.r{right:47px}
+.hamster[data-breed="dwarf"] .tail{
+  right:32px;
+  top:154px;
+  width:25px;
+  height:23px;
+}
+.hamster[data-breed="dwarf"] .dorsal-stripe{
+  display:block;
+  left:50%;
+  top:53px;
+  width:18px;
+  height:167px;
+  transform:translateX(-50%);
+  z-index:6;
+  border-radius:999px 999px 45% 45%;
+  background:linear-gradient(
+    to bottom,
+    color-mix(in srgb,var(--patch) 72%,#51495a),
+    color-mix(in srgb,var(--patch) 45%,#6b6570),
+    transparent
+  );
+  opacity:.72;
+}
+.hamster[data-breed="dwarf"] .belly{
+  left:70px;
+  right:70px;
+  top:136px;
+  height:79px;
+}
+.hamster[data-breed="dwarf"] .clothes{
+  transform:scale(.88) translateY(15px);
+  transform-origin:50% 70%;
+}
+
+/* Satin Syrian: angular alert ears, tapered head, pointed muzzle and shine. */
+.hamster[data-breed="satin"] .body{
+  left:36px;
+  right:36px;
+  top:79px;
+  height:157px;
+  border-radius:44% 44% 48% 48%;
+}
+.hamster[data-breed="satin"] .head{
+  left:44px;
+  right:44px;
+  top:31px;
+  height:143px;
+  border-radius:45% 45% 54% 54%;
+  clip-path:polygon(10% 0,90% 0,100% 63%,72% 100%,28% 100%,0 63%);
+}
+.hamster[data-breed="satin"] .ear{
+  top:6px;
+  width:57px;
+  height:72px;
+  border-radius:55% 55% 45% 45%;
+  animation:none!important;
+}
+.hamster[data-breed="satin"] .ear.l{
+  left:29px;
+  transform:rotate(-15deg) skewY(-8deg);
+}
+.hamster[data-breed="satin"] .ear.r{
+  right:29px;
+  transform:rotate(15deg) skewY(8deg);
+}
+.hamster[data-breed="satin"] .muzzle{
+  top:106px;
+  width:69px;
+  height:67px;
+  border-radius:45% 45% 58% 58%;
+  clip-path:polygon(14% 0,86% 0,100% 47%,50% 100%,0 47%);
+}
+.hamster[data-breed="satin"] .nose{
+  top:130px;
+}
+.hamster[data-breed="satin"] .mouth{
+  top:143px;
+}
+.hamster[data-breed="satin"] .eye{
+  top:84px;
+  width:16px;
+  height:28px;
+}
+.hamster[data-breed="satin"] .eye.l{left:73px}
+.hamster[data-breed="satin"] .eye.r{right:73px}
+.hamster[data-breed="satin"] .cheek{
+  top:124px;
+  width:18px;
+  height:12px;
+  opacity:.68;
+}
+.hamster[data-breed="satin"] .paw{
+  top:143px;
+  width:39px;
+  height:53px;
+  border-radius:45% 45% 52% 52%;
+}
+.hamster[data-breed="satin"] .paw.l{left:45px;transform:rotate(9deg)}
+.hamster[data-breed="satin"] .paw.r{right:45px;transform:rotate(-9deg)}
+.hamster[data-breed="satin"] .foot{
+  width:57px;
+  height:22px;
+}
+.hamster[data-breed="satin"] .coat-gloss{
+  display:block;
+  z-index:8;
+  border-radius:999px;
+  transform:rotate(-22deg);
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.88),
+    transparent
+  );
+  filter:blur(.2px);
+}
+.hamster[data-breed="satin"] .coat-gloss.g1{
+  left:77px;
+  top:50px;
+  width:56px;
+  height:13px;
+}
+.hamster[data-breed="satin"] .coat-gloss.g2{
+  left:72px;
+  top:151px;
+  width:81px;
+  height:15px;
+  opacity:.75;
+}
+
+/* Floppy-Ear: true folded ear silhouettes, long muzzle and whiskers. */
+.hamster[data-breed="floppy"] .body{
+  left:26px;
+  right:26px;
+  top:80px;
+  height:157px;
+  border-radius:44% 44% 38% 38%;
+}
+.hamster[data-breed="floppy"] .head{
+  left:39px;
+  right:39px;
+  top:38px;
+  height:142px;
+  border-radius:48% 48% 58% 58%;
 }
 .hamster[data-breed="floppy"] .ear{
+  top:25px;
+  width:76px;
+  height:116px;
   border-radius:58% 58% 72% 72%;
+  animation:none!important;
+  z-index:3;
 }
-.hamster[data-breed="roundface"] .head{transform:scaleX(1.12);transform-origin:center}
-.hamster[data-breed="roundface"] .muzzle{transform:translateX(-50%) scale(1.15)}
+.hamster[data-breed="floppy"] .ear.l{
+  left:-7px;
+  transform:rotate(-42deg);
+  transform-origin:80% 10%;
+}
+.hamster[data-breed="floppy"] .ear.r{
+  right:-7px;
+  transform:rotate(42deg);
+  transform-origin:20% 10%;
+}
+.hamster[data-breed="floppy"] .ear:after{
+  inset:12px 14px 17px;
+  border-radius:60% 60% 75% 75%;
+}
+.hamster[data-breed="floppy"] .ear-fold{
+  display:block;
+  top:58px;
+  width:52px;
+  height:78px;
+  z-index:4;
+  border:4px solid rgba(73,57,81,.52);
+  border-top:0;
+  border-radius:0 0 80% 80%;
+}
+.hamster[data-breed="floppy"] .ear-fold.l{
+  left:9px;
+  transform:rotate(-38deg);
+}
+.hamster[data-breed="floppy"] .ear-fold.r{
+  right:9px;
+  transform:rotate(38deg);
+}
+.hamster[data-breed="floppy"] .muzzle{
+  top:104px;
+  width:72px;
+  height:78px;
+  border-radius:46% 46% 62% 62%;
+}
+.hamster[data-breed="floppy"] .nose{top:129px}
+.hamster[data-breed="floppy"] .mouth{top:145px}
+.hamster[data-breed="floppy"] .eye{
+  top:89px;
+  width:17px;
+  height:24px;
+}
+.hamster[data-breed="floppy"] .eye.l{left:72px}
+.hamster[data-breed="floppy"] .eye.r{right:72px}
+.hamster[data-breed="floppy"] .cheek{
+  top:126px;
+}
+.hamster[data-breed="floppy"] .whiskers{
+  display:block;
+  top:133px;
+  width:59px;
+  height:31px;
+  z-index:12;
+  background:
+    linear-gradient(8deg,transparent 46%,var(--line) 47% 51%,transparent 52%) 0 0/59px 9px,
+    linear-gradient(-8deg,transparent 46%,var(--line) 47% 51%,transparent 52%) 0 12px/59px 9px,
+    linear-gradient(0deg,transparent 46%,var(--line) 47% 51%,transparent 52%) 0 23px/59px 8px;
+  background-repeat:no-repeat;
+  opacity:.72;
+}
+.hamster[data-breed="floppy"] .whiskers.l{left:9px}
+.hamster[data-breed="floppy"] .whiskers.r{right:9px;transform:scaleX(-1)}
+.hamster[data-breed="floppy"] .foot{
+  width:76px;
+  height:31px;
+}
+.hamster[data-breed="floppy"] .foot.l{left:18px}
+.hamster[data-breed="floppy"] .foot.r{right:18px}
+.hamster[data-breed="floppy"] .tail{
+  right:17px;
+  top:166px;
+  width:45px;
+  height:30px;
+  transform:rotate(18deg);
+}
+
+/* Preserve breed anatomy during motion without disabling body animations. */
+.hamster.tickle[data-breed="floppy"] .ear,
+.hamster.running[data-breed="floppy"] .ear,
+.hamster.tickle[data-breed="teddy"] .ear,
+.hamster.running[data-breed="teddy"] .ear,
+.hamster.tickle[data-breed="dwarf"] .ear,
+.hamster.running[data-breed="dwarf"] .ear,
+.hamster.tickle[data-breed="satin"] .ear,
+.hamster.running[data-breed="satin"] .ear{
+  animation:none!important;
+}
+
 @media(max-width:850px){
   .breed-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
@@ -951,7 +1434,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 }
 
 </style>
-<link rel="stylesheet" href="premium.css?v=249">
+<link rel="stylesheet" href="premium.css?v=25">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -996,7 +1479,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
   <div id="castlePlaced" class="furniture-item castle2d hidden"><button class="furniture-button" data-furniture-use="castle">Explore</button><div class="tower l"></div><div class="tower r"></div><div class="door"></div><div class="flag"></div></div>
   <div id="treadmill" class="treadmill off"><div class="tm-base"></div><div class="tm-belt"></div><div class="tm-post"></div><div class="tm-handle"></div></div>
   <button id="hamster" class="hamster white" aria-label="Tickle Nibbles">
-   <span id="speech" class="bubble hidden"></span><span id="zzz" class="zzz hidden">Zzz</span><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span><span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span>
+   <span id="speech" class="bubble hidden"></span><span id="zzz" class="zzz hidden">Zzz</span><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span><span class="breed-detail crown-tuft"></span><span class="breed-detail mane l"></span><span class="breed-detail mane r"></span><span class="breed-detail flank-fur l"></span><span class="breed-detail flank-fur r"></span><span class="breed-detail chin-fluff"></span><span class="breed-detail dorsal-stripe"></span><span class="breed-detail ear-fold l"></span><span class="breed-detail ear-fold r"></span><span class="breed-detail whiskers l"></span><span class="breed-detail whiskers r"></span><span class="breed-detail coat-gloss g1"></span><span class="breed-detail coat-gloss g2"></span><span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span>
    <span class="clothes">
     <span id="shirt" class="clothing shirt"><span class="collar"></span></span>
     <span id="hat" class="clothing hat"></span>
@@ -1141,7 +1624,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v24.9">Build v24.9</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v25">Build v25</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -1314,7 +1797,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button type="button" id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v24.9 seven times whenever you need to show this section.
+   Tap Build v25 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -1362,7 +1845,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v24.9</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v25</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -1474,12 +1957,30 @@ const hamsterColors={
  strawberry:{name:"Strawberry",fur:"#e99ab4",fur2:"#ffe5ee",patch:"#c96f8d",swatch:"#e99ab4"}
 };
 const hamsterBreeds={
- normal:{name:"Normal Breed",shortName:"Normal",description:"The classic balanced Hammy shape."},
- teddy:{name:"Teddy Breed",shortName:"Teddy",description:"Extra round, fluffy cheeks and a cuddly body."},
- longcoat:{name:"Long-Coat Breed",shortName:"Long-Coat",description:"Soft tufts and a longer fluffy coat."},
- dwarf:{name:"Dwarf Breed",shortName:"Dwarf",description:"A smaller compact Hammy with tiny ears."},
- satin:{name:"Satin Breed",shortName:"Satin",description:"Smooth glossy fur with a gentle shine."},
- floppy:{name:"Floppy-Ear Breed",shortName:"Floppy-Ear",description:"Large relaxed ears that fold down at the sides."}
+ normal:{
+  name:"Classic Syrian Breed",shortName:"Classic Syrian",
+  description:"Medium round ears, a broad face, short coat, sturdy paws, and the classic Hammy outline."
+ },
+ teddy:{
+  name:"Teddy Bear Breed",shortName:"Teddy Bear",
+  description:"A broad plush face with tiny partly-hidden ears, a fluffy mane, thick cheek fur, and a compact muzzle."
+ },
+ longcoat:{
+  name:"Long-Haired Breed",shortName:"Long-Haired",
+  description:"Long side tufts, a shaggy fur skirt, tufted ears, chin fluff, and a fuller plume-like tail."
+ },
+ dwarf:{
+  name:"Winter Dwarf Breed",shortName:"Winter Dwarf",
+  description:"Tiny ears, a short blunt muzzle, close-set eyes, a compact rounded body, and a dark dorsal stripe."
+ },
+ satin:{
+  name:"Satin Syrian Breed",shortName:"Satin Syrian",
+  description:"A sleek oval body, alert ears, a narrower face, longer paws, a pointed muzzle, and glossy coat highlights."
+ },
+ floppy:{
+  name:"Floppy-Ear Fantasy Breed",shortName:"Floppy-Ear",
+  description:"Large folded ears, a pear-shaped face, long muzzle, visible whiskers, broad hind feet, and a low tail."
+ }
 };
 const freeHamsterKey="normal_white";
 const legacySkinMap={
@@ -1811,11 +2312,14 @@ function tickle(){
 }
 function startRun(){clearFurnitureAction();if(running)return;running=true;$("hamster").classList.remove("tickle");$("hamster").classList.add("running");$("treadmill").classList.remove("off");$("runBtn").disabled=true;$("stopBtn").disabled=false;state.happy=Math.min(100,state.happy+5);state.energy=Math.max(0,state.energy-5);say("Nibbles is running!");update()}
 function stopRun(){running=false;$("hamster").classList.remove("running");$("treadmill").classList.add("off");$("runBtn").disabled=false;$("stopBtn").disabled=true;say("Nibbles finished running.")}
+function breedDetailMarkup(){
+ return `<span class="breed-detail crown-tuft"></span><span class="breed-detail mane l"></span><span class="breed-detail mane r"></span><span class="breed-detail flank-fur l"></span><span class="breed-detail flank-fur r"></span><span class="breed-detail chin-fluff"></span><span class="breed-detail dorsal-stripe"></span><span class="breed-detail ear-fold l"></span><span class="breed-detail ear-fold r"></span><span class="breed-detail whiskers l"></span><span class="breed-detail whiskers r"></span><span class="breed-detail coat-gloss g1"></span><span class="breed-detail coat-gloss g2"></span>`;
+}
 function hamsterPreview(key){
  const s=skins[key]||skins[freeHamsterKey];
  const breed=s.breed||"special";
  const effect=s.effect?` skin-${s.effect}`:"";
- return `<div class="skin-preview"><div class="hamster breed-${breed}${effect}" data-breed="${breed}" style="position:relative;left:50%;bottom:auto;top:0;--fur:${s.fur};--fur2:${s.fur2};--patch:${s.patch};pointer-events:none"><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span><span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span></div></div>`;
+ return `<div class="skin-preview"><div class="hamster breed-${breed}${effect}" data-breed="${breed}" style="position:relative;left:50%;bottom:auto;top:0;--fur:${s.fur};--fur2:${s.fur2};--patch:${s.patch};pointer-events:none"><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span>${breedDetailMarkup()}<span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span></div></div>`;
 }
 function selectHamsterSkin(key){
  const s=skins[key];
@@ -2029,6 +2533,7 @@ function clothingPreview(c){
    <div class="hamster breed-${breed}" data-breed="${breed}" style="--fur:${s.fur};--fur2:${s.fur2};--patch:${s.patch}">
     <span class="tail"></span><span class="ear l"></span><span class="ear r"></span>
     <span class="body"></span><span class="belly"></span><span class="head"></span>
+    ${breedDetailMarkup()}
     <span class="patch"></span><span class="muzzle"></span><span class="eye l"></span>
     <span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span>
     <span class="nose"></span><span class="mouth"></span><span class="paw l"></span>
@@ -2192,14 +2697,14 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=249"></script>
-<script src="cloud.js?v=249"></script>
-<script src="online.js?v=249"></script>
-<script src="gallery.js?v=249"></script>
+<script src="premium.js?v=25"></script>
+<script src="cloud.js?v=25"></script>
+<script src="online.js?v=25"></script>
+<script src="gallery.js?v=25"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=249").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=25").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>
