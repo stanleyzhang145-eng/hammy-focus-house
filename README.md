@@ -247,3 +247,8 @@ The breed system now changes actual hamster anatomy instead of mainly scaling
 one model. Each breed has its own face, ear, muzzle, fur, paw, foot, marking,
 and tail design. Breed details are shared by the home hamster, color cards,
 clothing previews, and Premium room previews.
+
+
+## Version 25.1 — Cute Breeds Polish
+
+The special breeds keep their unique anatomy, but the faces and body proportions were softened to look cuter. Eyes are slightly larger, cheeks are softer, longcoat is less scraggly, satin is less sharp, and floppy-ear has a shorter baby-face muzzle while keeping its folded ears.

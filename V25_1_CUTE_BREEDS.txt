@@ -1,0 +1,38 @@
+HAMMY FOCUS HOUSE V25.1 — CUTE BREEDS POLISH
+
+This update keeps the distinct breed silhouettes from v25, but softens the designs so they stay cute.
+
+Teddy Bear
+- rounder face
+- softer cheeks
+- slightly larger eyes
+- gentler mane
+
+Long-Haired
+- rounder head and body
+- shorter fluffier tail
+- softer ear tufts
+- less wild fur silhouette
+
+Winter Dwarf
+- bigger eyes
+- extra round baby-like face
+- smaller sweeter muzzle
+
+Satin Syrian
+- less angular head
+- softer ears
+- rounder muzzle
+- keeps glossy coat highlights
+
+Floppy-Ear
+- shorter baby-face muzzle
+- bigger eyes
+- softer cheeks
+- smaller feet and tail
+- still keeps long folded ears
+
+All breeds still remain visually different from each other, but they should now look friendlier and cuter.
+
+DEPLOYMENT CHECK
+/api/health must report version 25.1.
