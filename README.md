@@ -228,3 +228,14 @@ Black & White, Caramel, Silver, and Strawberry. White Normal is the only free
 combination; all other breed/color combinations require Premium. Existing
 skin saves migrate to the matching Normal-breed color, and the server enforces
 the same entitlement rule for cloud saves.
+
+
+## Version 24.9 — Breed and Admin Item Fix
+
+Breed tabs no longer reset to the currently equipped hamster when tapped.
+The selected breed stays open and displays its six matching colors.
+
+Admin exclusives now auto-equip when granted and all six built-in exclusives
+have visible room or hamster artwork. Existing owned items also display once
+unless the player deliberately unequips them. Unknown custom exclusive IDs
+remain visible using a fallback special-item card and effect.

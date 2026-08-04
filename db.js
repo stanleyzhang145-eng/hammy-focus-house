@@ -598,6 +598,10 @@ function applyAdminReward(stateInput,rewardInput,source="admin"){
   if(reward.exclusiveId&&!state.adminExclusives.includes(reward.exclusiveId)){
     state.adminExclusives.push(String(reward.exclusiveId));
   }
+  if(reward.exclusiveId){
+    state.equippedAdminExclusive=String(reward.exclusiveId);
+    state.adminExclusiveDisplayDisabled=false;
+  }
   if(!Array.isArray(state.adminGiftHistory))state.adminGiftHistory=[];
   state.adminGiftHistory.unshift({
     source,

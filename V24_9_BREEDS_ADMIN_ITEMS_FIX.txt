@@ -1,0 +1,37 @@
+HAMMY FOCUS HOUSE V24.9
+BREED BUTTONS + ADMIN SPECIAL ITEMS FIX
+
+BREED BUTTON FIX
+The breed tabs were changing briefly, but safeSkin() immediately changed the
+active tab back to the currently selected hamster's breed. Breed tabs now:
+
+- Stay on the breed the player taps
+- Redraw only the selected breed's six colors
+- Work with mouse and touch
+- Let free players inspect locked Premium breed colors
+- Keep White Normal as the only free selectable combination
+
+ADMIN SPECIAL ITEM FIX
+Every admin exclusive now has a visible effect:
+
+- Solar Crown: floating glowing crown
+- Aurora Aura: rotating two-layer aura with sparks
+- Star Trail: four animated stars around Hammy
+- Crystal Founder Badge: glowing crystal badge on Hammy
+- Golden Focus Trophy: trophy displayed in the room
+- Neon Profile Frame: animated neon frame around Hammy
+- Unknown custom admin IDs: visible special marker instead of disappearing
+
+Additional fixes:
+
+- New admin gifts auto-equip their special item
+- Existing owned items with no prior equipped selection display automatically
+- Players can still press Unequip
+- Unequip is remembered and does not immediately re-equip
+- Unknown admin item IDs remain in the collection
+- All exclusive cards now have Equip & show
+- Server-created gifts store the equipped special item in the cloud save
+- Automatic admin delivery applies and shows the item immediately
+
+DEPLOYMENT CHECK
+/api/health must report version 24.9.

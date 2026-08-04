@@ -27,13 +27,29 @@
   const AUTO_REFRESH_MS=45000;
 
   const exclusiveCatalog={
-    solar_crown:{name:"Solar Crown",icon:"♛",description:"A glowing crown reserved for special Hammy rewards.",equippable:true},
-    aurora_aura:{name:"Aurora Aura",icon:"✦",description:"A colourful glow that surrounds the selected hamster.",equippable:true},
-    star_trail:{name:"Star Trail",icon:"★",description:"A sparkling star effect for the hamster room.",equippable:true},
-    crystal_badge:{name:"Crystal Founder Badge",icon:"◆",description:"A rare collectible badge shown in the Exclusive Collection.",equippable:false},
-    golden_trophy:{name:"Golden Focus Trophy",icon:"🏆",description:"A trophy for special events and achievements.",equippable:false},
-    neon_frame:{name:"Neon Profile Frame",icon:"▣",description:"A bright exclusive frame for special accounts.",equippable:true}
+    solar_crown:{name:"Solar Crown",icon:"♛",description:"A glowing crown above Hammy.",equippable:true,visual:"crown"},
+    aurora_aura:{name:"Aurora Aura",icon:"✦",description:"A moving colourful aura around Hammy.",equippable:true,visual:"aura"},
+    star_trail:{name:"Star Trail",icon:"★",description:"Several sparkling stars orbit around Hammy.",equippable:true,visual:"stars"},
+    crystal_badge:{name:"Crystal Founder Badge",icon:"◆",description:"A glowing crystal badge worn by Hammy.",equippable:true,visual:"badge"},
+    golden_trophy:{name:"Golden Focus Trophy",icon:"🏆",description:"A golden trophy displayed inside Hammy's room.",equippable:true,visual:"trophy"},
+    neon_frame:{name:"Neon Profile Frame",icon:"▣",description:"A bright animated frame surrounding Hammy.",equippable:true,visual:"frame"}
   };
+
+  function fallbackExclusive(id){
+    const label=String(id||"special_item")
+      .replace(/[_-]+/g," ")
+      .replace(/\b\w/g,letter=>letter.toUpperCase());
+    return {
+      name:label||"Admin Special Item",
+      icon:"✦",
+      description:"A special admin-delivered Hammy collectible.",
+      equippable:true,
+      visual:"custom"
+    };
+  }
+  function exclusiveItem(id){
+    return exclusiveCatalog[id]||fallbackExclusive(id);
+  }
 
   function readMeta(){
     try{
@@ -270,72 +286,157 @@
   }
 
   function exclusiveIds(){
-    return Array.isArray(state?.adminExclusives)?state.adminExclusives.filter(id=>exclusiveCatalog[id]):[];
+    if(!Array.isArray(state?.adminExclusives))return [];
+    return [...new Set(
+      state.adminExclusives
+        .map(id=>String(id||"").trim())
+        .filter(Boolean)
+    )];
   }
-  function ensureExclusiveVisual(){
+  function ensureExclusiveVisuals(){
     const hamster=document.getElementById("hamster");
-    if(!hamster)return null;
-    let visual=document.getElementById("adminExclusiveVisual");
-    if(!visual){
-      visual=document.createElement("div");
-      visual.id="adminExclusiveVisual";
-      visual.className="admin-exclusive-visual";
-      visual.setAttribute("aria-hidden","true");
-      hamster.appendChild(visual);
+    const room=document.getElementById("room");
+    if(!hamster||!room)return null;
+
+    let hamsterVisual=document.getElementById("adminExclusiveVisual");
+    if(!hamsterVisual){
+      hamsterVisual=document.createElement("span");
+      hamsterVisual.id="adminExclusiveVisual";
+      hamsterVisual.className="admin-exclusive-visual hidden";
+      hamsterVisual.setAttribute("aria-hidden","true");
+      hamster.appendChild(hamsterVisual);
     }
-    return visual;
+
+    let roomVisual=document.getElementById("adminExclusiveRoomVisual");
+    if(!roomVisual){
+      roomVisual=document.createElement("div");
+      roomVisual.id="adminExclusiveRoomVisual";
+      roomVisual.className="admin-exclusive-room-visual hidden";
+      roomVisual.setAttribute("aria-hidden","true");
+      room.appendChild(roomVisual);
+    }
+
+    return {hamster,room,hamsterVisual,roomVisual};
   }
+
+  function exclusiveVisualMarkup(id){
+    if(id==="solar_crown"){
+      return {
+        hamster:'<span class="exclusive-crown-gem">♛</span>',
+        room:""
+      };
+    }
+    if(id==="aurora_aura"){
+      return {
+        hamster:"",
+        room:'<span class="exclusive-aura-ring ring-a"></span><span class="exclusive-aura-ring ring-b"></span><span class="exclusive-aura-spark s1">✦</span><span class="exclusive-aura-spark s2">✦</span><span class="exclusive-aura-spark s3">✦</span>'
+      };
+    }
+    if(id==="star_trail"){
+      return {
+        hamster:"",
+        room:'<span class="exclusive-orbit-star st1">★</span><span class="exclusive-orbit-star st2">★</span><span class="exclusive-orbit-star st3">★</span><span class="exclusive-orbit-star st4">★</span>'
+      };
+    }
+    if(id==="crystal_badge"){
+      return {
+        hamster:'<span class="exclusive-crystal-badge">◆</span>',
+        room:""
+      };
+    }
+    if(id==="golden_trophy"){
+      return {
+        hamster:"",
+        room:'<span class="exclusive-room-trophy">🏆</span><span class="exclusive-trophy-shine">✦</span>'
+      };
+    }
+    if(id==="neon_frame"){
+      return {
+        hamster:"",
+        room:'<span class="exclusive-neon-frame"></span><span class="exclusive-neon-dot d1"></span><span class="exclusive-neon-dot d2"></span><span class="exclusive-neon-dot d3"></span>'
+      };
+    }
+    return {
+      hamster:'<span class="exclusive-custom-item">✦</span>',
+      room:""
+    };
+  }
+
   function applyExclusiveVisual(){
-    const hamster=document.getElementById("hamster");
-    const visual=ensureExclusiveVisual();
-    if(!hamster||!visual)return;
+    const refs=ensureExclusiveVisuals();
+    if(!refs)return;
+
     const owned=exclusiveIds();
-    if(!owned.includes(state.equippedAdminExclusive))state.equippedAdminExclusive=null;
-    const id=state.equippedAdminExclusive||"";
-    hamster.dataset.adminExclusive=id;
-    visual.dataset.item=id;
-    visual.textContent=id==="solar_crown"?"♛":id==="star_trail"?"★":id==="neon_frame"?"▣":id==="aurora_aura"?"✦":"";
-    visual.classList.toggle("hidden",!id);
+    if(!owned.includes(state.equippedAdminExclusive)){
+      state.equippedAdminExclusive=null;
+    }
+    if(
+      !state.equippedAdminExclusive &&
+      owned.length &&
+      state.adminExclusiveDisplayDisabled!==true
+    ){
+      state.equippedAdminExclusive=owned[owned.length-1];
+      localStorage.setItem(SAVE_KEY,JSON.stringify(state));
+    }
+
+    const id=String(state.equippedAdminExclusive||"");
+    const markup=exclusiveVisualMarkup(id);
+    refs.hamster.dataset.adminExclusive=id;
+    refs.room.dataset.adminExclusive=id;
+    refs.hamsterVisual.dataset.item=id;
+    refs.roomVisual.dataset.item=id;
+    refs.hamsterVisual.innerHTML=markup.hamster;
+    refs.roomVisual.innerHTML=markup.room;
+    refs.hamsterVisual.classList.toggle("hidden",!id||!markup.hamster);
+    refs.roomVisual.classList.toggle("hidden",!id||!markup.room);
   }
+
   function equipExclusive(id){
     if(!exclusiveIds().includes(id))return;
-    state.equippedAdminExclusive=state.equippedAdminExclusive===id?null:id;
+    const item=exclusiveItem(id);
+    const removing=state.equippedAdminExclusive===id;
+    state.equippedAdminExclusive=removing?null:id;
+    state.adminExclusiveDisplayDisabled=removing;
     save();
     renderExclusiveCollection();
     applyExclusiveVisual();
-    toast(state.equippedAdminExclusive?`${exclusiveCatalog[id].name} equipped.`:"Exclusive effect removed.","success");
+    toast(
+      state.equippedAdminExclusive
+        ?`${item.name} equipped and visible in Hammy's room.`
+        :"Exclusive effect removed.",
+      "success"
+    );
   }
+
   function renderExclusiveCollection(){
     const grid=el("exclusiveCollection");
     if(!grid)return;
     const ids=exclusiveIds();
     el("exclusiveCount").textContent=String(ids.length);
     grid.innerHTML="";
+
     if(!ids.length){
       grid.innerHTML='<div class="exclusive-empty">No exclusive items yet. Admin gifts and live events can unlock them.</div>';
       applyExclusiveVisual();
       return;
     }
+
     ids.forEach(id=>{
-      const item=exclusiveCatalog[id];
+      const item=exclusiveItem(id);
       const card=document.createElement("article");
       card.className=`exclusive-item${state.equippedAdminExclusive===id?" equipped":""}`;
+      card.dataset.exclusiveId=id;
       card.innerHTML=`<span class="exclusive-item-icon">${item.icon}</span>
         <div><strong>${item.name}</strong><p>${item.description}</p></div>`;
-      if(item.equippable){
-        const button=document.createElement("button");
-        button.className=state.equippedAdminExclusive===id?"primary":"secondary";
-        button.textContent=state.equippedAdminExclusive===id?"Unequip":"Equip";
-        button.addEventListener("click",()=>equipExclusive(id));
-        card.appendChild(button);
-      }else{
-        const owned=document.createElement("span");
-        owned.className="exclusive-owned-label";
-        owned.textContent="Collectible";
-        card.appendChild(owned);
-      }
+
+      const button=document.createElement("button");
+      button.className=state.equippedAdminExclusive===id?"primary":"secondary";
+      button.textContent=state.equippedAdminExclusive===id?"Unequip":"Equip & show";
+      button.addEventListener("click",()=>equipExclusive(id));
+      card.appendChild(button);
       grid.appendChild(card);
     });
+
     applyExclusiveVisual();
   }
 
@@ -386,7 +487,7 @@
     Object.entries(reward?.fruits||{}).forEach(([key,value])=>{
       if(Number(value)>0)parts.push(`${Number(value)} ${fruitNames[key]||key}${Number(value)===1?"":"s"}`);
     });
-    if(reward?.exclusiveId&&exclusiveCatalog[reward.exclusiveId])parts.push(exclusiveCatalog[reward.exclusiveId].name);
+    if(reward?.exclusiveId)parts.push(exclusiveItem(reward.exclusiveId).name);
     return parts.join(" · ")||"Special reward";
   }
   function eventTimeRemaining(){
@@ -642,6 +743,10 @@
       if(!Array.isArray(target.adminExclusives))target.adminExclusives=[];
       if(reward.exclusiveId&&!target.adminExclusives.includes(reward.exclusiveId)){
         target.adminExclusives.push(reward.exclusiveId);
+      }
+      if(reward.exclusiveId){
+        target.equippedAdminExclusive=reward.exclusiveId;
+        target.adminExclusiveDisplayDisabled=false;
       }
       if(!Array.isArray(target.adminGiftHistory))target.adminGiftHistory=[];
       target.adminGiftHistory.unshift({

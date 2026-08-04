@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=248">
-<link rel="stylesheet" href="cloud.css?v=248">
+<link rel="stylesheet" href="online.css?v=249">
+<link rel="stylesheet" href="cloud.css?v=249">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -951,7 +951,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 }
 
 </style>
-<link rel="stylesheet" href="premium.css?v=248">
+<link rel="stylesheet" href="premium.css?v=249">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -1141,7 +1141,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v24.8">Build v24.8</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v24.9">Build v24.9</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -1314,7 +1314,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button type="button" id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v24.8 seven times whenever you need to show this section.
+   Tap Build v24.9 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -1362,7 +1362,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v24.8</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v24.9</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -1769,7 +1769,11 @@ function safeSkin(){
  if((!standard&&!special)||(!state.premium&&state.skin!==freeHamsterKey)){
   state.skin=freeHamsterKey;
  }
- if(standard&&skins[state.skin])activeBreedTab=skins[state.skin].breed;
+ if(!hamsterBreeds[activeBreedTab]){
+  activeBreedTab=standard&&skins[state.skin]
+   ?skins[state.skin].breed
+   :"normal";
+ }
 }
 function getLootLevel(){return Math.min(20,1+Math.floor(state.totalFocusMinutes/120))}
 function nextCostume(){return Object.values(clothes).filter(c=>c.days>state.practiceDays).sort((a,b)=>a.days-b.days)[0]||null}
@@ -1840,15 +1844,19 @@ function renderBreedTabs(){
   button.innerHTML=`${breed.shortName}${locked?'<span class="breed-lock">🔒</span>':""}`;
   button.setAttribute("role","tab");
   button.setAttribute("aria-selected",String(activeBreedTab===breedKey));
-  button.addEventListener("click",()=>{
+  button.addEventListener("click",event=>{
+   event.preventDefault();
+   event.stopPropagation();
    activeBreedTab=breedKey;
-   renderSkins();
+   renderBreedTabs();
+   renderStandardBreedColors();
   });
   tabs.appendChild(button);
  });
  const breed=hamsterBreeds[activeBreedTab]||hamsterBreeds.normal;
  $("activeBreedName").textContent=breed.name;
  $("activeBreedDescription").textContent=breed.description;
+ tabs.dataset.activeBreed=activeBreedTab;
  $("breedAccessBadge").textContent=state.premium
   ?"ALL 36 BREED COLORS UNLOCKED"
   :"1 FREE · 35 PREMIUM";
@@ -2184,14 +2192,14 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=248"></script>
-<script src="cloud.js?v=248"></script>
-<script src="online.js?v=248"></script>
-<script src="gallery.js?v=248"></script>
+<script src="premium.js?v=249"></script>
+<script src="cloud.js?v=249"></script>
+<script src="online.js?v=249"></script>
+<script src="gallery.js?v=249"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=248").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=249").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>
