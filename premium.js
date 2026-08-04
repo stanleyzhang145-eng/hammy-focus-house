@@ -418,6 +418,9 @@
     const breed=s.breed||"special";
     el.className='hamster premium-skin breed-'+breed+' '+premiumSkinClass(key);
     el.dataset.breed=breed;
+    el.dataset.visualStyle=typeof safeBreedLook==="function"
+      ?safeBreedLook()
+      :"cartoon";
     el.style.setProperty('--fur',s.fur);
     el.style.setProperty('--fur2',s.fur2);
     el.style.setProperty('--patch',s.patch);

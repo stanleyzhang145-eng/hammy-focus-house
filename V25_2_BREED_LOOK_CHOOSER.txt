@@ -1,0 +1,32 @@
+HAMMY FOCUS HOUSE V25.2 — BREED LOOK CHOOSER
+
+NEW CHOOSING PANEL
+The Hamsters screen now includes two working live-preview options:
+
+1. Realistic-Cute
+- Smaller, more natural eyes
+- Softer cheek colouring
+- More balanced head and body proportions
+- Slightly longer natural muzzle
+- Smaller paws, feet, nose, and tail
+
+2. Cartoon-Cute
+- Bigger sparkling eyes
+- Rounder cheeks
+- Shorter muzzle
+- Plusher head and body
+- Slightly larger paws and nose
+
+The chosen style applies to:
+- The hamster in the home room
+- Every breed and colour card
+- Clothing previews
+- Premium hamster previews
+- Premium room hamster
+
+The selection saves locally and in the cloud save. It remains available to
+free and Premium players. It changes only the drawing style, not Premium
+breed access.
+
+DEPLOYMENT CHECK
+/api/health must report version 25.2.

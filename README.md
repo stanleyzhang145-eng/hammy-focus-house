@@ -252,3 +252,11 @@ clothing previews, and Premium room previews.
 ## Version 25.1 — Cute Breeds Polish
 
 The special breeds keep their unique anatomy, but the faces and body proportions were softened to look cuter. Eyes are slightly larger, cheeks are softer, longcoat is less scraggly, satin is less sharp, and floppy-ear has a shorter baby-face muzzle while keeping its folded ears.
+
+
+## Version 25.2 — Breed Look Chooser
+
+The Hamsters page now has a saved Realistic-Cute versus Cartoon-Cute choosing
+panel with live breed previews. The selected style updates the home hamster,
+breed cards, clothing cards, and Premium previews without changing breed
+ownership or colour access.
