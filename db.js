@@ -1129,6 +1129,7 @@ async function adminSetPremium(identifier,active){
   let state=clone(current?.state||{});
   state.premium=enabled;
   state.premiumDemoEntitlement=enabled;
+  if(!enabled)state.skin="normal_white";
   state=appendAdminCommand(
     state,
     "setPremium",

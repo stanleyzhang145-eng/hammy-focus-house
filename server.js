@@ -28,6 +28,23 @@ const rewardCodeCatalog=new Map([
   }]
 ]);
 
+const standardHamsterBreeds=["normal","teddy","longcoat","dwarf","satin","floppy"];
+const standardHamsterColors=["white","orange","panda","caramel","silver","strawberry"];
+const standardHamsterSkins=new Set(
+  standardHamsterBreeds.flatMap(
+    breed=>standardHamsterColors.map(color=>`${breed}_${color}`)
+  )
+);
+const premiumSpecialHamsterSkins=new Set([
+  "galaxy","rainbow","frost","sakura","golden",
+  "ghost","robot","dragon","axolotl","custom"
+]);
+const legacyHamsterSkins={
+  white:"normal_white",orange:"normal_orange",panda:"normal_panda",
+  caramel:"normal_caramel",silver:"normal_silver",strawberry:"normal_strawberry"
+};
+const freeHamsterSkin="normal_white";
+
 const adminExclusiveCatalog=new Map([
   ["solar_crown",{name:"Solar Crown",icon:"♛",description:"A glowing crown reserved for special Hammy rewards."}],
   ["aurora_aura",{name:"Aurora Aura",icon:"✦",description:"A colourful glow that surrounds the selected hamster."}],
@@ -319,6 +336,21 @@ function cleanNickname(value){
   }
   return name;
 }
+function sanitizeHamsterSkinKey(value,premiumActive){
+  const raw=String(value||"").replace(/[^A-Za-z0-9_-]/g,"").slice(0,40);
+  const migrated=legacyHamsterSkins[raw]||raw||freeHamsterSkin;
+  if(!premiumActive)return freeHamsterSkin;
+  if(standardHamsterSkins.has(migrated)||premiumSpecialHamsterSkins.has(migrated)){
+    return migrated;
+  }
+  return freeHamsterSkin;
+}
+function sanitizeHamsterSelection(stateInput,premiumActive){
+  const state=stateInput&&typeof stateInput==="object"?stateInput:{};
+  state.skin=sanitizeHamsterSkinKey(state.skin,premiumActive);
+  return state;
+}
+
 function cleanJson(value,depth=0){
   if(depth>12)return null;
   if(value===null||["string","number","boolean"].includes(typeof value))return value;
@@ -362,7 +394,7 @@ function cleanProfile(input,premiumActive){
   const profileData={
     nickname:cleanNickname(input.nickname),
     visibility:input.visibility==="public"?"public":"unlisted",
-    skin:String(input.skin||"white").replace(/[^A-Za-z0-9_-]/g,"").slice(0,32)||"white",
+    skin:sanitizeHamsterSkinKey(input.skin,premiumActive),
     skinColors:{
       fur:safeColor(input.skinColors?.fur,"#ffffff"),
       fur2:safeColor(input.skinColors?.fur2,"#f7f5f1"),
@@ -394,9 +426,16 @@ async function accountPayload(userId,{includeSave=false}={}){
   const summary=await db.accountSummary(userId);
   if(!summary.user)return null;
   const profile=summary.profile;
+  const premiumActive=Boolean(summary.entitlement?.active);
+  const formattedSave=includeSave?formatSave(summary.save):null;
+  if(formattedSave?.state){
+    formattedSave.state.premium=premiumActive;
+    formattedSave.state.premiumDemoEntitlement=summary.entitlement?.source==="demo";
+    sanitizeHamsterSelection(formattedSave.state,premiumActive);
+  }
   return {
     playerId:summary.user.player_id,
-    premium:{active:Boolean(summary.entitlement?.active),source:summary.entitlement?.source||"none"},
+    premium:{active:premiumActive,source:summary.entitlement?.source||"none"},
     cloud:{
       revision:Number(summary.save?.revision)||0,
       updatedAt:summary.save?.updated_at||null,
@@ -405,7 +444,7 @@ async function accountPayload(userId,{includeSave=false}={}){
     profile:profile?{
       code:profile.code,nickname:profile.nickname,visibility:profile.visibility,updatedAt:profile.updatedAt
     }:null,
-    ...(includeSave?{save:formatSave(summary.save)}:{})
+    ...(includeSave?{save:formattedSave}:{})
   };
 }
 async function createUniquePlayer(){
@@ -432,7 +471,7 @@ function sendStaticFile(res,file){
     "Cache-Control":updateFile?"no-store":"public, max-age=3600",
     "X-Content-Type-Options":"nosniff",
     "Referrer-Policy":"same-origin",
-    "X-Hammy-Version":"24.7"
+    "X-Hammy-Version":"24.8"
   });
   fs.createReadStream(file).pipe(res);
 }
@@ -463,17 +502,17 @@ async function handleApi(req,res,url){
     if(!databaseReady){
       return json(res,503,{
         ok:false,
-        version:24.7,
+        version:24.8,
         databaseReady:false,
         error:String(databaseError?.message||"Database is not ready.")
       });
     }
-    return json(res,200,{ok:true,version:24.7,databaseReady:true,databaseMode:db.mode()});
+    return json(res,200,{ok:true,version:24.8,databaseReady:true,databaseMode:db.mode()});
   }
 
   if(req.method==="GET"&&url.pathname==="/api/health"){
     return json(res,200,{
-      ok:true,name:"Hammy Cloud server",version:24.7,
+      ok:true,name:"Hammy Cloud server",version:24.8,
       databaseReady,databaseMode:databaseReady?db.mode():"not-configured",
       setupRequired:!databaseReady,
       databaseError:databaseReady?null:String(databaseError?.message||"DATABASE_URL is missing")
@@ -499,6 +538,7 @@ async function handleApi(req,res,url){
       const state=cleanJson(body.state);
       state.premium=Boolean(entitlement.active);
       state.premiumDemoEntitlement=entitlement.source==="demo";
+      sanitizeHamsterSelection(state,Boolean(entitlement.active));
       await db.saveCloud(id,{baseRevision:0,deviceId,state,force:true});
     }
     const account=await accountPayload(id,{includeSave:true});
@@ -542,6 +582,7 @@ async function handleApi(req,res,url){
     if(formatted?.state){
       formatted.state.premium=Boolean(entitlement.active);
       formatted.state.premiumDemoEntitlement=entitlement.source==="demo";
+      sanitizeHamsterSelection(formatted.state,Boolean(entitlement.active));
     }
     return json(res,200,{save:formatted,premium:{active:Boolean(entitlement.active),source:entitlement.source||"none"}});
   }
@@ -557,6 +598,7 @@ async function handleApi(req,res,url){
     if(!state||typeof state!=="object"||Array.isArray(state))return json(res,400,{error:"Invalid cloud save."});
     state.premium=Boolean(entitlement.active);
     state.premiumDemoEntitlement=entitlement.source==="demo";
+    sanitizeHamsterSelection(state,Boolean(entitlement.active));
     const result=await db.saveCloud(auth.userId,{
       baseRevision:safeNumber(body.baseRevision,0,Number.MAX_SAFE_INTEGER,0),
       deviceId:String(body.deviceId||auth.deviceId||"device").slice(0,80),
@@ -568,6 +610,7 @@ async function handleApi(req,res,url){
       if(current?.state){
         current.state.premium=Boolean(entitlement.active);
         current.state.premiumDemoEntitlement=entitlement.source==="demo";
+        sanitizeHamsterSelection(current.state,Boolean(entitlement.active));
       }
       return json(res,409,{error:"A newer cloud save already exists.",conflict:true,save:current});
     }
@@ -1140,5 +1183,5 @@ const server=http.createServer(async(req,res)=>{
     databaseReady=false;databaseError=error;
     console.error("Cloud database setup incomplete:",error.message);
   }
-  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v24.7 running at http://${HOST}:${PORT}`));
+  server.listen(PORT,HOST,()=>console.log(`Hammy Focus House v24.8 running at http://${HOST}:${PORT}`));
 })();

@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=247">
-<link rel="stylesheet" href="cloud.css?v=247">
+<link rel="stylesheet" href="online.css?v=248">
+<link rel="stylesheet" href="cloud.css?v=248">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -816,8 +816,142 @@ body[data-theme="night"] .fruit-dot{filter:brightness(1.08)}
 body[data-theme="night"] .focus-warning{background:#5a4d2a;color:#fff}
 body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
+
+/* ===== v24.8 breed and color collection ===== */
+.breed-selector-card{
+  margin-top:12px;
+  border:3px solid var(--line);
+  border-radius:20px;
+  padding:14px;
+  background:rgba(255,255,255,.88);
+  box-shadow:0 5px 0 rgba(73,57,81,.10);
+}
+.breed-selector-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:10px;
+}
+.breed-kicker{
+  display:block;
+  color:var(--accent);
+  font-size:.72rem;
+  font-weight:1000;
+  letter-spacing:.12em;
+}
+.badge-static{
+  display:inline-flex;
+  align-items:center;
+  border:2px solid var(--line);
+  border-radius:999px;
+  padding:5px 9px;
+  background:#fff;
+  font-size:.75rem;
+  font-weight:1000;
+  white-space:nowrap;
+}
+.badge-static.premium{background:#ffd66d}
+.breed-tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:3px 2px 8px;
+  scrollbar-width:thin;
+}
+.breed-tabs button{
+  min-width:138px;
+  white-space:nowrap;
+}
+.breed-tabs button.active{
+  background:var(--accent);
+  color:#fff;
+}
+.breed-tabs button .breed-lock{
+  display:inline-block;
+  margin-left:4px;
+}
+.breed-color-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.breed-color-grid .skin{min-height:288px}
+.breed-color-label{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  justify-content:center;
+  margin-top:4px;
+  font-size:.78rem;
+  font-weight:900;
+}
+.breed-color-swatch{
+  width:17px;
+  height:17px;
+  border:2px solid var(--line);
+  border-radius:50%;
+  background:var(--swatch);
+}
+.hamster[data-breed="teddy"]{scale:1.04}
+.hamster[data-breed="teddy"] .body{
+  transform:scaleX(1.12) scaleY(1.04);
+  transform-origin:50% 80%;
+  border-radius:50% 50% 44% 44%;
+}
+.hamster[data-breed="teddy"] .cheek{transform:scale(1.22)}
+.hamster[data-breed="teddy"] .ear{scale:.86}
+.hamster[data-breed="longcoat"] .body,
+.hamster[data-breed="longcoat"] .head{
+  filter:drop-shadow(-4px 5px 0 var(--fur2)) drop-shadow(4px 5px 0 var(--fur));
+}
+.hamster[data-breed="longcoat"] .body::after{
+  content:"";
+  position:absolute;
+  left:18px;
+  right:18px;
+  bottom:-8px;
+  height:20px;
+  background:
+    radial-gradient(circle at 10px 0,var(--fur) 0 9px,transparent 10px)
+    0 0/28px 20px repeat-x;
+  pointer-events:none;
+}
+.hamster[data-breed="dwarf"]{scale:.84}
+.hamster[data-breed="dwarf"] .ear{scale:.78}
+.hamster[data-breed="dwarf"] .body{border-radius:53% 53% 48% 48%}
+.hamster[data-breed="satin"] .body::before,
+.hamster[data-breed="satin"] .head::before{
+  content:"";
+  position:absolute;
+  inset:8px 16px auto 25px;
+  height:34%;
+  border-radius:50%;
+  background:linear-gradient(115deg,rgba(255,255,255,.72),rgba(255,255,255,0));
+  pointer-events:none;
+  z-index:2;
+}
+.hamster[data-breed="floppy"] .ear.l{
+  transform:translate(-6px,18px) rotate(-38deg) scale(1.08);
+}
+.hamster[data-breed="floppy"] .ear.r{
+  transform:translate(6px,18px) rotate(38deg) scale(1.08);
+}
+.hamster[data-breed="floppy"] .ear{
+  border-radius:58% 58% 72% 72%;
+}
+.hamster[data-breed="roundface"] .head{transform:scaleX(1.12);transform-origin:center}
+.hamster[data-breed="roundface"] .muzzle{transform:translateX(-50%) scale(1.15)}
+@media(max-width:850px){
+  .breed-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:540px){
+  .breed-selector-heading{display:grid}
+  .breed-color-grid{grid-template-columns:1fr}
+}
+
 </style>
-<link rel="stylesheet" href="premium.css?v=247">
+<link rel="stylesheet" href="premium.css?v=248">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -955,8 +1089,38 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
  <div id="furnitureGrid" class="grid grid2" style="margin-top:12px"></div>
 </section>
 <section id="hamstersPage" class="page hidden">
- <div class="row"><div><h2>Choose a Hamster</h2><p class="muted">Tap an unlocked hamster once.</p></div><button id="premiumBtn" class="primary">Demo unlock Premium</button></div>
- <div id="skinGrid" class="skin-grid" style="margin-top:12px"></div>
+ <div class="row">
+  <div>
+   <h2>Choose a Hamster Breed and Color</h2>
+   <p class="muted">Every breed has the same six colors. Free players can use only the White Normal Hamster.</p>
+  </div>
+  <button id="premiumBtn" class="primary">Demo unlock Premium</button>
+ </div>
+
+ <section class="breed-selector-card">
+  <div class="breed-selector-heading">
+   <div>
+    <span class="breed-kicker">BREED COLLECTION</span>
+    <h3 id="activeBreedName">Normal Breed</h3>
+    <p id="activeBreedDescription" class="muted">The classic balanced Hammy shape.</p>
+   </div>
+   <span id="breedAccessBadge" class="badge-static">1 FREE · 35 PREMIUM</span>
+  </div>
+  <div id="breedTabs" class="breed-tabs" role="tablist" aria-label="Hamster breeds"></div>
+  <div id="skinGrid" class="breed-color-grid" style="margin-top:12px"></div>
+ </section>
+
+ <section id="specialHamsterSection" class="breed-selector-card" style="margin-top:14px">
+  <div class="breed-selector-heading">
+   <div>
+    <span class="breed-kicker">SPECIAL COLLECTION</span>
+    <h3>Fantasy and Custom Hamsters</h3>
+    <p class="muted">Premium animated designs remain separate from the real breed color collection.</p>
+   </div>
+   <span class="badge-static premium">PREMIUM</span>
+  </div>
+  <div id="specialSkinGrid" class="breed-color-grid"></div>
+ </section>
 </section>
 <section id="clothingPage" class="page hidden"><h2>Clothing</h2><p class="muted">Wear or unequip fitted clothing.</p><div id="clothingGrid" class="grid grid2" style="margin-top:12px"></div></section>
 
@@ -977,7 +1141,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v24.7">Build v24.7</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v24.8">Build v24.8</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -1150,7 +1314,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button type="button" id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v24.7 seven times whenever you need to show this section.
+   Tap Build v24.8 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -1198,7 +1362,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v24.7</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v24.8</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -1298,17 +1462,56 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"white",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},clothes:["shirt","hoodie"],equipped:null,marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},activeBoosters:{coinBooster:0,fruitCharm:0},ownedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},placedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},ownedMarketThemes:{forest:false,candy:false,space:false},ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false}};
+const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"normal_white",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},clothes:["shirt","hoodie"],equipped:null,marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},activeBoosters:{coinBooster:0,fruitCharm:0},ownedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},placedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},ownedMarketThemes:{forest:false,candy:false,space:false},ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false}};
 let state;
 try{state={...defaults,...JSON.parse(localStorage.getItem("hammyV8")||localStorage.getItem("hammyV5")||"{}")};state.foods={...defaults.foods,...(state.foods||{})};state.marketInventory={...defaults.marketInventory,...(state.marketInventory||{})};state.activeBoosters={...defaults.activeBoosters,...(state.activeBoosters||{})};state.ownedDecorations={...defaults.ownedDecorations,...(state.ownedDecorations||{})};state.placedDecorations={...defaults.placedDecorations,...(state.placedDecorations||{})};state.ownedMarketThemes={...defaults.ownedMarketThemes,...(state.ownedMarketThemes||{})};state.ownedFurniture={...defaults.ownedFurniture,...(state.ownedFurniture||{})};state.placedFurniture={...defaults.placedFurniture,...(state.placedFurniture||{})};state.practiceDays=Number(state.practiceDays||0);state.totalFocusMinutes=Number(state.totalFocusMinutes||0);state.sessionCount=Number(state.sessionCount||0);state.lastPracticeDate=state.lastPracticeDate||"";state.theme=state.theme||"lavender"}catch{state=structuredClone(defaults)}
-const skins={
- white:{name:"White Hamster",fur:"#fff",fur2:"#f7f5f1",patch:"transparent",premium:false},
- orange:{name:"Orange Hamster",fur:"#e89a3f",fur2:"#fff0d1",patch:"transparent",premium:true},
- panda:{name:"Black & White Hamster",fur:"#f6f6f6",fur2:"#fff",patch:"#35333b",premium:true},
- caramel:{name:"Caramel Hamster",fur:"#b9784d",fur2:"#edd0b8",patch:"#805239",premium:true},
- silver:{name:"Silver Hamster",fur:"#b8beca",fur2:"#eef1f5",patch:"#747a88",premium:true},
- strawberry:{name:"Strawberry Hamster",fur:"#e99ab4",fur2:"#ffe5ee",patch:"#c96f8d",premium:true}
+const hamsterColors={
+ white:{name:"White",fur:"#fff",fur2:"#f7f5f1",patch:"transparent",swatch:"#ffffff"},
+ orange:{name:"Orange",fur:"#e89a3f",fur2:"#fff0d1",patch:"transparent",swatch:"#e89a3f"},
+ panda:{name:"Black & White",fur:"#f6f6f6",fur2:"#fff",patch:"#35333b",swatch:"linear-gradient(90deg,#fff 0 50%,#35333b 50%)"},
+ caramel:{name:"Caramel",fur:"#b9784d",fur2:"#edd0b8",patch:"#805239",swatch:"#b9784d"},
+ silver:{name:"Silver",fur:"#b8beca",fur2:"#eef1f5",patch:"#747a88",swatch:"#b8beca"},
+ strawberry:{name:"Strawberry",fur:"#e99ab4",fur2:"#ffe5ee",patch:"#c96f8d",swatch:"#e99ab4"}
 };
+const hamsterBreeds={
+ normal:{name:"Normal Breed",shortName:"Normal",description:"The classic balanced Hammy shape."},
+ teddy:{name:"Teddy Breed",shortName:"Teddy",description:"Extra round, fluffy cheeks and a cuddly body."},
+ longcoat:{name:"Long-Coat Breed",shortName:"Long-Coat",description:"Soft tufts and a longer fluffy coat."},
+ dwarf:{name:"Dwarf Breed",shortName:"Dwarf",description:"A smaller compact Hammy with tiny ears."},
+ satin:{name:"Satin Breed",shortName:"Satin",description:"Smooth glossy fur with a gentle shine."},
+ floppy:{name:"Floppy-Ear Breed",shortName:"Floppy-Ear",description:"Large relaxed ears that fold down at the sides."}
+};
+const freeHamsterKey="normal_white";
+const legacySkinMap={
+ white:"normal_white",orange:"normal_orange",panda:"normal_panda",
+ caramel:"normal_caramel",silver:"normal_silver",strawberry:"normal_strawberry"
+};
+const standardSkinKeys=new Set();
+const skins={};
+Object.entries(hamsterBreeds).forEach(([breedKey,breed])=>{
+ Object.entries(hamsterColors).forEach(([colorKey,color])=>{
+  const key=`${breedKey}_${colorKey}`;
+  const free=key===freeHamsterKey;
+  skins[key]={
+   name:`${color.name} ${breed.shortName} Hamster`,
+   fur:color.fur,fur2:color.fur2,patch:color.patch,
+   swatch:color.swatch,breed:breedKey,color:colorKey,
+   standard:true,premium:!free
+  };
+  standardSkinKeys.add(key);
+ });
+});
+const specialSkinKeys=new Set([
+ "galaxy","rainbow","frost","sakura","golden",
+ "ghost","robot","dragon","axolotl","custom"
+]);
+function migrateSkinKey(key){
+ return legacySkinMap[key]||key||freeHamsterKey;
+}
+state.skin=migrateSkinKey(state.skin);
+let activeBreedTab=standardSkinKeys.has(state.skin)
+ ?skins[state.skin].breed
+ :"normal";
 const clothes={
  shirt:{name:"Focus Shirt",type:"shirt",color:"#7d9edb",days:0},
  hoodie:{name:"Cloud Hoodie",type:"hoodie",color:"#8a9fe3",days:0},
@@ -1559,13 +1762,24 @@ window.HammyGameState={
  }
 };
 function say(text){$("status").textContent=text;$("roomMessage").textContent=text}
-function safeSkin(){if(!skins[state.skin]||(skins[state.skin].premium&&!state.premium))state.skin="white"}
+function safeSkin(){
+ state.skin=migrateSkinKey(state.skin);
+ const standard=standardSkinKeys.has(state.skin);
+ const special=specialSkinKeys.has(state.skin);
+ if((!standard&&!special)||(!state.premium&&state.skin!==freeHamsterKey)){
+  state.skin=freeHamsterKey;
+ }
+ if(standard&&skins[state.skin])activeBreedTab=skins[state.skin].breed;
+}
 function getLootLevel(){return Math.min(20,1+Math.floor(state.totalFocusMinutes/120))}
 function nextCostume(){return Object.values(clothes).filter(c=>c.days>state.practiceDays).sort((a,b)=>a.days-b.days)[0]||null}
 function isCostumeUnlocked(c){return c.days===0||state.practiceDays>=c.days||state.clothes.includes(Object.keys(clothes).find(k=>clothes[k]===c))}
 function update(){
- applyTheme();safeSkin();const s=skins[state.skin];const h=$("hamster");
+ applyTheme();safeSkin();const s=skins[state.skin]||skins[freeHamsterKey];const h=$("hamster");
  h.style.setProperty("--fur",s.fur);h.style.setProperty("--fur2",s.fur2);h.style.setProperty("--patch",s.patch);
+ h.dataset.breed=s.breed||"special";
+ [...h.classList].filter(name=>name.startsWith("breed-")).forEach(name=>h.classList.remove(name));
+ h.classList.add(`breed-${s.breed||"special"}`);
  $("coins").textContent=state.coins;$("streak").textContent=state.streak;$("practiceDays").textContent=state.practiceDays;$("lootLevel").textContent=getLootLevel();
  $("focusLootLevel").textContent=getLootLevel();$("totalFocusText").textContent=Math.floor(state.totalFocusMinutes)+" min";
  const next=nextCostume();$("nextCostumeText").textContent=next?(next.days-state.practiceDays)+" more day"+((next.days-state.practiceDays)===1?"":"s"):"All unlocked";
@@ -1593,17 +1807,103 @@ function tickle(){
 }
 function startRun(){clearFurnitureAction();if(running)return;running=true;$("hamster").classList.remove("tickle");$("hamster").classList.add("running");$("treadmill").classList.remove("off");$("runBtn").disabled=true;$("stopBtn").disabled=false;state.happy=Math.min(100,state.happy+5);state.energy=Math.max(0,state.energy-5);say("Nibbles is running!");update()}
 function stopRun(){running=false;$("hamster").classList.remove("running");$("treadmill").classList.add("off");$("runBtn").disabled=false;$("stopBtn").disabled=true;say("Nibbles finished running.")}
-function hamsterPreview(key){const s=skins[key];return `<div class="skin-preview"><div class="hamster" style="position:relative;left:50%;bottom:auto;top:0;--fur:${s.fur};--fur2:${s.fur2};--patch:${s.patch};pointer-events:none"><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span><span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span></div></div>`}
-function renderSkins(){
- $("skinGrid").innerHTML="";
- Object.entries(skins).forEach(([key,s])=>{
-  const locked=s.premium&&!state.premium;
-  const card=document.createElement("div");card.className="skin"+(state.skin===key?" selected":"");
-  card.innerHTML=`<span class="badge left ${s.premium?"premium":""}">${s.premium?"PREMIUM":"FREE"}</span><span class="badge right">${locked?"LOCKED":state.skin===key?"USING":"CHOOSE"}</span>${hamsterPreview(key)}<strong>${s.name}</strong><p class="muted">${locked?"Unlock Premium first":"Tap the button to use"}</p>`;
-  const b=document.createElement("button");b.className=locked?"secondary":"primary";b.style.marginTop="8px";b.textContent=locked?"Locked":state.skin===key?"Selected":"Use";b.disabled=locked||state.skin===key;
-  b.addEventListener("click",()=>{state.skin=key;update();renderSkins();say(s.name+" selected.")});
-  card.appendChild(b);$("skinGrid").appendChild(card);
+function hamsterPreview(key){
+ const s=skins[key]||skins[freeHamsterKey];
+ const breed=s.breed||"special";
+ const effect=s.effect?` skin-${s.effect}`:"";
+ return `<div class="skin-preview"><div class="hamster breed-${breed}${effect}" data-breed="${breed}" style="position:relative;left:50%;bottom:auto;top:0;--fur:${s.fur};--fur2:${s.fur2};--patch:${s.patch};pointer-events:none"><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span><span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span></div></div>`;
+}
+function selectHamsterSkin(key){
+ const s=skins[key];
+ if(!s)return;
+ const locked=!state.premium&&key!==freeHamsterKey;
+ if(locked){
+  say("Premium unlocks this breed and color.");
+  return;
+ }
+ state.skin=key;
+ if(s.breed)activeBreedTab=s.breed;
+ update();
+ renderSkins();
+ if(typeof renderPremiumHamsters==="function")renderPremiumHamsters();
+ say(s.name+" selected.");
+}
+function renderBreedTabs(){
+ const tabs=$("breedTabs");
+ if(!tabs)return;
+ tabs.innerHTML="";
+ Object.entries(hamsterBreeds).forEach(([breedKey,breed])=>{
+  const button=document.createElement("button");
+  button.type="button";
+  button.className=activeBreedTab===breedKey?"secondary active":"secondary";
+  const locked=!state.premium&&breedKey!=="normal";
+  button.innerHTML=`${breed.shortName}${locked?'<span class="breed-lock">🔒</span>':""}`;
+  button.setAttribute("role","tab");
+  button.setAttribute("aria-selected",String(activeBreedTab===breedKey));
+  button.addEventListener("click",()=>{
+   activeBreedTab=breedKey;
+   renderSkins();
+  });
+  tabs.appendChild(button);
  });
+ const breed=hamsterBreeds[activeBreedTab]||hamsterBreeds.normal;
+ $("activeBreedName").textContent=breed.name;
+ $("activeBreedDescription").textContent=breed.description;
+ $("breedAccessBadge").textContent=state.premium
+  ?"ALL 36 BREED COLORS UNLOCKED"
+  :"1 FREE · 35 PREMIUM";
+}
+function renderStandardBreedColors(){
+ const grid=$("skinGrid");
+ if(!grid)return;
+ grid.innerHTML="";
+ Object.keys(hamsterColors).forEach(colorKey=>{
+  const key=`${activeBreedTab}_${colorKey}`;
+  const s=skins[key];
+  const locked=!state.premium&&key!==freeHamsterKey;
+  const selected=state.skin===key;
+  const card=document.createElement("div");
+  card.className="skin"+(selected?" selected":"");
+  card.innerHTML=`<span class="badge left ${locked?"premium":""}">${key===freeHamsterKey?"FREE":"PREMIUM"}</span><span class="badge right">${locked?"LOCKED":selected?"USING":"CHOOSE"}</span>${hamsterPreview(key)}<strong>${s.name}</strong><span class="breed-color-label"><i class="breed-color-swatch" style="--swatch:${s.swatch}"></i>${hamsterColors[colorKey].name}</span><p class="muted">${locked?"Premium is required for this combination.":key===freeHamsterKey?"The free starter breed and color.":"Use this breed and color."}</p>`;
+  const button=document.createElement("button");
+  button.className=locked?"secondary":"primary";
+  button.style.marginTop="8px";
+  button.textContent=locked?"Locked":selected?"Selected":"Use";
+  button.disabled=locked||selected;
+  button.addEventListener("click",()=>selectHamsterSkin(key));
+  card.appendChild(button);
+  grid.appendChild(card);
+ });
+}
+function renderSpecialSkins(){
+ const grid=$("specialSkinGrid");
+ const section=$("specialHamsterSection");
+ if(!grid||!section)return;
+ const available=[...specialSkinKeys].filter(key=>skins[key]);
+ section.classList.toggle("hidden",available.length===0);
+ grid.innerHTML="";
+ available.forEach(key=>{
+  const s=skins[key];
+  const locked=!state.premium;
+  const selected=state.skin===key;
+  const card=document.createElement("div");
+  card.className="skin"+(selected?" selected":"");
+  card.innerHTML=`<span class="badge left premium">PREMIUM</span><span class="badge right">${locked?"LOCKED":selected?"USING":"CHOOSE"}</span>${hamsterPreview(key)}<strong>${s.name}</strong><p class="muted">${locked?"Premium is required.":"Animated special design."}</p>`;
+  const button=document.createElement("button");
+  button.className=locked?"secondary":"primary";
+  button.style.marginTop="8px";
+  button.textContent=locked?"Locked":selected?"Selected":"Use";
+  button.disabled=locked||selected;
+  button.addEventListener("click",()=>selectHamsterSkin(key));
+  card.appendChild(button);
+  grid.appendChild(card);
+ });
+}
+function renderSkins(){
+ safeSkin();
+ renderBreedTabs();
+ renderStandardBreedColors();
+ renderSpecialSkins();
 }
 
 function furniturePreview(key){
@@ -1714,10 +2014,11 @@ function outfitMarkup(c){
  return `<span class="clothing ${c.type} on" style="--cloth:${c.color}"></span>`;
 }
 function clothingPreview(c){
- const s=skins[state.skin]||skins.white;
+ const s=skins[state.skin]||skins[freeHamsterKey];
+ const breed=s.breed||"special";
  const locked=c.days>state.practiceDays&&!state.clothes.includes(Object.keys(clothes).find(k=>clothes[k]===c));
  return `<div class="clothing-card-preview ${locked?"costume-locked":""}">
-   <div class="hamster" style="--fur:${s.fur};--fur2:${s.fur2};--patch:${s.patch}">
+   <div class="hamster breed-${breed}" data-breed="${breed}" style="--fur:${s.fur};--fur2:${s.fur2};--patch:${s.patch}">
     <span class="tail"></span><span class="ear l"></span><span class="ear r"></span>
     <span class="body"></span><span class="belly"></span><span class="head"></span>
     <span class="patch"></span><span class="muzzle"></span><span class="eye l"></span>
@@ -1860,7 +2161,7 @@ window.addEventListener("beforeunload",()=>{
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));b.classList.add("active");$(b.dataset.page+"Page").classList.remove("hidden")}));
 $("hamster").addEventListener("click",tickle);$("tickleBtn").addEventListener("click",tickle);$("runBtn").addEventListener("click",startRun);$("stopBtn").addEventListener("click",stopRun);
 document.querySelectorAll("[data-furniture-use]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();useFurniture(b.dataset.furnitureUse)}));
-$("premiumBtn").addEventListener("click",()=>{state.premium=true;state.skin="white";$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true;update();renderSkins();say("Premium demo unlocked. Choose any hamster.")});
+$("premiumBtn").addEventListener("click",()=>{state.premium=true;state.skin=freeHamsterKey;$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true;update();renderSkins();say("Premium demo unlocked. Choose any hamster.")});
 
 $("task").addEventListener("change",()=>{
  $("customTaskRow").classList.toggle("hidden",$("task").value!=="custom");
@@ -1883,14 +2184,14 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=247"></script>
-<script src="cloud.js?v=247"></script>
-<script src="online.js?v=247"></script>
-<script src="gallery.js?v=247"></script>
+<script src="premium.js?v=248"></script>
+<script src="cloud.js?v=248"></script>
+<script src="online.js?v=248"></script>
+<script src="gallery.js?v=248"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=247").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=248").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>

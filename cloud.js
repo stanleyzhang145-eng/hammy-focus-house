@@ -660,7 +660,7 @@
     if(command?.type==="setPremium"){
       target.premium=payload.active===true;
       target.premiumDemoEntitlement=payload.active===true;
-      if(!payload.active&&target.skin&&target.skin!=="white")target.skin="white";
+      if(!payload.active&&target.skin&&target.skin!=="normal_white")target.skin="normal_white";
     }
     if(command?.type==="removeExclusive"){
       const id=String(payload.exclusiveId||"");
@@ -1319,7 +1319,7 @@
         sessionCount:0,lastPracticeDate:"",
         happy:70,hunger:30,energy:85,
         premium:false,premiumDemoEntitlement:false,
-        skin:"white",theme:"lavender",
+        skin:"normal_white",theme:"lavender",
         foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},
         clothes:["shirt","hoodie"],equipped:null,
         marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},

@@ -1,8 +1,8 @@
 {
   "name": "hammy-focus-house-cloud",
-  "version": "24.7.0",
+  "version": "24.8.0",
   "private": true,
-  "description": "Hammy Focus House v24.7 with verified admin gifts applied to both the running game state and cloud save",
+  "description": "Hammy Focus House v24.8 with six hamster breeds, matching color collections, and Premium entitlement enforcement",
   "scripts": {
     "start": "node server.js",
     "check": "node --check server.js && node --check db.js && node --check cloud.js && node --check online.js && node --check gallery.js && node --check admin.js"

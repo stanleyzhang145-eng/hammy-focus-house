@@ -39,16 +39,16 @@
   state.premiumPriceLabel=state.premiumPriceLabel||"$4.99";
 
   Object.assign(skins,{
-    galaxy:{name:"Galaxy Hamster",fur:"#554086",fur2:"#cbbaf5",patch:"#273d76",premium:true,effect:"galaxy"},
-    rainbow:{name:"Rainbow Hamster",fur:"#ff91a9",fur2:"#fff1d2",patch:"#75c7ed",premium:true,effect:"rainbow"},
-    frost:{name:"Frost Hamster",fur:"#d8f4ff",fur2:"#f8fdff",patch:"#9dd3e8",premium:true,effect:"frost"},
-    sakura:{name:"Sakura Hamster",fur:"#f4c2d2",fur2:"#fff0f5",patch:"#e891ad",premium:true,effect:"sakura"},
-    golden:{name:"Golden Hamster",fur:"#f1c95a",fur2:"#fff0a8",patch:"#d8a43d",premium:true,effect:"golden"},
-    ghost:{name:"Ghost Hamster",fur:"#d9f5ff",fur2:"#f7fdff",patch:"#b8e0ed",premium:true,effect:"ghost"},
-    robot:{name:"Robot Hamster",fur:"#aeb8c5",fur2:"#dce2e8",patch:"#687483",premium:true,effect:"robot"},
-    dragon:{name:"Dragon Hamster",fur:"#73b980",fur2:"#c9edc8",patch:"#4e9163",premium:true,effect:"dragon"},
-    axolotl:{name:"Axolotl Hamster",fur:"#f4a8bd",fur2:"#ffe5ec",patch:"#d87d9b",premium:true,effect:"axolotl"},
-    custom:{name:"Custom Hamster",fur:state.customSkin.fur,fur2:state.customSkin.fur2,patch:state.customSkin.patch,premium:true,effect:"custom"}
+    galaxy:{name:"Galaxy Hamster",fur:"#554086",fur2:"#cbbaf5",patch:"#273d76",premium:true,effect:"galaxy",breed:"special"},
+    rainbow:{name:"Rainbow Hamster",fur:"#ff91a9",fur2:"#fff1d2",patch:"#75c7ed",premium:true,effect:"rainbow",breed:"special"},
+    frost:{name:"Frost Hamster",fur:"#d8f4ff",fur2:"#f8fdff",patch:"#9dd3e8",premium:true,effect:"frost",breed:"special"},
+    sakura:{name:"Sakura Hamster",fur:"#f4c2d2",fur2:"#fff0f5",patch:"#e891ad",premium:true,effect:"sakura",breed:"special"},
+    golden:{name:"Golden Hamster",fur:"#f1c95a",fur2:"#fff0a8",patch:"#d8a43d",premium:true,effect:"golden",breed:"special"},
+    ghost:{name:"Ghost Hamster",fur:"#d9f5ff",fur2:"#f7fdff",patch:"#b8e0ed",premium:true,effect:"ghost",breed:"special"},
+    robot:{name:"Robot Hamster",fur:"#aeb8c5",fur2:"#dce2e8",patch:"#687483",premium:true,effect:"robot",breed:"special"},
+    dragon:{name:"Dragon Hamster",fur:"#73b980",fur2:"#c9edc8",patch:"#4e9163",premium:true,effect:"dragon",breed:"special"},
+    axolotl:{name:"Axolotl Hamster",fur:"#f4a8bd",fur2:"#ffe5ec",patch:"#d87d9b",premium:true,effect:"axolotl",breed:"special"},
+    custom:{name:"Custom Hamster",fur:state.customSkin.fur,fur2:state.customSkin.fur2,patch:state.customSkin.patch,premium:true,effect:"custom",breed:"special"}
   });
 
   Object.assign(clothes,{
@@ -412,10 +412,20 @@
   function premiumSkinClass(key){const effect=skins[key]?.effect;return effect?`skin-${effect}`:''}
   function updateCustomSkinObject(){Object.assign(skins.custom,{fur:state.customSkin.fur,fur2:state.customSkin.fur2,patch:state.customSkin.patch})}
   function applySkinToElement(el,key){
-    if(!el)return;updateCustomSkinObject();const s=skins[key]||skins.white;
-    el.className='hamster premium-skin '+premiumSkinClass(key);
-    el.style.setProperty('--fur',s.fur);el.style.setProperty('--fur2',s.fur2);el.style.setProperty('--patch',s.patch);
-    if(key==='custom'){el.style.setProperty('--custom-eye',state.customSkin.eye);el.style.setProperty('--custom-ear',state.customSkin.ear);el.style.setProperty('--custom-cheek',state.customSkin.cheek)}
+    if(!el)return;
+    updateCustomSkinObject();
+    const s=skins[key]||skins[freeHamsterKey]||skins.normal_white;
+    const breed=s.breed||"special";
+    el.className='hamster premium-skin breed-'+breed+' '+premiumSkinClass(key);
+    el.dataset.breed=breed;
+    el.style.setProperty('--fur',s.fur);
+    el.style.setProperty('--fur2',s.fur2);
+    el.style.setProperty('--patch',s.patch);
+    if(key==='custom'){
+      el.style.setProperty('--custom-eye',state.customSkin.eye);
+      el.style.setProperty('--custom-ear',state.customSkin.ear);
+      el.style.setProperty('--custom-cheek',state.customSkin.cheek);
+    }
   }
 
   function renderPremiumHamsters(){
@@ -1228,6 +1238,6 @@
     $('premiumScene').addEventListener('click',e=>{if(e.target===$('premiumScene')||e.target.classList.contains('scene-floor')||e.target.classList.contains('scene-wall')){state.selectedDecor=null;state.activePremiumFurniture=null;renderDecorLayer();syncDecorControls()}});
   }
 
-  ensureDefaultRoomSetups();buildPremiumPage();ensurePremiumCostumeElements();bindPremiumUi();applyAppIcon();renderSkins();renderClothing();renderSettings();renderPremiumAll();save();
+  ensureDefaultRoomSetups();buildPremiumPage();ensurePremiumCostumeElements();bindPremiumUi();applyAppIcon();update();renderSkins();renderClothing();renderSettings();renderPremiumAll();save();
   window.addEventListener('beforeunload',stopSoundscape);
 })();

@@ -219,3 +219,12 @@ Admin deliveries now update localStorage and the running game state together.
 The client verifies coin, fruit, Premium, and exclusive changes, then syncs
 the merged save and installs the server-confirmed result. The success message
 is displayed only after the reward exists in the visible game state.
+
+
+## Version 24.8 — Hamster Breeds
+
+The Hamsters screen now has six breed tabs. Every breed offers White, Orange,
+Black & White, Caramel, Silver, and Strawberry. White Normal is the only free
+combination; all other breed/color combinations require Premium. Existing
+skin saves migrate to the matching Normal-breed color, and the server enforces
+the same entitlement rule for cloud saves.

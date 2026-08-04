@@ -1,0 +1,58 @@
+HAMMY FOCUS HOUSE V24.8 — BREEDS AND MATCHING COLORS
+
+NEW BREED SECTIONS
+1. Normal Breed
+2. Teddy Breed
+3. Long-Coat Breed
+4. Dwarf Breed
+5. Satin Breed
+6. Floppy-Ear Breed
+
+EVERY BREED HAS THE SAME COLORS
+- White
+- Orange
+- Black & White
+- Caramel
+- Silver
+- Strawberry
+
+ACCESS RULE
+Free players can use only:
+- White Normal Hamster
+
+Premium is required for:
+- The other five Normal colors
+- Every color in Teddy
+- Every color in Long-Coat
+- Every color in Dwarf
+- Every color in Satin
+- Every color in Floppy-Ear
+- Fantasy and custom hamsters
+
+TOTAL STANDARD COMBINATIONS
+- 36 breed-and-color combinations
+- 1 free
+- 35 Premium
+
+VISUAL DIFFERENCES
+- Normal: classic balanced shape
+- Teddy: wider fluffy body and cheeks
+- Long-Coat: visible fur tufts
+- Dwarf: smaller compact proportions
+- Satin: glossy fur highlights
+- Floppy-Ear: larger folded-down ears
+
+COMPATIBILITY
+Old saves migrate safely:
+- White -> Normal White
+- Orange -> Normal Orange
+- Black & White -> Normal Black & White
+- Caramel -> Normal Caramel
+- Silver -> Normal Silver
+- Strawberry -> Normal Strawberry
+
+Cloud and server rules also enforce the access restriction. Removing Premium
+automatically returns the selected hamster to White Normal.
+
+DEPLOYMENT CHECK
+/api/health must report version 24.8.
