@@ -273,3 +273,14 @@ between generated rooms, and furniture cards display their room location.
 ## Version 25.4 — Fitted Layered Clothing
 
 Clothing now uses separate fitted torso, sleeve, collar, cuff, hood, pocket, trouser, cape, and accessory layers. Breed-specific measurements keep outfits attached to the hamster while the face and paws remain visible.
+
+
+## Version 25.5 — Room Designer Mode
+
+Rooms now support saved drag-and-drop furniture layouts, touch editing,
+rotation, flipping, grid snapping, room transfers, storage, undo, and room
+thumbnails. Invalid placements are shown in red and cannot cover Hammy, the
+exit, or navigation controls. Existing fixed layouts migrate automatically.
+
+Hammy now finds a route around furniture, walks to an open interaction point,
+uses the furniture, and returns to a safe position instead of teleporting.

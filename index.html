@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=254">
-<link rel="stylesheet" href="cloud.css?v=254">
+<link rel="stylesheet" href="online.css?v=255">
+<link rel="stylesheet" href="cloud.css?v=255">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -1866,8 +1866,242 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 @keyframes fittedClothingBreath{0%,100%{transform:scale(var(--fit-style-x),var(--fit-style-y))}50%{transform:scale(calc(var(--fit-style-x) + .012),calc(var(--fit-style-y) + .025))}}@keyframes fittedSleeveRunL{to{transform:rotate(31deg) translateY(3px) scale(var(--fit-sleeve-scale))}}@keyframes fittedSleeveRunR{to{transform:rotate(-31deg) translateY(3px) scale(var(--fit-sleeve-scale))}}@keyframes fittedFabricRun{to{transform:rotate(4deg) translateX(3px)}}@keyframes fittedSleeveTickleL{50%{transform:rotate(38deg) translate(10px,-5px) scale(var(--fit-sleeve-scale))}}@keyframes fittedSleeveTickleR{50%{transform:rotate(-38deg) translate(-10px,-5px) scale(var(--fit-sleeve-scale))}}@keyframes fittedFabricTickle{50%{transform:rotate(5deg) translateX(5px)}}
 .clothing-card-preview{height:190px}.clothing-card-preview .hamster{top:-10px!important;transform:translateX(-50%) scale(.67)!important}
 
+
+/* ===== v25.5 Room Designer Mode ===== */
+.room-designer-panel,
+.room-thumbnail-section{
+  margin-top:12px;
+  padding:13px;
+  border:3px solid var(--line);
+  border-radius:18px;
+  background:rgba(255,255,255,.93);
+  box-shadow:0 4px 0 rgba(73,57,81,.1);
+}
+.room-designer-heading,
+.room-thumbnail-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.room-designer-heading h3{margin:2px 0}
+.designer-toolbar{
+  display:grid;
+  gap:9px;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:2px dashed var(--line);
+}
+.designer-toolbar-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.designer-toolbar-row select{
+  flex:1;
+  min-width:180px;
+}
+.designer-snap-toggle{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:0;
+  padding:7px 10px;
+  border:2px solid var(--line);
+  border-radius:999px;
+  background:white;
+  font-weight:900;
+}
+.designer-snap-toggle input{width:auto;margin:0}
+.room-thumbnail-strip{
+  display:flex;
+  gap:9px;
+  margin-top:9px;
+  overflow-x:auto;
+  padding:2px 2px 8px;
+}
+.room-thumbnail{
+  flex:0 0 148px;
+  min-height:112px;
+  padding:7px;
+  color:var(--text);
+  text-align:left;
+  border:3px solid var(--line);
+  border-radius:14px;
+  background:white;
+  box-shadow:none;
+}
+.room-thumbnail.active{
+  border-color:var(--accent);
+  outline:3px solid color-mix(in srgb,var(--accent) 30%,transparent);
+}
+.room-thumbnail strong{display:block;margin-bottom:5px}
+.room-thumbnail-canvas{
+  position:relative;
+  height:68px;
+  overflow:hidden;
+  border:2px solid var(--line);
+  border-radius:9px;
+  background:linear-gradient(#eee4ff 0 67%,#e6c59d 67%);
+}
+.room-thumbnail-dot{
+  position:absolute;
+  display:grid;
+  place-items:center;
+  width:23px;
+  height:20px;
+  transform:translate(-50%,-50%);
+  border:2px solid var(--line);
+  border-radius:6px;
+  background:#fff;
+  font-size:.63rem;
+  font-weight:1000;
+}
+.room-thumbnail-empty{
+  display:grid;
+  place-items:center;
+  height:100%;
+  color:#85778f;
+  font-size:.72rem;
+  font-weight:800;
+}
+
+/* Layout-managed furniture keeps its old artwork but uses saved coordinates. */
+.furniture-item.layout-managed{
+  right:auto!important;
+  bottom:auto!important;
+  margin:0!important;
+  transform:
+    rotate(var(--designer-rotation,0deg))
+    scaleX(var(--designer-flip,1));
+  transform-origin:50% 70%;
+  transition:
+    left .22s ease,
+    top .22s ease,
+    transform .22s ease,
+    filter .18s ease;
+}
+.room.designer-active{
+  touch-action:none;
+  user-select:none;
+}
+.room.designer-active .furniture-item.layout-managed{
+  transition:none!important;
+}
+.room.designer-active .furniture-item:not(.hidden){
+  cursor:grab;
+  outline:3px dashed rgba(104,76,127,.38);
+  outline-offset:3px;
+}
+.room.designer-active .furniture-item.designer-selected{
+  z-index:48!important;
+  cursor:grabbing;
+  outline:5px solid #5fcad0;
+  filter:drop-shadow(0 0 10px rgba(95,202,208,.75));
+}
+.room.designer-active .furniture-item.designer-invalid{
+  outline-color:#e2556c!important;
+  filter:drop-shadow(0 0 12px rgba(226,85,108,.9));
+}
+.room.designer-active .furniture-item .furniture-button{
+  display:none!important;
+}
+.designer-safe-zone{
+  display:none;
+  position:absolute;
+  z-index:45;
+  pointer-events:none;
+  border:4px dashed rgba(226,85,108,.72);
+  border-radius:16px;
+  background:rgba(255,101,123,.12);
+  color:#8b3042;
+  font-size:.72rem;
+  font-weight:1000;
+}
+.designer-safe-zone span{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  padding:3px 6px;
+  border-radius:999px;
+  background:rgba(255,255,255,.88);
+  white-space:nowrap;
+}
+.room.designer-active .designer-safe-zone{display:block}
+.designer-door-zone{
+  left:0;
+  bottom:0;
+  width:92px;
+  height:150px;
+  border-left:0;
+  border-bottom:0;
+  border-radius:0 18px 0 0;
+}
+.designer-hammy-zone{
+  left:50%;
+  bottom:17px;
+  width:205px;
+  height:235px;
+  transform:translateX(-50%);
+}
+.room.designer-active #hamster{
+  opacity:.72;
+  pointer-events:none;
+}
+.room.designer-active .room-navigation,
+.room.designer-active .room-unlock-message{
+  z-index:62;
+}
+.room.designer-active:after{
+  content:"Drag furniture · red means it cannot be placed there";
+  position:absolute;
+  left:50%;
+  bottom:7px;
+  z-index:65;
+  transform:translateX(-50%);
+  padding:5px 9px;
+  border:2px solid var(--line);
+  border-radius:999px;
+  background:rgba(255,255,255,.94);
+  font-size:.7rem;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+/* Hammy walking for edited layouts. */
+.hamster.path-walking{
+  animation:designerHammyWalk .22s ease-in-out infinite alternate!important;
+  transition:left .35s linear,top .35s linear!important;
+}
+.hamster.path-walking .foot.l{transform:rotate(10deg)}
+.hamster.path-walking .foot.r{transform:rotate(-10deg)}
+@keyframes designerHammyWalk{
+  to{filter:drop-shadow(0 7px 5px rgba(73,57,81,.17));}
+}
+.hamster.path-facing-left{scale:-1 1}
+.hamster.path-facing-left .clothes,
+.hamster.path-facing-left .eye,
+.hamster.path-facing-left .cheek,
+.hamster.path-facing-left .muzzle,
+.hamster.path-facing-left .nose,
+.hamster.path-facing-left .mouth{
+  scale:-1 1;
+}
+
+@media(max-width:620px){
+  .room-designer-heading,
+  .room-thumbnail-heading{align-items:flex-start}
+  .room-designer-heading{display:grid}
+  .designer-toolbar-row{display:grid;grid-template-columns:1fr 1fr}
+  .designer-toolbar-row select,
+  .designer-snap-toggle{grid-column:1/-1}
+  .room.designer-active:after{max-width:86%;white-space:normal;text-align:center}
+}
+
 </style>
-<link rel="stylesheet" href="premium.css?v=254">
+<link rel="stylesheet" href="premium.css?v=255">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -1949,7 +2183,47 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 </span>
 </button>
   <div id="roomMessage" class="msg">Tap Nibbles or press Tickle.</div>
+  <div id="designerSafeDoor" class="designer-safe-zone designer-door-zone"><span>Door / Exit</span></div>
+  <div id="designerSafeHammy" class="designer-safe-zone designer-hammy-zone"><span>Hammy space</span></div>
  </div>
+
+ <section id="roomDesignerPanel" class="room-designer-panel">
+  <div class="room-designer-heading">
+   <div>
+    <span class="market-kicker">ROOM DESIGNER</span>
+    <h3 id="designerTitle">Arrange Room 1</h3>
+    <p id="designerStatus" class="muted">Press Edit Room, then drag furniture.</p>
+   </div>
+   <button id="editRoomButton" type="button" class="primary">Edit Room</button>
+  </div>
+
+  <div id="designerToolbar" class="designer-toolbar hidden">
+   <strong id="designerSelectedName">Select furniture</strong>
+   <div class="designer-toolbar-row">
+    <button id="designerRotateButton" type="button" class="secondary" disabled>Rotate</button>
+    <button id="designerFlipButton" type="button" class="secondary" disabled>Flip</button>
+    <label class="designer-snap-toggle"><input id="designerSnapToggle" type="checkbox"> Snap to grid</label>
+   </div>
+   <div class="designer-toolbar-row">
+    <select id="designerMoveRoomSelect" aria-label="Move selected furniture to another room"></select>
+    <button id="designerMoveRoomButton" type="button" class="secondary" disabled>Move room</button>
+    <button id="designerStorageButton" type="button" class="secondary" disabled>Put in storage</button>
+   </div>
+   <div class="designer-toolbar-row">
+    <button id="designerUndoButton" type="button" class="secondary" disabled>Undo</button>
+    <button id="designerFinishButton" type="button" class="primary">Finish Editing</button>
+   </div>
+  </div>
+ </section>
+
+ <section class="room-thumbnail-section">
+  <div class="room-thumbnail-heading">
+   <strong>Your rooms</strong>
+   <span class="muted">Tap a thumbnail to visit it.</span>
+  </div>
+  <div id="roomThumbnailStrip" class="room-thumbnail-strip"></div>
+ </section>
+
  <div class="grid grid3" style="margin-top:12px"><button id="tickleBtn" class="primary">Tickle Nibbles</button><button id="runBtn" class="secondary">Use treadmill</button><button id="stopBtn" class="secondary" disabled>Stop running</button></div>
 </section>
 <section id="focusPage" class="page hidden">
@@ -2096,7 +2370,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v25.4">Build v25.4</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v25.5">Build v25.5</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -2269,7 +2543,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button type="button" id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v25.4.1 seven times whenever you need to show this section.
+   Tap Build v25.5 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -2317,7 +2591,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v25.4</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v25.5</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -2417,9 +2691,9 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"normal_white",breedLook:"cartoon",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},clothes:["shirt","hoodie"],equipped:null,marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},activeBoosters:{coinBooster:0,fruitCharm:0},ownedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},placedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},ownedMarketThemes:{forest:false,candy:false,space:false},ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},furnitureRooms:{},generatedFurnitureRooms:1,currentFurnitureRoom:1,furnitureRoomMigrationV1:false};
+const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"normal_white",breedLook:"cartoon",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},clothes:["shirt","hoodie"],equipped:null,marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},activeBoosters:{coinBooster:0,fruitCharm:0},ownedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},placedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},ownedMarketThemes:{forest:false,candy:false,space:false},ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},furnitureRooms:{},generatedFurnitureRooms:1,currentFurnitureRoom:1,furnitureRoomMigrationV1:false,furnitureLayouts:{},furnitureLayoutMigrationV1:false,designerSnap:true};
 let state;
-try{state={...defaults,...JSON.parse(localStorage.getItem("hammyV8")||localStorage.getItem("hammyV5")||"{}")};state.foods={...defaults.foods,...(state.foods||{})};state.marketInventory={...defaults.marketInventory,...(state.marketInventory||{})};state.activeBoosters={...defaults.activeBoosters,...(state.activeBoosters||{})};state.ownedDecorations={...defaults.ownedDecorations,...(state.ownedDecorations||{})};state.placedDecorations={...defaults.placedDecorations,...(state.placedDecorations||{})};state.ownedMarketThemes={...defaults.ownedMarketThemes,...(state.ownedMarketThemes||{})};state.ownedFurniture={...defaults.ownedFurniture,...(state.ownedFurniture||{})};state.placedFurniture={...defaults.placedFurniture,...(state.placedFurniture||{})};state.furnitureRooms=state.furnitureRooms&&typeof state.furnitureRooms==="object"?state.furnitureRooms:{};state.generatedFurnitureRooms=Math.max(1,Number(state.generatedFurnitureRooms)||1);state.currentFurnitureRoom=Math.max(1,Number(state.currentFurnitureRoom)||1);state.furnitureRoomMigrationV1=Boolean(state.furnitureRoomMigrationV1);state.practiceDays=Number(state.practiceDays||0);state.totalFocusMinutes=Number(state.totalFocusMinutes||0);state.sessionCount=Number(state.sessionCount||0);state.lastPracticeDate=state.lastPracticeDate||"";state.breedLook=["realistic","cartoon"].includes(state.breedLook)?state.breedLook:"cartoon";state.theme=state.theme||"lavender"}catch{state=structuredClone(defaults)}
+try{state={...defaults,...JSON.parse(localStorage.getItem("hammyV8")||localStorage.getItem("hammyV5")||"{}")};state.foods={...defaults.foods,...(state.foods||{})};state.marketInventory={...defaults.marketInventory,...(state.marketInventory||{})};state.activeBoosters={...defaults.activeBoosters,...(state.activeBoosters||{})};state.ownedDecorations={...defaults.ownedDecorations,...(state.ownedDecorations||{})};state.placedDecorations={...defaults.placedDecorations,...(state.placedDecorations||{})};state.ownedMarketThemes={...defaults.ownedMarketThemes,...(state.ownedMarketThemes||{})};state.ownedFurniture={...defaults.ownedFurniture,...(state.ownedFurniture||{})};state.placedFurniture={...defaults.placedFurniture,...(state.placedFurniture||{})};state.furnitureRooms=state.furnitureRooms&&typeof state.furnitureRooms==="object"?state.furnitureRooms:{};state.generatedFurnitureRooms=Math.max(1,Number(state.generatedFurnitureRooms)||1);state.currentFurnitureRoom=Math.max(1,Number(state.currentFurnitureRoom)||1);state.furnitureRoomMigrationV1=Boolean(state.furnitureRoomMigrationV1);state.furnitureLayouts=state.furnitureLayouts&&typeof state.furnitureLayouts==="object"?state.furnitureLayouts:{};state.furnitureLayoutMigrationV1=Boolean(state.furnitureLayoutMigrationV1);state.designerSnap=state.designerSnap!==false;state.practiceDays=Number(state.practiceDays||0);state.totalFocusMinutes=Number(state.totalFocusMinutes||0);state.sessionCount=Number(state.sessionCount||0);state.lastPracticeDate=state.lastPracticeDate||"";state.breedLook=["realistic","cartoon"].includes(state.breedLook)?state.breedLook:"cartoon";state.theme=state.theme||"lavender"}catch{state=structuredClone(defaults)}
 const hamsterColors={
  white:{name:"White",fur:"#fff",fur2:"#f7f5f1",patch:"transparent",swatch:"#ffffff"},
  orange:{name:"Orange",fur:"#e89a3f",fur2:"#fff0d1",patch:"transparent",swatch:"#e89a3f"},
@@ -2805,12 +3079,18 @@ function placeFurnitureInRoom(key){
  state.furnitureRooms[key]=room;
  state.placedFurniture[key]=true;
  state.currentFurnitureRoom=room;
+ ensureFurnitureLayoutForRoom(key,room);
  return room;
 }
 function storeFurniture(key){
+ const room=Number(state.furnitureRooms[key])||0;
  state.furnitureRooms[key]=0;
  state.placedFurniture[key]=false;
+ if(room&&state.furnitureLayouts?.[String(room)]){
+  delete state.furnitureLayouts[String(room)][key];
+ }
  clearFurnitureAction();
+ if(typeof renderRoomThumbnails==="function")renderRoomThumbnails();
 }
 function changeFurnitureRoom(direction){
  normalizeFurnitureRoomData(state);
@@ -2821,8 +3101,11 @@ function changeFurnitureRoom(direction){
  if(next===state.currentFurnitureRoom)return;
  clearFurnitureAction();
  state.currentFurnitureRoom=next;
+ if(typeof designerSelectedKey!=="undefined")designerSelectedKey=null;
  update();
  renderFurniture();
+ if(typeof renderRoomDesignerUi==="function")renderRoomDesignerUi();
+ if(typeof renderRoomThumbnails==="function")renderRoomThumbnails();
 }
 function renderFurnitureRoomNavigation(){
  normalizeFurnitureRoomData(state);
@@ -2848,15 +3131,655 @@ function renderFurnitureRoomNavigation(){
  if($("furnitureRoomSummary"))$("furnitureRoomSummary").textContent=`Room ${room} has ${count} of ${FURNITURE_ROOM_CAPACITY} furniture pieces`;
  if($("furnitureRoomRule"))$("furnitureRoomRule").textContent=rule;
 }
+function ensureDesignerState(target=state){
+ target.furnitureLayouts=target.furnitureLayouts&&typeof target.furnitureLayouts==="object"
+  ?target.furnitureLayouts
+  :{};
+ target.furnitureLayoutMigrationV1=Boolean(target.furnitureLayoutMigrationV1);
+ target.designerSnap=target.designerSnap!==false;
+ for(let room=1;room<=Math.max(1,Number(target.generatedFurnitureRooms)||1);room++){
+  const roomKey=String(room);
+  if(!target.furnitureLayouts[roomKey]||typeof target.furnitureLayouts[roomKey]!=="object"){
+   target.furnitureLayouts[roomKey]={};
+  }
+ }
+ return target;
+}
+ensureDesignerState(state);
+
+const furnitureDesignerIcons={
+ bed:"🛏",sofa:"🛋",desk:"✎",plant:"🌿",aquarium:"🐟",tunnel:"◯",
+ toybox:"★",bookshelf:"▤",lamp:"☾",rug:"☁",wheel:"◉",snack:"🍎",
+ music:"♫",castle:"♜",hammock:"⌣",easel:"🎨",piano:"♬",telescope:"🔭",
+ kitchen:"♨",climber:"⇧",tea:"☕",swing:"⌁"
+};
+const nonRotatingFurniture=new Set(["rug","tunnel","wheel"]);
+let roomDesignerActive=false;
+let designerSelectedKey=null;
+let designerDrag=null;
+let designerUndoStack=[];
+let hamsterPathToken=0;
+
+function cloneDesignerState(){
+ return JSON.parse(JSON.stringify({
+  furnitureRooms:state.furnitureRooms,
+  placedFurniture:state.placedFurniture,
+  furnitureLayouts:state.furnitureLayouts,
+  generatedFurnitureRooms:state.generatedFurnitureRooms,
+  currentFurnitureRoom:state.currentFurnitureRoom
+ }));
+}
+function pushDesignerUndo(){
+ designerUndoStack.push(cloneDesignerState());
+ if(designerUndoStack.length>25)designerUndoStack.shift();
+}
+function restoreDesignerSnapshot(snapshot){
+ if(!snapshot)return;
+ state.furnitureRooms=snapshot.furnitureRooms||{};
+ state.placedFurniture={...defaults.placedFurniture,...(snapshot.placedFurniture||{})};
+ state.furnitureLayouts=snapshot.furnitureLayouts||{};
+ state.generatedFurnitureRooms=Math.max(1,Number(snapshot.generatedFurnitureRooms)||1);
+ state.currentFurnitureRoom=Math.max(
+  1,
+  Math.min(state.generatedFurnitureRooms,Number(snapshot.currentFurnitureRoom)||1)
+ );
+ ensureDesignerState(state);
+ designerSelectedKey=null;
+ clearFurnitureAction();
+ update();
+ renderFurniture();
+ renderRoomDesignerUi();
+ renderRoomThumbnails();
+ save();
+}
+
+function roomLayout(room=state.currentFurnitureRoom,target=state){
+ ensureDesignerState(target);
+ const roomKey=String(room);
+ if(!target.furnitureLayouts[roomKey])target.furnitureLayouts[roomKey]={};
+ return target.furnitureLayouts[roomKey];
+}
+function normalizedLayout(layout){
+ return {
+  x:Math.max(0,Math.min(100,Number(layout?.x)||0)),
+  y:Math.max(0,Math.min(100,Number(layout?.y)||0)),
+  rotation:((Number(layout?.rotation)||0)%360+360)%360,
+  flip:Number(layout?.flip)===-1?-1:1
+ };
+}
+function captureFurnitureDefaultLayout(key){
+ const room=$("room"),item=furniture[key],element=item?$(item.placed):null;
+ if(!room||!element)return {x:10,y:55,rotation:0,flip:1};
+ const wasHidden=element.classList.contains("hidden");
+ const wasManaged=element.classList.contains("layout-managed");
+ const previous={
+  left:element.style.left,top:element.style.top,right:element.style.right,
+  bottom:element.style.bottom,visibility:element.style.visibility,
+  rotation:element.style.getPropertyValue("--designer-rotation"),
+  flip:element.style.getPropertyValue("--designer-flip")
+ };
+ element.classList.remove("hidden","layout-managed");
+ element.style.visibility="hidden";
+ element.style.removeProperty("left");
+ element.style.removeProperty("top");
+ element.style.removeProperty("right");
+ element.style.removeProperty("bottom");
+ element.style.removeProperty("--designer-rotation");
+ element.style.removeProperty("--designer-flip");
+ const roomRect=room.getBoundingClientRect();
+ const rect=element.getBoundingClientRect();
+ const x=roomRect.width?((rect.left-roomRect.left)/roomRect.width)*100:10;
+ const y=roomRect.height?((rect.top-roomRect.top)/roomRect.height)*100:55;
+ element.style.left=previous.left;
+ element.style.top=previous.top;
+ element.style.right=previous.right;
+ element.style.bottom=previous.bottom;
+ element.style.visibility=previous.visibility;
+ if(previous.rotation)element.style.setProperty("--designer-rotation",previous.rotation);
+ if(previous.flip)element.style.setProperty("--designer-flip",previous.flip);
+ if(wasManaged)element.classList.add("layout-managed");
+ if(wasHidden)element.classList.add("hidden");
+ return normalizedLayout({x,y,rotation:0,flip:1});
+}
+function findOpenDesignerLayout(room,key){
+ const roomEl=$("room");
+ const width=roomEl?.clientWidth||720;
+ const height=roomEl?.clientHeight||480;
+ const element=$(furniture[key]?.placed);
+ const itemWidth=Math.max(60,element?.offsetWidth||120);
+ const itemHeight=Math.max(50,element?.offsetHeight||90);
+ const positions=[
+  [14,28],[35,28],[57,28],[76,28],
+  [13,53],[34,53],[57,53],[77,53],
+  [15,73],[38,73],[62,73],[79,73]
+ ];
+ const layouts=roomLayout(room);
+ for(const [x,y] of positions){
+  const candidate=normalizedLayout({x,y,rotation:0,flip:1});
+  const rect={
+   left:x/100*width,top:y/100*height,
+   right:x/100*width+itemWidth,bottom:y/100*height+itemHeight,
+   width:itemWidth,height:itemHeight
+  };
+  const occupied=Object.entries(layouts).some(([otherKey,layout])=>{
+   if(otherKey===key)return false;
+   const other=$(furniture[otherKey]?.placed);
+   const otherRect={
+    left:(Number(layout.x)||0)/100*width,
+    top:(Number(layout.y)||0)/100*height,
+    width:other?.offsetWidth||120,
+    height:other?.offsetHeight||90
+   };
+   otherRect.right=otherRect.left+otherRect.width;
+   otherRect.bottom=otherRect.top+otherRect.height;
+   return rectangleOverlapRatio(rect,otherRect)>.22;
+  });
+  if(!occupied)return candidate;
+ }
+ return normalizedLayout({x:12+Math.random()*60,y:45+Math.random()*25,rotation:0,flip:1});
+}
+function ensureFurnitureLayoutForRoom(key,room=state.currentFurnitureRoom,target=state){
+ ensureDesignerState(target);
+ const layout=roomLayout(room,target);
+ if(!layout[key]){
+  if(target===state&&target.furnitureLayoutMigrationV1){
+   layout[key]=findOpenDesignerLayout(room,key);
+  }else{
+   layout[key]=captureFurnitureDefaultLayout(key);
+  }
+ }
+ layout[key]=normalizedLayout(layout[key]);
+ return layout[key];
+}
+function migrateFurnitureLayoutsFromFixedPositions(){
+ ensureDesignerState(state);
+ Object.keys(furniture).forEach(key=>{
+  const room=Number(state.furnitureRooms[key])||0;
+  if(!room)return;
+  ensureFurnitureLayoutForRoom(key,room,state);
+ });
+ state.furnitureLayoutMigrationV1=true;
+ save();
+}
+function applyFurnitureLayout(key,room=state.currentFurnitureRoom){
+ const item=furniture[key],element=item?$(item.placed):null;
+ if(!element)return;
+ const layout=ensureFurnitureLayoutForRoom(key,room);
+ element.classList.add("layout-managed");
+ element.style.left=`${layout.x}%`;
+ element.style.top=`${layout.y}%`;
+ element.style.right="auto";
+ element.style.bottom="auto";
+ element.style.setProperty("--designer-rotation",`${layout.rotation}deg`);
+ element.style.setProperty("--designer-flip",String(layout.flip));
+ element.dataset.furnitureKey=key;
+ element.dataset.room=String(room);
+}
+function removeFurnitureLayoutStyles(element){
+ if(!element)return;
+ element.classList.remove(
+  "layout-managed","designer-selected","designer-invalid"
+ );
+ element.style.removeProperty("left");
+ element.style.removeProperty("top");
+ element.style.removeProperty("right");
+ element.style.removeProperty("bottom");
+ element.style.removeProperty("--designer-rotation");
+ element.style.removeProperty("--designer-flip");
+ delete element.dataset.furnitureKey;
+ delete element.dataset.room;
+}
+
+function rectangleOverlap(a,b){
+ return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+}
+function rectangleOverlapRatio(a,b){
+ if(!rectangleOverlap(a,b))return 0;
+ const width=Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left));
+ const height=Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
+ const overlap=width*height;
+ return overlap/Math.max(1,Math.min(a.width*a.height,b.width*b.height));
+}
+function localRect(element){
+ const roomRect=$("room").getBoundingClientRect();
+ const rect=element.getBoundingClientRect();
+ return {
+  left:rect.left-roomRect.left,top:rect.top-roomRect.top,
+  right:rect.right-roomRect.left,bottom:rect.bottom-roomRect.top,
+  width:rect.width,height:rect.height
+ };
+}
+function safeDesignerRects(){
+ const room=$("room"),roomRect=room.getBoundingClientRect();
+ const local=node=>{
+  if(!node)return null;
+  const rect=node.getBoundingClientRect();
+  return {
+   left:rect.left-roomRect.left-7,top:rect.top-roomRect.top-7,
+   right:rect.right-roomRect.left+7,bottom:rect.bottom-roomRect.top+7,
+   width:rect.width+14,height:rect.height+14
+  };
+ };
+ return [
+  local($("roomDesignerSafeNavigation")||room.querySelector(".room-navigation")),
+  local($("roomUnlockMessage")),
+  {left:0,top:roomRect.height-153,right:95,bottom:roomRect.height,width:95,height:153},
+  {
+   left:roomRect.width/2-105,top:roomRect.height-245,
+   right:roomRect.width/2+105,bottom:roomRect.height-7,
+   width:210,height:238
+  }
+ ].filter(Boolean);
+}
+function validateFurniturePlacement(key,element){
+ const room=$("room"),roomRect=room.getBoundingClientRect();
+ const rect=localRect(element);
+ const margin=7;
+ if(
+  rect.left<margin||rect.top<76||
+  rect.right>roomRect.width-margin||rect.bottom>roomRect.height-8
+ ){
+  return {ok:false,reason:"Keep furniture fully inside the room."};
+ }
+ if(safeDesignerRects().some(safe=>rectangleOverlap(rect,safe))){
+  return {ok:false,reason:"Furniture cannot cover Hammy, the door, or room controls."};
+ }
+ const collision=Object.entries(furniture).some(([otherKey,item])=>{
+  if(otherKey===key||!isFurnitureInCurrentRoom(otherKey))return false;
+  const other=$(item.placed);
+  if(!other||other.classList.contains("hidden"))return false;
+  return rectangleOverlapRatio(rect,localRect(other))>.46;
+ });
+ if(collision)return {ok:false,reason:"That overlaps another furniture piece too much."};
+ return {ok:true,reason:"Valid placement"};
+}
+function clampDesignerPosition(element,left,top){
+ const room=$("room");
+ const maxLeft=Math.max(7,room.clientWidth-element.offsetWidth-7);
+ const maxTop=Math.max(76,room.clientHeight-element.offsetHeight-8);
+ let nextLeft=Math.max(7,Math.min(maxLeft,left));
+ let nextTop=Math.max(76,Math.min(maxTop,top));
+ if(state.designerSnap){
+  const grid=20;
+  nextLeft=Math.round(nextLeft/grid)*grid;
+  nextTop=Math.round(nextTop/grid)*grid;
+  nextLeft=Math.max(7,Math.min(maxLeft,nextLeft));
+  nextTop=Math.max(76,Math.min(maxTop,nextTop));
+ }
+ return {left:nextLeft,top:nextTop};
+}
+function setLayoutFromPixels(key,element,left,top){
+ const room=$("room");
+ const layout=roomLayout(state.currentFurnitureRoom);
+ const current=normalizedLayout(layout[key]);
+ layout[key]=normalizedLayout({
+  ...current,
+  x:room.clientWidth?left/room.clientWidth*100:current.x,
+  y:room.clientHeight?top/room.clientHeight*100:current.y
+ });
+ applyFurnitureLayout(key,state.currentFurnitureRoom);
+}
+function selectDesignerFurniture(key){
+ if(!roomDesignerActive||!isFurnitureInCurrentRoom(key))return;
+ designerSelectedKey=key;
+ document.querySelectorAll(".furniture-item").forEach(element=>{
+  element.classList.toggle("designer-selected",element.dataset.furnitureKey===key);
+  element.classList.remove("designer-invalid");
+ });
+ renderRoomDesignerUi();
+}
+function designerPointerDown(event,key){
+ if(!roomDesignerActive||event.button>0)return;
+ const element=$(furniture[key]?.placed);
+ if(!element||element.classList.contains("hidden"))return;
+ event.preventDefault();
+ event.stopPropagation();
+ selectDesignerFurniture(key);
+ const roomRect=$("room").getBoundingClientRect();
+ const rect=element.getBoundingClientRect();
+ designerDrag={
+  key,element,pointerId:event.pointerId,
+  offsetX:event.clientX-rect.left,
+  offsetY:event.clientY-rect.top,
+  before:cloneDesignerState(),
+  startLayout:JSON.parse(JSON.stringify(
+   ensureFurnitureLayoutForRoom(key,state.currentFurnitureRoom)
+  )),
+  moved:false,
+  roomRect
+ };
+ element.setPointerCapture?.(event.pointerId);
+}
+function designerPointerMove(event){
+ if(!designerDrag||event.pointerId!==designerDrag.pointerId)return;
+ event.preventDefault();
+ const {element,key}=designerDrag;
+ const roomRect=$("room").getBoundingClientRect();
+ const desiredLeft=event.clientX-roomRect.left-designerDrag.offsetX;
+ const desiredTop=event.clientY-roomRect.top-designerDrag.offsetY;
+ const position=clampDesignerPosition(element,desiredLeft,desiredTop);
+ setLayoutFromPixels(key,element,position.left,position.top);
+ const validation=validateFurniturePlacement(key,element);
+ element.classList.toggle("designer-invalid",!validation.ok);
+ $("designerStatus").textContent=validation.ok
+  ?"Release to save this position."
+  :validation.reason;
+ designerDrag.moved=true;
+}
+function designerPointerUp(event){
+ if(!designerDrag||event.pointerId!==designerDrag.pointerId)return;
+ const drag=designerDrag;
+ designerDrag=null;
+ drag.element.releasePointerCapture?.(event.pointerId);
+ const validation=validateFurniturePlacement(drag.key,drag.element);
+ drag.element.classList.remove("designer-invalid");
+ if(!drag.moved){
+  renderRoomDesignerUi();
+  return;
+ }
+ if(!validation.ok){
+  state.furnitureLayouts=drag.before.furnitureLayouts;
+  applyFurnitureLayout(drag.key,state.currentFurnitureRoom);
+  $("designerStatus").textContent=`Not saved: ${validation.reason}`;
+  bubble(validation.reason,2500);
+ }else{
+  designerUndoStack.push(drag.before);
+  if(designerUndoStack.length>25)designerUndoStack.shift();
+  $("designerStatus").textContent=`${furniture[drag.key].name} position saved.`;
+  save();
+  renderRoomThumbnails();
+ }
+ renderRoomDesignerUi();
+}
+
+function tryDesignerLayoutNearby(key,desiredLayout){
+ const room=$("room");
+ const element=$(furniture[key]?.placed);
+ if(!room||!element)return false;
+ const original=JSON.parse(JSON.stringify(
+  ensureFurnitureLayoutForRoom(key,state.currentFurnitureRoom)
+ ));
+ const layoutStore=roomLayout(state.currentFurnitureRoom);
+ const desired=normalizedLayout(desiredLayout);
+
+ layoutStore[key]=desired;
+ applyFurnitureLayout(key,state.currentFurnitureRoom);
+ if(validateFurniturePlacement(key,element).ok)return true;
+
+ const baseLeft=desired.x/100*room.clientWidth;
+ const baseTop=desired.y/100*room.clientHeight;
+ const offsets=[
+  [20,0],[-20,0],[0,20],[0,-20],
+  [40,0],[-40,0],[0,40],[0,-40],
+  [40,20],[-40,20],[40,-20],[-40,-20],
+  [60,0],[-60,0],[0,60],[0,-60],
+  [80,0],[-80,0],[0,80],[0,-80]
+ ];
+ for(const [dx,dy] of offsets){
+  const position=clampDesignerPosition(element,baseLeft+dx,baseTop+dy);
+  layoutStore[key]=normalizedLayout({
+   ...desired,
+   x:room.clientWidth?position.left/room.clientWidth*100:desired.x,
+   y:room.clientHeight?position.top/room.clientHeight*100:desired.y
+  });
+  applyFurnitureLayout(key,state.currentFurnitureRoom);
+  if(validateFurniturePlacement(key,element).ok)return true;
+ }
+ for(let top=80;top<room.clientHeight-element.offsetHeight-8;top+=20){
+  for(let left=8;left<room.clientWidth-element.offsetWidth-8;left+=20){
+   const position=clampDesignerPosition(element,left,top);
+   layoutStore[key]=normalizedLayout({
+    ...desired,
+    x:room.clientWidth?position.left/room.clientWidth*100:desired.x,
+    y:room.clientHeight?position.top/room.clientHeight*100:desired.y
+   });
+   applyFurnitureLayout(key,state.currentFurnitureRoom);
+   if(validateFurniturePlacement(key,element).ok)return true;
+  }
+ }
+ layoutStore[key]=original;
+ applyFurnitureLayout(key,state.currentFurnitureRoom);
+ return false;
+}
+function rotateSelectedFurniture(){
+ if(!designerSelectedKey)return;
+ if(nonRotatingFurniture.has(designerSelectedKey)){
+  bubble("This furniture stays facing one direction.",1800);
+  return;
+ }
+ const before=cloneDesignerState();
+ const layout=ensureFurnitureLayoutForRoom(
+  designerSelectedKey,state.currentFurnitureRoom
+ );
+ const desired={...layout,rotation:(layout.rotation+90)%360};
+ if(!tryDesignerLayoutNearby(designerSelectedKey,desired)){
+  bubble("There is not enough safe space to rotate that furniture here.",2200);
+  renderRoomDesignerUi();
+  return;
+ }
+ designerUndoStack.push(before);
+ if(designerUndoStack.length>25)designerUndoStack.shift();
+ save();
+ renderRoomThumbnails();
+ renderRoomDesignerUi();
+}
+function flipSelectedFurniture(){
+ if(!designerSelectedKey)return;
+ pushDesignerUndo();
+ const layout=ensureFurnitureLayoutForRoom(
+  designerSelectedKey,state.currentFurnitureRoom
+ );
+ layout.flip=layout.flip===-1?1:-1;
+ applyFurnitureLayout(designerSelectedKey,state.currentFurnitureRoom);
+ save();
+ renderRoomThumbnails();
+ renderRoomDesignerUi();
+}
+function moveSelectedFurnitureToRoom(){
+ if(!designerSelectedKey)return;
+ const select=$("designerMoveRoomSelect");
+ let target=select.value;
+ if(target==="new"){
+  if(!canGenerateFurnitureRoom()){
+   bubble(furnitureRoomFullMessage(),2600);
+   return;
+  }
+  pushDesignerUndo();
+  state.generatedFurnitureRooms++;
+  target=String(state.generatedFurnitureRooms);
+  ensureDesignerState(state);
+ }else{
+  pushDesignerUndo();
+ }
+ const targetRoom=Math.max(1,Number(target)||1);
+ if(targetRoom===Number(state.furnitureRooms[designerSelectedKey])){
+  designerUndoStack.pop();
+  return;
+ }
+ if(furnitureCountInRoom(targetRoom)>=FURNITURE_ROOM_CAPACITY){
+  designerUndoStack.pop();
+  bubble(`Room ${targetRoom} is full.`,2200);
+  return;
+ }
+ const oldRoom=Number(state.furnitureRooms[designerSelectedKey])||0;
+ const oldLayout=roomLayout(oldRoom)[designerSelectedKey];
+ if(oldRoom&&roomLayout(oldRoom)[designerSelectedKey]){
+  delete roomLayout(oldRoom)[designerSelectedKey];
+ }
+ state.furnitureRooms[designerSelectedKey]=targetRoom;
+ state.placedFurniture[designerSelectedKey]=true;
+ roomLayout(targetRoom)[designerSelectedKey]=oldLayout
+  ?normalizedLayout(oldLayout)
+  :findOpenDesignerLayout(targetRoom,designerSelectedKey);
+ state.currentFurnitureRoom=targetRoom;
+ const movedName=furniture[designerSelectedKey].name;
+ designerSelectedKey=null;
+ update();
+ renderFurniture();
+ renderRoomDesignerUi();
+ renderRoomThumbnails();
+ save();
+ bubble(`${movedName} moved to Room ${targetRoom}.`,2200);
+}
+function storeSelectedFurniture(){
+ if(!designerSelectedKey)return;
+ pushDesignerUndo();
+ const name=furniture[designerSelectedKey].name;
+ storeFurniture(designerSelectedKey);
+ designerSelectedKey=null;
+ update();
+ renderFurniture();
+ renderRoomDesignerUi();
+ renderRoomThumbnails();
+ save();
+ bubble(`${name} moved to storage.`,2000);
+}
+function undoDesignerMove(){
+ const snapshot=designerUndoStack.pop();
+ if(!snapshot){
+  bubble("There is nothing to undo.",1600);
+  return;
+ }
+ restoreDesignerSnapshot(snapshot);
+ $("designerStatus").textContent="Latest room change undone.";
+}
+
+function populateDesignerRoomSelect(){
+ const select=$("designerMoveRoomSelect");
+ if(!select)return;
+ const selectedRoom=designerSelectedKey
+  ?Number(state.furnitureRooms[designerSelectedKey])||state.currentFurnitureRoom
+  :state.currentFurnitureRoom;
+ select.innerHTML="";
+ for(let room=1;room<=state.generatedFurnitureRooms;room++){
+  const option=document.createElement("option");
+  option.value=String(room);
+  option.textContent=`Room ${room} · ${furnitureCountInRoom(room)}/${FURNITURE_ROOM_CAPACITY}`;
+  option.disabled=room!==selectedRoom&&furnitureCountInRoom(room)>=FURNITURE_ROOM_CAPACITY;
+  option.selected=room===selectedRoom;
+  select.appendChild(option);
+ }
+ if(canGenerateFurnitureRoom()){
+  const option=document.createElement("option");
+  option.value="new";
+  option.textContent=state.premium
+   ?"Create new Premium room"
+   :"Create unlocked streak room";
+  select.appendChild(option);
+ }
+}
+function renderRoomDesignerUi(){
+ const room=$("room");
+ room.classList.toggle("designer-active",roomDesignerActive);
+ $("designerToolbar").classList.toggle("hidden",!roomDesignerActive);
+ $("editRoomButton").classList.toggle("hidden",roomDesignerActive);
+ $("designerTitle").textContent=`Arrange Room ${state.currentFurnitureRoom}`;
+ $("designerSnapToggle").checked=Boolean(state.designerSnap);
+ const selected=Boolean(designerSelectedKey&&isFurnitureInCurrentRoom(designerSelectedKey));
+ $("designerSelectedName").textContent=selected
+  ?furniture[designerSelectedKey].name
+  :"Select furniture";
+ $("designerRotateButton").disabled=!selected;
+ $("designerFlipButton").disabled=!selected;
+ $("designerMoveRoomButton").disabled=!selected;
+ $("designerStorageButton").disabled=!selected;
+ $("designerUndoButton").disabled=designerUndoStack.length===0;
+ populateDesignerRoomSelect();
+ document.querySelectorAll(".furniture-item").forEach(element=>{
+  element.classList.toggle(
+   "designer-selected",
+   selected&&element.dataset.furnitureKey===designerSelectedKey
+  );
+ });
+}
+function startRoomDesigner(){
+ if(roomDesignerActive)return;
+ clearFurnitureAction();
+ stopRun();
+ roomDesignerActive=true;
+ designerSelectedKey=null;
+ $("designerStatus").textContent="Drag a furniture piece. Red placement will not be saved.";
+ renderRoomDesignerUi();
+ renderRoomThumbnails();
+}
+function finishRoomDesigner(){
+ if(!roomDesignerActive)return;
+ if(designerDrag){
+  state.furnitureLayouts=designerDrag.before.furnitureLayouts;
+  designerDrag=null;
+ }
+ roomDesignerActive=false;
+ designerSelectedKey=null;
+ document.querySelectorAll(".furniture-item").forEach(element=>{
+  element.classList.remove("designer-selected","designer-invalid");
+ });
+ $("designerStatus").textContent="Room layout saved.";
+ renderRoomDesignerUi();
+ renderRoomThumbnails();
+ update();
+ save();
+}
+
+function renderRoomThumbnails(){
+ const strip=$("roomThumbnailStrip");
+ if(!strip)return;
+ ensureDesignerState(state);
+ strip.innerHTML="";
+ for(let room=1;room<=state.generatedFurnitureRooms;room++){
+  const keys=furnitureKeysInRoom(room);
+  const button=document.createElement("button");
+  button.type="button";
+  button.className=`room-thumbnail${room===state.currentFurnitureRoom?" active":""}`;
+  const canvas=document.createElement("span");
+  canvas.className="room-thumbnail-canvas";
+  if(!keys.length){
+   canvas.innerHTML='<span class="room-thumbnail-empty">Empty room</span>';
+  }else{
+   keys.forEach(key=>{
+    const layout=ensureFurnitureLayoutForRoom(key,room);
+    const marker=document.createElement("span");
+    marker.className="room-thumbnail-dot";
+    marker.style.left=`${Math.max(8,Math.min(92,layout.x+7))}%`;
+    marker.style.top=`${Math.max(15,Math.min(86,layout.y+7))}%`;
+    marker.textContent=furnitureDesignerIcons[key]||"•";
+    marker.title=furniture[key].name;
+    canvas.appendChild(marker);
+   });
+  }
+  button.innerHTML=`<strong>Room ${room}</strong>`;
+  button.appendChild(canvas);
+  button.addEventListener("click",()=>{
+   if(room===state.currentFurnitureRoom)return;
+   clearFurnitureAction();
+   state.currentFurnitureRoom=room;
+   designerSelectedKey=null;
+   update();
+   renderFurniture();
+   renderRoomDesignerUi();
+   renderRoomThumbnails();
+  });
+  strip.appendChild(button);
+ }
+}
+
 function renderRoomFurniture(){
  normalizeFurnitureRoomData(state);
+ ensureDesignerState(state);
  Object.entries(furniture).forEach(([key,item])=>{
   const element=$(item.placed);
   if(!element)return;
   const visible=isFurnitureInCurrentRoom(key);
   element.classList.toggle("hidden",!visible);
+  if(visible){
+   ensureFurnitureLayoutForRoom(key,state.currentFurnitureRoom);
+   applyFurnitureLayout(key,state.currentFurnitureRoom);
+  }else{
+   element.classList.remove("designer-selected","designer-invalid");
+  }
  });
  renderFurnitureRoomNavigation();
+ renderRoomThumbnails();
+ if(typeof renderRoomDesignerUi==="function")renderRoomDesignerUi();
 }
 
 let tickleCount=0,tickleReset=0,running=false,timer=null,remaining=20,total=20,paused=false,focusActive=false,focusFailedByLeaving=false;
@@ -2885,6 +3808,11 @@ function normalizeGameState(nextState){
  next.generatedFurnitureRooms=Math.max(1,Number(next.generatedFurnitureRooms)||1);
  next.currentFurnitureRoom=Math.max(1,Number(next.currentFurnitureRoom)||1);
  next.furnitureRoomMigrationV1=Boolean(next.furnitureRoomMigrationV1);
+ next.furnitureLayouts=next.furnitureLayouts&&typeof next.furnitureLayouts==="object"
+  ?next.furnitureLayouts
+  :{};
+ next.furnitureLayoutMigrationV1=Boolean(next.furnitureLayoutMigrationV1);
+ next.designerSnap=next.designerSnap!==false;
  next.practiceDays=Number(next.practiceDays||0);
  next.totalFocusMinutes=Number(next.totalFocusMinutes||0);
  next.sessionCount=Number(next.sessionCount||0);
@@ -2894,6 +3822,7 @@ function normalizeGameState(nextState){
   :"cartoon";
  next.theme=next.theme||"lavender";
  normalizeFurnitureRoomData(next);
+ ensureDesignerState(next);
  return next;
 }
 
@@ -3242,70 +4171,283 @@ const furnitureActionClasses=[
  "furn-music","furn-castle","furn-hammock","furn-easel","furn-piano",
  "furn-telescope","furn-kitchen","furn-climber","furn-tea","furn-swing"
 ];
-function clearFurnitureAction(){
+function clearFurnitureVisualState({keepPosition=false}={}){
  const h=$("hamster");
  h.classList.remove(
   "sleeping","sitting","reading","playing","walking","smelling","watching",
   "celebrating","eating","wheelrun","peeking","napping","dancing",
+  "path-walking","path-facing-left",
   ...furnitureActionClasses
  );
  $("zzz").classList.add("hidden");
- h.style.removeProperty("left");
- h.style.removeProperty("bottom");
+ h.style.removeProperty("transition");
+ if(!keepPosition){
+  h.style.removeProperty("left");
+  h.style.removeProperty("top");
+  h.style.removeProperty("bottom");
+ }
  Object.values(furniture).forEach(f=>{
-   const el=$(f.placed);
-   if(el)el.classList.remove("action-on","on","active","playing");
+  const el=$(f.placed);
+  if(el)el.classList.remove("action-on","on","active","playing");
  });
 }
-function useFurniture(key){
- if(!isFurnitureInCurrentRoom(key)||!furniture[key])return;
+function clearFurnitureAction(){
+ hamsterPathToken++;
  clearTimeout(furnitureActionTimer);
- clearFurnitureAction();
+ clearFurnitureVisualState();
+}
 
+function roomPointFromHamster(){
+ const roomRect=$("room").getBoundingClientRect();
+ const rect=$("hamster").getBoundingClientRect();
+ return {
+  x:rect.left-roomRect.left+rect.width/2,
+  y:rect.top-roomRect.top+rect.height/2
+ };
+}
+function hamsterHomePoint(){
+ const room=$("room");
+ return {x:room.clientWidth/2,y:room.clientHeight-170};
+}
+function furnitureObstacleRects(excludeKey=null){
+ const roomRect=$("room").getBoundingClientRect();
+ return Object.entries(furniture).flatMap(([key,item])=>{
+  if(key===excludeKey||!isFurnitureInCurrentRoom(key))return [];
+  const element=$(item.placed);
+  if(!element||element.classList.contains("hidden"))return [];
+  const rect=element.getBoundingClientRect();
+  return [{
+   left:rect.left-roomRect.left-32,
+   top:rect.top-roomRect.top-28,
+   right:rect.right-roomRect.left+32,
+   bottom:rect.bottom-roomRect.top+25
+  }];
+ });
+}
+function pointBlockedForHamster(point,obstacles){
+ const footprint={
+  left:point.x-43,top:point.y-63,
+  right:point.x+43,bottom:point.y+63
+ };
+ return obstacles.some(rect=>rectangleOverlap(footprint,{
+  ...rect,width:rect.right-rect.left,height:rect.bottom-rect.top
+ }));
+}
+function nearestWalkCell(point,grid,bounds,obstacles){
+ let best=null;
+ for(let radius=0;radius<10;radius++){
+  for(let dx=-radius;dx<=radius;dx++){
+   for(let dy=-radius;dy<=radius;dy++){
+    if(radius&&Math.abs(dx)!==radius&&Math.abs(dy)!==radius)continue;
+    const x=Math.max(bounds.left,Math.min(bounds.right,Math.round(point.x/grid)*grid+dx*grid));
+    const y=Math.max(bounds.top,Math.min(bounds.bottom,Math.round(point.y/grid)*grid+dy*grid));
+    const candidate={x,y};
+    if(!pointBlockedForHamster(candidate,obstacles)){
+     const distance=Math.hypot(x-point.x,y-point.y);
+     if(!best||distance<best.distance)best={...candidate,distance};
+    }
+   }
+  }
+  if(best)return {x:best.x,y:best.y};
+ }
+ return {
+  x:Math.max(bounds.left,Math.min(bounds.right,point.x)),
+  y:Math.max(bounds.top,Math.min(bounds.bottom,point.y))
+ };
+}
+function findHamsterPath(start,target,obstacles){
+ const room=$("room"),grid=32;
+ const bounds={
+  left:52,right:Math.max(52,room.clientWidth-52),
+  top:150,bottom:Math.max(150,room.clientHeight-115)
+ };
+ const from=nearestWalkCell(start,grid,bounds,obstacles);
+ const to=nearestWalkCell(target,grid,bounds,obstacles);
+ const key=point=>`${Math.round(point.x/grid)},${Math.round(point.y/grid)}`;
+ const startKey=key(from),targetKey=key(to);
+ const queue=[from],parents=new Map([[startKey,null]]),points=new Map([[startKey,from]]);
+ let index=0,found=false;
+ while(index<queue.length&&queue.length<1800){
+  const current=queue[index++];
+  const currentKey=key(current);
+  if(currentKey===targetKey){found=true;break}
+  for(const [dx,dy] of [[grid,0],[-grid,0],[0,grid],[0,-grid]]){
+   const next={
+    x:Math.max(bounds.left,Math.min(bounds.right,current.x+dx)),
+    y:Math.max(bounds.top,Math.min(bounds.bottom,current.y+dy))
+   };
+   const nextKey=key(next);
+   if(parents.has(nextKey)||pointBlockedForHamster(next,obstacles))continue;
+   parents.set(nextKey,currentKey);
+   points.set(nextKey,next);
+   queue.push(next);
+  }
+ }
+ if(!found)return [to];
+ const reversed=[];
+ let cursor=targetKey;
+ while(cursor){
+  reversed.push(points.get(cursor));
+  cursor=parents.get(cursor);
+ }
+ const path=reversed.reverse();
+ const compressed=[];
+ for(const point of path){
+  if(compressed.length<2){
+   compressed.push(point);
+   continue;
+  }
+  const a=compressed[compressed.length-2],b=compressed[compressed.length-1];
+  const sameDirection=
+   (a.x===b.x&&b.x===point.x)||
+   (a.y===b.y&&b.y===point.y);
+  if(sameDirection)compressed[compressed.length-1]=point;
+  else compressed.push(point);
+ }
+ compressed.push(to);
+ return compressed;
+}
+function furnitureInteractionTarget(key){
+ const room=$("room"),element=$(furniture[key].placed);
+ const roomRect=room.getBoundingClientRect(),rect=element.getBoundingClientRect();
+ const local={
+  left:rect.left-roomRect.left,top:rect.top-roomRect.top,
+  right:rect.right-roomRect.left,bottom:rect.bottom-roomRect.top,
+  width:rect.width,height:rect.height
+ };
+ const y=Math.max(175,Math.min(room.clientHeight-150,local.bottom-35));
+ const candidates=[
+  {x:local.left-72,y},
+  {x:local.right+72,y},
+  {x:local.left+local.width/2,y:local.top-80},
+  {x:local.left+local.width/2,y:local.bottom+76}
+ ];
+ const obstacles=furnitureObstacleRects(key);
+ const current=roomPointFromHamster();
+ const valid=candidates
+  .map(candidate=>nearestWalkCell(candidate,32,{
+   left:52,right:room.clientWidth-52,top:150,bottom:room.clientHeight-115
+  },obstacles))
+  .filter(candidate=>!pointBlockedForHamster(candidate,obstacles))
+  .sort((a,b)=>Math.hypot(a.x-current.x,a.y-current.y)-Math.hypot(b.x-current.x,b.y-current.y));
+ return valid[0]||{
+  x:Math.max(55,Math.min(room.clientWidth-55,local.left+local.width/2)),
+  y:Math.max(165,Math.min(room.clientHeight-130,y))
+ };
+}
+async function moveHamsterAlongPath(path,token){
  const h=$("hamster");
- const placed=$(furniture[key].placed);
+ h.style.bottom="auto";
+ for(const point of path){
+  if(token!==hamsterPathToken)return false;
+  const current=roomPointFromHamster();
+  h.classList.toggle("path-facing-left",point.x<current.x-3);
+  h.classList.add("path-walking");
+  const distance=Math.hypot(point.x-current.x,point.y-current.y);
+  const duration=Math.max(180,Math.min(650,distance*2.1));
+  h.style.transition=`left ${duration}ms linear,top ${duration}ms linear`;
+  h.style.left=`${point.x}px`;
+  h.style.top=`${point.y-125}px`;
+  await new Promise(resolve=>setTimeout(resolve,duration+25));
+ }
+ h.classList.remove("path-walking","path-facing-left");
+ return token===hamsterPathToken;
+}
+async function walkHamsterToFurniture(key,token){
+ const start=roomPointFromHamster();
+ const target=furnitureInteractionTarget(key);
+ const path=findHamsterPath(start,target,furnitureObstacleRects(key));
+ return moveHamsterAlongPath(path,token);
+}
+async function walkHamsterHome(token){
+ const start=roomPointFromHamster(),target=hamsterHomePoint();
+ const path=findHamsterPath(start,target,furnitureObstacleRects());
+ const arrived=await moveHamsterAlongPath(path,token);
+ if(arrived){
+  const h=$("hamster");
+  h.style.removeProperty("left");
+  h.style.removeProperty("top");
+  h.style.removeProperty("bottom");
+  h.style.removeProperty("transition");
+ }
+ return arrived;
+}
+
+const furnitureMessages={
+ bed:"Nibbles walks to the bed, climbs in, and curls up.",
+ sofa:"Nibbles walks around the furniture and relaxes on the sofa.",
+ desk:"Nibbles walks to the desk and writes carefully.",
+ plant:"Nibbles walks beside the plant and sniffs the leaves.",
+ aquarium:"Nibbles stops beside the aquarium and follows the fish.",
+ tunnel:"Nibbles finds the tunnel entrance and crawls through it!",
+ toybox:"Nibbles walks to the toy box and jumps in to play.",
+ bookshelf:"Nibbles walks to the shelf and sits down to read.",
+ lamp:"Nibbles finds a clear path to the moon lamp for cozy reading.",
+ rug:"Nibbles walks to the rug and curls up for a nap.",
+ wheel:"Nibbles walks to the deluxe wheel and starts running!",
+ snack:"Nibbles walks to the snack table and eats.",
+ music:"Nibbles walks to the music player and dances!",
+ castle:"Nibbles walks to the castle doorway and peeks inside!",
+ hammock:"Nibbles walks to the hammock and gently rocks.",
+ easel:"Nibbles walks to the easel and paints a bright landscape.",
+ piano:"Nibbles walks to the piano and plays a cheerful tune!",
+ telescope:"Nibbles finds a clear route to the telescope and looks for stars.",
+ kitchen:"Nibbles walks to the mini kitchen and cooks a fruit snack.",
+ climber:"Nibbles walks to the climbing tower and climbs to the top!",
+ tea:"Nibbles walks to the tea table for a tiny tea party.",
+ swing:"Nibbles walks to the swing, holds on, and swings through the air!"
+};
+
+async function useFurniture(key){
+ if(roomDesignerActive){
+  selectDesignerFurniture(key);
+  return;
+ }
+ if(!isFurnitureInCurrentRoom(key)||!furniture[key])return;
+ const token=++hamsterPathToken;
+ clearTimeout(furnitureActionTimer);
+ clearFurnitureVisualState();
+
+ say(`Nibbles is walking to the ${furniture[key].name}.`);
+ const arrived=await walkHamsterToFurniture(key,token);
+ if(!arrived||token!==hamsterPathToken)return;
+
+ const h=$("hamster"),placed=$(furniture[key].placed);
  h.classList.add("furn-"+key);
  if(placed)placed.classList.add("action-on");
-
- const messages={
-  bed:"Nibbles climbs into the bed and curls up.",
-  sofa:"Nibbles hops onto the sofa and relaxes.",
-  desk:"Nibbles sits at the desk and writes carefully.",
-  plant:"Nibbles walks beside the plant and sniffs the leaves.",
-  aquarium:"Nibbles stands beside the aquarium and follows the fish.",
-  tunnel:"Nibbles crawls all the way through the tunnel!",
-  toybox:"Nibbles jumps into the toy box and plays.",
-  bookshelf:"Nibbles sits beside the shelf and reads.",
-  lamp:"Nibbles sits under the moon lamp for cozy reading.",
-  rug:"Nibbles lies directly on the cloud rug for a nap.",
-  wheel:"Nibbles climbs inside the deluxe wheel and runs!",
-  snack:"Nibbles sits at the snack table and eats.",
-  music:"Nibbles dances in front of the music player!",
-  castle:"Nibbles goes inside the castle and peeks through the doorway!",
-  hammock:"Nibbles climbs into the hammock and gently rocks.",
-  easel:"Nibbles paints a bright little landscape.",
-  piano:"Nibbles taps the piano keys and plays a cheerful tune!",
-  telescope:"Nibbles looks through the telescope for tiny stars.",
-  kitchen:"Nibbles cooks a warm fruit snack in the mini kitchen.",
-  climber:"Nibbles climbs all the way to the top platform!",
-  tea:"Nibbles sits down for a tiny friendship tea party.",
-  swing:"Nibbles holds on and swings through the air!"
- };
 
  if(key==="bed"||key==="rug")$("zzz").classList.remove("hidden");
  if(key==="lamp"&&placed)placed.classList.add("on");
  if(key==="wheel"&&placed)placed.classList.add("active");
  if((key==="music"||key==="piano")&&placed)placed.classList.add("playing");
  if(key==="snack"||key==="kitchen"||key==="tea"){
-   state.hunger=Math.max(0,state.hunger-(key==="kitchen"?7:5));
-   state.happy=Math.min(100,state.happy+2);
-   update();
+  state.hunger=Math.max(0,state.hunger-(key==="kitchen"?7:5));
+  state.happy=Math.min(100,state.happy+2);
+  update();
  }
- say(messages[key]);
- bubble(messages[key],2200);
+ say(furnitureMessages[key]);
+ bubble(furnitureMessages[key],2200);
 
- const duration=key==="tunnel"?2400:(key==="music"||key==="piano")?3300:(key==="castle"||key==="climber")?3900:key==="swing"?4200:3800;
- furnitureActionTimer=setTimeout(clearFurnitureAction,duration);
+ const duration=key==="tunnel"
+  ?2400
+  :(key==="music"||key==="piano")
+   ?3300
+   :(key==="castle"||key==="climber")
+    ?3900
+    :key==="swing"
+     ?4200
+     :3800;
+
+ furnitureActionTimer=setTimeout(async()=>{
+  if(token!==hamsterPathToken)return;
+  clearFurnitureVisualState({keepPosition:true});
+  say("Nibbles is walking back to an open spot.");
+  await walkHamsterHome(token);
+  if(token===hamsterPathToken){
+   clearFurnitureVisualState();
+   say("Nibbles is ready.");
+  }
+ },duration);
 }
 const layeredOutfitPieces={"shirt":"<span class=\"outfit-torso\"></span><span class=\"outfit-sleeve l\"></span><span class=\"outfit-sleeve r\"></span><span class=\"outfit-collar\"></span><span class=\"outfit-hem\"></span>","hoodie":"<span class=\"outfit-hood\"></span><span class=\"outfit-torso\"></span><span class=\"outfit-sleeve l\"></span><span class=\"outfit-sleeve r\"></span><span class=\"outfit-cuff l\"></span><span class=\"outfit-cuff r\"></span><span class=\"outfit-collar\"></span><span class=\"outfit-string l\"></span><span class=\"outfit-string r\"></span><span class=\"outfit-pocket\"></span><span class=\"outfit-hem\"></span>","pajamas":"<span class=\"outfit-torso\"></span><span class=\"outfit-sleeve l\"></span><span class=\"outfit-sleeve r\"></span><span class=\"outfit-cuff l\"></span><span class=\"outfit-cuff r\"></span><span class=\"outfit-collar\"></span><span class=\"outfit-button b1\"></span><span class=\"outfit-button b2\"></span><span class=\"outfit-button b3\"></span><span class=\"outfit-pants l\"></span><span class=\"outfit-pants r\"></span><span class=\"outfit-ankle l\"></span><span class=\"outfit-ankle r\"></span>","jacket":"<span class=\"outfit-jacket-back\"></span><span class=\"outfit-sleeve l\"></span><span class=\"outfit-sleeve r\"></span><span class=\"outfit-cuff l\"></span><span class=\"outfit-cuff r\"></span><span class=\"outfit-panel l\"></span><span class=\"outfit-panel r\"></span><span class=\"outfit-lapel l\"></span><span class=\"outfit-lapel r\"></span><span class=\"outfit-zipper\"></span><span class=\"outfit-hem\"></span>","cape":"<span class=\"outfit-cape-panel\"></span><span class=\"outfit-cape-neck\"></span><span class=\"outfit-cape-clasp\"></span>","hat":"<span class=\"outfit-hat-crown\"></span><span class=\"outfit-hat-band\"></span><span class=\"outfit-hat-brim\"></span>","scarf":"<span class=\"outfit-scarf-wrap\"></span><span class=\"outfit-scarf-tail t1\"></span><span class=\"outfit-scarf-tail t2\"></span>","glasses":"<span class=\"outfit-glasses-bridge\"></span><span class=\"outfit-lens l\"></span><span class=\"outfit-lens r\"></span>","bow":"<span class=\"outfit-bow-wing l\"></span><span class=\"outfit-bow-wing r\"></span><span class=\"outfit-bow-knot\"></span>","crown":"<span class=\"outfit-crown-base\"></span><span class=\"outfit-crown-points\"></span>","backpack":"<span class=\"outfit-backpack-pack\"></span><span class=\"outfit-backpack-strap l\"></span><span class=\"outfit-backpack-strap r\"></span>","overalls":"<span class=\"outfit-overall-bib\"></span><span class=\"outfit-overall-strap l\"></span><span class=\"outfit-overall-strap r\"></span><span class=\"outfit-overall-pocket\"></span><span class=\"outfit-pants l\"></span><span class=\"outfit-pants r\"></span><span class=\"outfit-ankle l\"></span><span class=\"outfit-ankle r\"></span>","apron":"<span class=\"outfit-apron-neck\"></span><span class=\"outfit-apron-body\"></span><span class=\"outfit-apron-tie l\"></span><span class=\"outfit-apron-tie r\"></span><span class=\"outfit-apron-pocket\"></span>","headband":"<span class=\"outfit-headband-band\"></span><span class=\"outfit-headband-knot\"></span>"};
 function layeredOutfitInner(type){return layeredOutfitPieces[type]||"";}
@@ -3462,10 +4604,42 @@ window.addEventListener("beforeunload",()=>{
  if(focusActive)localStorage.setItem("hammyFocusFailed","1");
 });
 
-document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));b.classList.add("active");$(b.dataset.page+"Page").classList.remove("hidden")}));
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>{
+ if(roomDesignerActive&&b.dataset.page!=="home")finishRoomDesigner();
+ document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
+ document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));
+ b.classList.add("active");
+ $(b.dataset.page+"Page").classList.remove("hidden");
+}));
 $("hamster").addEventListener("click",tickle);$("tickleBtn").addEventListener("click",tickle);$("runBtn").addEventListener("click",startRun);$("stopBtn").addEventListener("click",stopRun);
 $("roomLeftButton").addEventListener("click",()=>changeFurnitureRoom(-1));
 $("roomRightButton").addEventListener("click",()=>changeFurnitureRoom(1));
+$("editRoomButton").addEventListener("click",startRoomDesigner);
+$("designerFinishButton").addEventListener("click",finishRoomDesigner);
+$("designerRotateButton").addEventListener("click",rotateSelectedFurniture);
+$("designerFlipButton").addEventListener("click",flipSelectedFurniture);
+$("designerMoveRoomButton").addEventListener("click",moveSelectedFurnitureToRoom);
+$("designerStorageButton").addEventListener("click",storeSelectedFurniture);
+$("designerUndoButton").addEventListener("click",undoDesignerMove);
+$("designerSnapToggle").addEventListener("change",event=>{
+ state.designerSnap=Boolean(event.target.checked);
+ save();
+ $("designerStatus").textContent=state.designerSnap
+  ?"Snap-to-grid enabled."
+  :"Free placement enabled.";
+});
+Object.entries(furniture).forEach(([key,item])=>{
+ const element=$(item.placed);
+ if(!element)return;
+ element.addEventListener("pointerdown",event=>designerPointerDown(event,key));
+});
+window.addEventListener("pointermove",designerPointerMove,{passive:false});
+window.addEventListener("pointerup",designerPointerUp);
+window.addEventListener("pointercancel",designerPointerUp);
+window.addEventListener("resize",()=>{
+ if(roomDesignerActive&&designerDrag)return;
+ renderRoomFurniture();
+});
 $("openCurrentFurnitureRoom").addEventListener("click",()=>{
  document.querySelectorAll(".nav button").forEach(node=>node.classList.remove("active"));
  document.querySelectorAll(".page").forEach(node=>node.classList.add("hidden"));
@@ -3473,7 +4647,14 @@ $("openCurrentFurnitureRoom").addEventListener("click",()=>{
  $("homePage").classList.remove("hidden");
  update();
 });
-document.querySelectorAll("[data-furniture-use]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();useFurniture(b.dataset.furnitureUse)}));
+document.querySelectorAll("[data-furniture-use]").forEach(b=>b.addEventListener("click",e=>{
+ e.stopPropagation();
+ if(roomDesignerActive){
+  selectDesignerFurniture(b.dataset.furnitureUse);
+  return;
+ }
+ useFurniture(b.dataset.furnitureUse);
+}));
 $("premiumBtn").addEventListener("click",()=>{state.premium=true;state.skin=freeHamsterKey;$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true;normalizeFurnitureRoomData(state);update();renderSkins();renderFurniture();say("Premium demo unlocked. Extra furniture rooms now generate automatically.")});
 
 $("task").addEventListener("change",()=>{
@@ -3490,6 +4671,9 @@ $("useCustomTask").addEventListener("click",()=>{
 $("buyDailySpecial").addEventListener("click",buyDailySpecial);
 $("startBtn").addEventListener("click",startFocus);$("pauseBtn").addEventListener("click",pauseFocus);$("cancelBtn").addEventListener("click",cancelFocus);$("duration").addEventListener("change",()=>{if(!timer){remaining=Number($("duration").value);timerView()}});
 safeSkin();applyTheme();
+migrateFurnitureLayoutsFromFixedPositions();
+renderRoomDesignerUi();
+renderRoomThumbnails();
 if(localStorage.getItem("hammyFocusFailed")==="1"){
  $("focusFailed").classList.remove("hidden");
  $("timerTask").textContent="Previous session failed";
@@ -3497,14 +4681,14 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=254"></script>
-<script src="cloud.js?v=254"></script>
-<script src="online.js?v=254"></script>
-<script src="gallery.js?v=254"></script>
+<script src="premium.js?v=255"></script>
+<script src="cloud.js?v=255"></script>
+<script src="online.js?v=255"></script>
+<script src="gallery.js?v=255"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=254").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=255").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>

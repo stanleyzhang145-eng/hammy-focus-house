@@ -1,0 +1,38 @@
+HAMMY FOCUS HOUSE V25.5 — ROOM DESIGNER MODE
+
+ROOM EDITING
+- Working Edit Room and Finish Editing buttons
+- Mouse and touch dragging
+- Snap-to-grid toggle
+- Rotate suitable furniture
+- Flip furniture
+- Invalid placement turns red
+- Furniture remains inside room boundaries
+- Furniture cannot cover room navigation, the exit, or Hammy's safe area
+- Heavy furniture overlap is blocked
+- Undo the latest room change
+
+ROOM MANAGEMENT
+- Move selected furniture between generated rooms
+- Create a new room during a move when Premium or streak rules allow
+- Put furniture into storage
+- Each room stores its own x/y position, rotation, and flip state
+- Small clickable room thumbnails show furniture locations
+- Premium-generated rooms and the free streak room use the same editor
+
+SAVE COMPATIBILITY
+- Existing fixed furniture positions are converted automatically
+- Current furniture ownership and room assignment are preserved
+- Layouts save locally and through the existing cloud state
+- Admin gifts, Premium, streaks, breeds, breed looks, and fitted clothing remain compatible
+
+HAMMY PATHFINDING
+- Hammy walks to edited furniture instead of teleporting
+- A grid path searches around other furniture
+- Hammy chooses an open interaction side
+- Hammy stops near the furniture without using its exact occupied space
+- After the interaction, Hammy walks back to a safe open position
+- Switching rooms or entering edit mode safely cancels movement
+
+DEPLOYMENT CHECK
+/api/health must report version 25.5.

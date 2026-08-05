@@ -1,8 +1,8 @@
 {
   "name": "hammy-focus-house-cloud",
-  "version": "25.4.0",
+  "version": "25.5.0",
   "private": true,
-  "description": "Hammy Focus House v25.4 with layered body-fitted clothing that adapts to every breed and visual style",
+  "description": "Hammy Focus House v25.5 with touch-friendly Room Designer Mode, saved layouts, room thumbnails, and obstacle-aware Hammy walking",
   "scripts": {
     "start": "node server.js",
     "check": "node --check server.js && node --check db.js && node --check cloud.js && node --check online.js && node --check gallery.js && node --check admin.js"
