@@ -268,3 +268,8 @@ Eight new interactive furniture pieces were added. Rooms now hold six pieces.
 Premium automatically generates additional rooms as needed, while free
 players can unlock Room 2 with a 10-day streak. Home-room arrow buttons switch
 between generated rooms, and furniture cards display their room location.
+
+
+## Version 25.4 — Fitted Layered Clothing
+
+Clothing now uses separate fitted torso, sleeve, collar, cuff, hood, pocket, trouser, cape, and accessory layers. Breed-specific measurements keep outfits attached to the hamster while the face and paws remain visible.

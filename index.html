@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=253">
-<link rel="stylesheet" href="cloud.css?v=253">
+<link rel="stylesheet" href="online.css?v=254">
+<link rel="stylesheet" href="cloud.css?v=254">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -1817,8 +1817,57 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
   .furniture-room-summary{display:grid}
 }
 
+
+/* ===== v25.4 body-fitted layered clothing ===== */
+.hamster{--fit-left:39px;--fit-right:39px;--fit-top:137px;--fit-height:86px;--fit-sleeve-left:24px;--fit-sleeve-right:24px;--fit-sleeve-top:143px;--fit-sleeve-width:47px;--fit-sleeve-height:50px;--fit-pants-left:49px;--fit-pants-right:49px;--fit-pants-top:185px;--fit-pants-width:53px;--fit-pants-height:43px;--fit-hat-left:48px;--fit-hat-width:124px;--fit-hat-top:6px;--fit-cape-left:31px;--fit-cape-right:31px;--fit-cape-top:130px;--fit-style-x:1;--fit-style-y:1;--fit-sleeve-scale:1}
+.hamster[data-breed="teddy"]{--fit-left:29px;--fit-right:29px;--fit-top:134px;--fit-height:91px;--fit-sleeve-left:16px;--fit-sleeve-right:16px;--fit-sleeve-top:141px;--fit-sleeve-width:52px;--fit-sleeve-height:53px;--fit-pants-left:41px;--fit-pants-right:41px;--fit-pants-top:184px;--fit-pants-width:58px;--fit-hat-left:43px;--fit-hat-width:134px;--fit-cape-left:24px;--fit-cape-right:24px}
+.hamster[data-breed="longcoat"]{--fit-left:34px;--fit-right:34px;--fit-top:137px;--fit-height:88px;--fit-sleeve-left:21px;--fit-sleeve-right:21px;--fit-sleeve-top:143px;--fit-sleeve-width:49px;--fit-pants-left:46px;--fit-pants-right:46px;--fit-hat-left:49px;--fit-hat-width:122px;--fit-hat-top:10px}
+.hamster[data-breed="dwarf"]{--fit-left:52px;--fit-right:52px;--fit-top:145px;--fit-height:75px;--fit-sleeve-left:43px;--fit-sleeve-right:43px;--fit-sleeve-top:149px;--fit-sleeve-width:37px;--fit-sleeve-height:40px;--fit-pants-left:58px;--fit-pants-right:58px;--fit-pants-top:184px;--fit-pants-width:43px;--fit-pants-height:35px;--fit-hat-left:60px;--fit-hat-width:100px;--fit-hat-top:35px;--fit-cape-left:45px;--fit-cape-right:45px;--fit-cape-top:139px}
+.hamster[data-breed="satin"]{--fit-left:42px;--fit-right:42px;--fit-top:138px;--fit-height:87px;--fit-sleeve-left:29px;--fit-sleeve-right:29px;--fit-pants-left:51px;--fit-pants-right:51px;--fit-hat-left:53px;--fit-hat-width:114px;--fit-hat-top:10px}
+.hamster[data-breed="floppy"]{--fit-left:39px;--fit-right:39px;--fit-top:138px;--fit-height:86px;--fit-sleeve-left:25px;--fit-sleeve-right:25px;--fit-pants-left:49px;--fit-pants-right:49px;--fit-hat-left:58px;--fit-hat-width:104px;--fit-hat-top:25px;--fit-cape-left:34px;--fit-cape-right:34px}
+.hamster[data-visual-style="cartoon"]{--fit-style-x:1.045;--fit-style-y:1.02;--fit-sleeve-scale:1.08}
+.hamster[data-visual-style="realistic"]{--fit-style-x:.97;--fit-style-y:1;--fit-sleeve-scale:.93}
+.hamster .clothes{position:absolute;inset:0;z-index:auto;pointer-events:none;transform:none!important;animation:none!important}
+.hamster .clothing{display:none;position:absolute;inset:0;background:none!important;border:0!important;clip-path:none!important;border-radius:0!important;overflow:visible!important;transform:none}
+.hamster .clothing.on{display:block}.hamster .clothing>span{position:absolute;box-sizing:border-box;pointer-events:none}
+.outfit-torso{left:var(--fit-left);right:var(--fit-right);top:var(--fit-top);height:var(--fit-height);z-index:6;border:4px solid var(--line);border-radius:26px 26px 39px 39px;background:var(--cloth);clip-path:polygon(14% 0,35% 0,42% 8%,58% 8%,65% 0,86% 0,100% 23%,86% 44%,80% 100%,20% 100%,14% 44%,0 23%);transform-origin:50% 18%}
+.outfit-sleeve{top:var(--fit-sleeve-top);width:var(--fit-sleeve-width);height:var(--fit-sleeve-height);z-index:10;border:4px solid var(--line);border-radius:48% 48% 44% 44%;background:var(--cloth);transform-origin:50% 10%}.outfit-sleeve.l{left:var(--fit-sleeve-left);transform:rotate(17deg) scale(var(--fit-sleeve-scale))}.outfit-sleeve.r{right:var(--fit-sleeve-right);transform:rotate(-17deg) scale(var(--fit-sleeve-scale))}
+.outfit-collar{left:50%;top:calc(var(--fit-top) - 2px);width:45px;height:22px;z-index:8;transform:translateX(-50%);border:3px solid var(--line);border-top:0;border-radius:0 0 50% 50%;background:color-mix(in srgb,var(--cloth) 68%,white)}
+.outfit-hem{left:calc(var(--fit-left) + 17px);right:calc(var(--fit-right) + 17px);top:calc(var(--fit-top) + var(--fit-height) - 12px);height:11px;z-index:8;border:3px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--cloth) 82%,white)}
+.shirt .outfit-sleeve{height:43px}.shirt .outfit-collar{width:50px;height:24px;background:var(--fur2)}
+.outfit-hood{left:50%;top:calc(var(--fit-top) - 55px);width:100px;height:74px;z-index:3;transform:translateX(-50%);border:4px solid var(--line);border-radius:54% 54% 28px 28px;background:var(--cloth);box-shadow:inset 0 -13px 0 color-mix(in srgb,var(--cloth) 75%,black)}
+.outfit-pocket{left:50%;top:calc(var(--fit-top) + 48px);width:59px;height:28px;z-index:8;transform:translateX(-50%);border:3px solid var(--line);border-top:0;border-radius:0 0 24px 24px;background:color-mix(in srgb,var(--cloth) 82%,white)}
+.outfit-string{top:calc(var(--fit-top) + 13px);width:4px;height:31px;z-index:9;border-radius:999px;background:var(--line);transform-origin:top}.outfit-string.l{left:calc(50% - 9px)}.outfit-string.r{right:calc(50% - 9px)}
+.outfit-cuff{top:calc(var(--fit-sleeve-top) + var(--fit-sleeve-height) - 12px);width:31px;height:13px;z-index:11;border:3px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--cloth) 75%,white)}.outfit-cuff.l{left:calc(var(--fit-sleeve-left) + 8px);transform:rotate(17deg)}.outfit-cuff.r{right:calc(var(--fit-sleeve-right) + 8px);transform:rotate(-17deg)}
+.pajamas .outfit-torso,.pajamas .outfit-sleeve,.pajamas .outfit-pants{background:radial-gradient(circle at 23% 25%,#fff2a1 0 4px,transparent 5px),radial-gradient(circle at 72% 53%,#fff2a1 0 4px,transparent 5px),var(--cloth)}
+.outfit-button{left:50%;width:8px;height:8px;z-index:9;transform:translateX(-50%);border:2px solid var(--line);border-radius:50%;background:white}.outfit-button.b1{top:calc(var(--fit-top) + 26px)}.outfit-button.b2{top:calc(var(--fit-top) + 45px)}.outfit-button.b3{top:calc(var(--fit-top) + 64px)}
+.outfit-pants{top:var(--fit-pants-top);width:var(--fit-pants-width);height:var(--fit-pants-height);z-index:6;border:4px solid var(--line);border-radius:12px 12px 42% 42%;background:var(--cloth)}.outfit-pants.l{left:var(--fit-pants-left);transform:rotate(3deg)}.outfit-pants.r{right:var(--fit-pants-right);transform:rotate(-3deg)}
+.outfit-ankle{top:calc(var(--fit-pants-top) + var(--fit-pants-height) - 10px);width:38px;height:12px;z-index:9;border:3px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--cloth) 75%,white)}.outfit-ankle.l{left:calc(var(--fit-pants-left) + 7px);transform:rotate(3deg)}.outfit-ankle.r{right:calc(var(--fit-pants-right) + 7px);transform:rotate(-3deg)}
+.outfit-jacket-back{left:var(--fit-left);right:var(--fit-right);top:var(--fit-top);height:var(--fit-height);z-index:5;border:4px solid var(--line);border-radius:25px 25px 40px 40px;background:var(--cloth)}
+.outfit-panel{top:var(--fit-top);width:calc((220px - var(--fit-left) - var(--fit-right))/2 - 9px);height:var(--fit-height);z-index:7;border:4px solid var(--line);background:var(--cloth)}.outfit-panel.l{left:var(--fit-left);border-radius:25px 8px 10px 38px;clip-path:polygon(0 0,100% 0,78% 45%,88% 100%,0 100%)}.outfit-panel.r{right:var(--fit-right);border-radius:8px 25px 38px 10px;clip-path:polygon(0 0,100% 0,100% 100%,12% 100%,22% 45%)}
+.outfit-lapel{top:calc(var(--fit-top) + 1px);width:35px;height:45px;z-index:8;border:3px solid var(--line);background:color-mix(in srgb,var(--cloth) 72%,white)}.outfit-lapel.l{left:calc(50% - 35px);transform:skewY(18deg);clip-path:polygon(0 0,100% 0,55% 100%,0 70%)}.outfit-lapel.r{right:calc(50% - 35px);transform:skewY(-18deg);clip-path:polygon(0 0,100% 0,100% 70%,45% 100%)}
+.outfit-zipper{left:50%;top:calc(var(--fit-top) + 42px);width:5px;height:calc(var(--fit-height) - 48px);z-index:8;transform:translateX(-50%);border-radius:999px;background:var(--line);opacity:.75}
+.outfit-cape-panel{left:var(--fit-cape-left);right:var(--fit-cape-right);top:var(--fit-cape-top);height:108px;z-index:1;border:4px solid var(--line);border-radius:22px 22px 48% 48%;background:linear-gradient(90deg,color-mix(in srgb,var(--cloth) 75%,black),var(--cloth),color-mix(in srgb,var(--cloth) 75%,black));transform-origin:50% 7%}
+.outfit-cape-neck{left:50%;top:calc(var(--fit-cape-top) - 7px);width:78px;height:20px;z-index:7;transform:translateX(-50%);border:4px solid var(--line);border-radius:999px;background:var(--cloth)}.outfit-cape-clasp{left:50%;top:calc(var(--fit-cape-top) - 2px);width:13px;height:13px;z-index:8;transform:translateX(-50%);border:3px solid var(--line);border-radius:50%;background:#ffe278}
+.outfit-backpack-pack{left:50%;top:calc(var(--fit-top) + 5px);width:103px;height:90px;z-index:2;transform:translateX(-50%);border:4px solid var(--line);border-radius:28px 28px 35px 35px;background:var(--cloth);box-shadow:inset 0 -20px 0 color-mix(in srgb,var(--cloth) 75%,black)}
+.outfit-backpack-strap{top:calc(var(--fit-top) + 12px);width:19px;height:78px;z-index:7;border:4px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--cloth) 78%,white)}.outfit-backpack-strap.l{left:calc(var(--fit-left) + 13px);transform:rotate(10deg)}.outfit-backpack-strap.r{right:calc(var(--fit-right) + 13px);transform:rotate(-10deg)}
+.outfit-hat-crown{left:var(--fit-hat-left);top:var(--fit-hat-top);width:var(--fit-hat-width);height:55px;z-index:7;border:4px solid var(--line);border-radius:55% 55% 18px 18px;background:var(--cloth)}.outfit-hat-band{left:calc(var(--fit-hat-left) + 8px);top:calc(var(--fit-hat-top) + 37px);width:calc(var(--fit-hat-width) - 16px);height:15px;z-index:8;border:3px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--cloth) 65%,black)}.outfit-hat-brim{left:calc(var(--fit-hat-left) - 7px);top:calc(var(--fit-hat-top) + 45px);width:calc(var(--fit-hat-width) + 14px);height:18px;z-index:7;border:4px solid var(--line);border-radius:999px;background:var(--cloth)}
+.outfit-scarf-wrap{left:calc(var(--fit-left) + 10px);right:calc(var(--fit-right) + 10px);top:calc(var(--fit-top) - 4px);height:31px;z-index:8;border:4px solid var(--line);border-radius:999px;background:var(--cloth)}.outfit-scarf-tail{top:calc(var(--fit-top) + 19px);width:28px;height:65px;z-index:8;border:4px solid var(--line);border-radius:8px 8px 14px 14px;background:var(--cloth);transform-origin:top}.outfit-scarf-tail.t1{right:calc(var(--fit-right) + 23px);transform:rotate(8deg)}.outfit-scarf-tail.t2{right:calc(var(--fit-right) + 45px);height:53px;transform:rotate(-5deg)}
+.outfit-glasses-bridge{left:50%;top:98px;width:30px;height:6px;z-index:10;transform:translateX(-50%);border-radius:999px;background:var(--line)}.outfit-lens{top:82px;width:43px;height:36px;z-index:10;border:5px solid var(--line);border-radius:50%;background:rgba(190,226,255,.35)}.outfit-lens.l{left:47px}.outfit-lens.r{right:47px}
+.outfit-bow-wing{top:30px;width:41px;height:31px;z-index:8;border:4px solid var(--line);border-radius:50% 18% 50% 18%;background:var(--cloth)}.outfit-bow-wing.l{left:79px;transform:rotate(18deg)}.outfit-bow-wing.r{right:79px;transform:rotate(-18deg)}.outfit-bow-knot{left:50%;top:35px;width:24px;height:24px;z-index:9;transform:translateX(-50%);border:4px solid var(--line);border-radius:50%;background:var(--cloth)}
+.outfit-crown-base{left:63px;top:29px;width:94px;height:22px;z-index:8;border:4px solid var(--line);border-radius:8px 8px 14px 14px;background:var(--cloth)}.outfit-crown-points{left:63px;top:2px;width:94px;height:41px;z-index:7;border:4px solid var(--line);background:var(--cloth);clip-path:polygon(0 100%,4% 18%,27% 58%,50% 0,73% 58%,96% 18%,100% 100%)}
+.outfit-overall-bib{left:calc(var(--fit-left) + 11px);right:calc(var(--fit-right) + 11px);top:calc(var(--fit-top) + 11px);height:68px;z-index:7;border:4px solid var(--line);border-radius:14px 14px 31px 31px;background:var(--cloth)}.outfit-overall-strap{top:calc(var(--fit-top) - 18px);width:18px;height:45px;z-index:8;border:4px solid var(--line);border-radius:999px;background:var(--cloth)}.outfit-overall-strap.l{left:calc(var(--fit-left) + 30px);transform:rotate(-8deg)}.outfit-overall-strap.r{right:calc(var(--fit-right) + 30px);transform:rotate(8deg)}
+.outfit-overall-pocket,.outfit-apron-pocket{left:50%;z-index:9;transform:translateX(-50%);border:3px solid var(--line);border-radius:7px 7px 15px 15px;background:color-mix(in srgb,var(--cloth) 78%,white)}.outfit-overall-pocket{top:calc(var(--fit-top) + 31px);width:43px;height:29px}
+.outfit-apron-body{left:calc(var(--fit-left) + 15px);right:calc(var(--fit-right) + 15px);top:calc(var(--fit-top) + 8px);height:78px;z-index:7;border:4px solid var(--line);border-radius:12px 12px 36px 36px;background:var(--cloth)}.outfit-apron-neck{left:50%;top:calc(var(--fit-top) - 22px);width:50px;height:37px;z-index:6;transform:translateX(-50%);border:4px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0}.outfit-apron-tie{top:calc(var(--fit-top) + 31px);width:45px;height:12px;z-index:6;border:3px solid var(--line);border-radius:999px;background:var(--cloth)}.outfit-apron-tie.l{left:calc(var(--fit-left) - 4px);transform:rotate(13deg)}.outfit-apron-tie.r{right:calc(var(--fit-right) - 4px);transform:rotate(-13deg)}.outfit-apron-pocket{top:calc(var(--fit-top) + 48px);width:47px;height:26px}
+.headband:before{content:"";position:absolute;left:49px;top:53px;width:122px;height:17px;z-index:8;border:4px solid var(--line);border-radius:999px;background:var(--cloth)}.headband:after{content:"";position:absolute;right:45px;top:43px;width:31px;height:27px;z-index:9;border:4px solid var(--line);border-radius:50% 18% 50% 18%;background:var(--cloth);transform:rotate(18deg)}
+.hamster .head{z-index:5}.hamster .muzzle{z-index:9}.hamster .eye,.hamster .cheek,.hamster .mouth{z-index:10}.hamster .nose{z-index:11}.hamster .paw{z-index:12}
+.hamster:not(.tickle):not(.running) .clothing.on .outfit-torso,.hamster:not(.tickle):not(.running) .clothing.on .outfit-jacket-back,.hamster:not(.tickle):not(.running) .clothing.on .outfit-overall-bib,.hamster:not(.tickle):not(.running) .clothing.on .outfit-apron-body{animation:fittedClothingBreath 2.7s ease-in-out infinite}
+.hamster.running .clothing.on .outfit-sleeve.l{animation:fittedSleeveRunL .16s ease-in-out infinite alternate}.hamster.running .clothing.on .outfit-sleeve.r{animation:fittedSleeveRunR .16s ease-in-out infinite alternate}.hamster.running .clothing.on .outfit-string,.hamster.running .clothing.on .outfit-scarf-tail,.hamster.running .clothing.on .outfit-cape-panel{animation:fittedFabricRun .2s ease-in-out infinite alternate}.hamster.tickle .clothing.on .outfit-sleeve.l{animation:fittedSleeveTickleL .2s ease-in-out 8}.hamster.tickle .clothing.on .outfit-sleeve.r{animation:fittedSleeveTickleR .2s ease-in-out 8}.hamster.tickle .clothing.on .outfit-cape-panel,.hamster.tickle .clothing.on .outfit-scarf-tail{animation:fittedFabricTickle .105s ease-in-out 16}
+@keyframes fittedClothingBreath{0%,100%{transform:scale(var(--fit-style-x),var(--fit-style-y))}50%{transform:scale(calc(var(--fit-style-x) + .012),calc(var(--fit-style-y) + .025))}}@keyframes fittedSleeveRunL{to{transform:rotate(31deg) translateY(3px) scale(var(--fit-sleeve-scale))}}@keyframes fittedSleeveRunR{to{transform:rotate(-31deg) translateY(3px) scale(var(--fit-sleeve-scale))}}@keyframes fittedFabricRun{to{transform:rotate(4deg) translateX(3px)}}@keyframes fittedSleeveTickleL{50%{transform:rotate(38deg) translate(10px,-5px) scale(var(--fit-sleeve-scale))}}@keyframes fittedSleeveTickleR{50%{transform:rotate(-38deg) translate(-10px,-5px) scale(var(--fit-sleeve-scale))}}@keyframes fittedFabricTickle{50%{transform:rotate(5deg) translateX(5px)}}
+.clothing-card-preview{height:190px}.clothing-card-preview .hamster{top:-10px!important;transform:translateX(-50%) scale(.67)!important}
+
 </style>
-<link rel="stylesheet" href="premium.css?v=253">
+<link rel="stylesheet" href="premium.css?v=254">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -1884,21 +1933,21 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
   <button id="hamster" class="hamster white" aria-label="Tickle Nibbles">
    <span id="speech" class="bubble hidden"></span><span id="zzz" class="zzz hidden">Zzz</span><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span><span class="breed-detail crown-tuft"></span><span class="breed-detail mane l"></span><span class="breed-detail mane r"></span><span class="breed-detail flank-fur l"></span><span class="breed-detail flank-fur r"></span><span class="breed-detail chin-fluff"></span><span class="breed-detail dorsal-stripe"></span><span class="breed-detail ear-fold l"></span><span class="breed-detail ear-fold r"></span><span class="breed-detail whiskers l"></span><span class="breed-detail whiskers r"></span><span class="breed-detail coat-gloss g1"></span><span class="breed-detail coat-gloss g2"></span><span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span>
    <span class="clothes">
-    <span id="shirt" class="clothing shirt"><span class="collar"></span></span>
-    <span id="hat" class="clothing hat"></span>
-    <span id="scarf" class="clothing scarf"></span>
-    <span id="hoodie" class="clothing hoodie"><span class="sleeve-left"></span><span class="sleeve-right"></span><span class="string-left"></span><span class="string-right"></span><span class="collar"></span></span>
-    <span id="cape" class="clothing cape"></span>
-    <span id="glasses" class="clothing glasses"></span>
-    <span id="bow" class="clothing bow"></span>
-    <span id="crown" class="clothing crown"></span>
-    <span id="backpack" class="clothing backpack"></span>
-    <span id="pajamas" class="clothing pajamas"><span class="collar"></span><span class="button b1"></span><span class="button b2"></span><span class="button b3"></span></span>
-    <span id="jacket" class="clothing jacket"><span class="zipper"></span></span>
-    <span id="overalls" class="clothing overalls"><span class="pocket"></span></span>
-    <span id="apron" class="clothing apron"><span class="pocket"></span></span>
-   </span>
-  </button>
+<span id="cape" class="clothing cape outfit-root"><span class="outfit-cape-panel"></span><span class="outfit-cape-neck"></span><span class="outfit-cape-clasp"></span></span>
+<span id="backpack" class="clothing backpack outfit-root"><span class="outfit-backpack-pack"></span><span class="outfit-backpack-strap l"></span><span class="outfit-backpack-strap r"></span></span>
+<span id="shirt" class="clothing shirt outfit-root"><span class="outfit-torso"></span><span class="outfit-sleeve l"></span><span class="outfit-sleeve r"></span><span class="outfit-collar"></span><span class="outfit-hem"></span></span>
+<span id="hoodie" class="clothing hoodie outfit-root"><span class="outfit-hood"></span><span class="outfit-torso"></span><span class="outfit-sleeve l"></span><span class="outfit-sleeve r"></span><span class="outfit-cuff l"></span><span class="outfit-cuff r"></span><span class="outfit-collar"></span><span class="outfit-string l"></span><span class="outfit-string r"></span><span class="outfit-pocket"></span><span class="outfit-hem"></span></span>
+<span id="pajamas" class="clothing pajamas outfit-root"><span class="outfit-torso"></span><span class="outfit-sleeve l"></span><span class="outfit-sleeve r"></span><span class="outfit-cuff l"></span><span class="outfit-cuff r"></span><span class="outfit-collar"></span><span class="outfit-button b1"></span><span class="outfit-button b2"></span><span class="outfit-button b3"></span><span class="outfit-pants l"></span><span class="outfit-pants r"></span><span class="outfit-ankle l"></span><span class="outfit-ankle r"></span></span>
+<span id="jacket" class="clothing jacket outfit-root"><span class="outfit-jacket-back"></span><span class="outfit-sleeve l"></span><span class="outfit-sleeve r"></span><span class="outfit-cuff l"></span><span class="outfit-cuff r"></span><span class="outfit-panel l"></span><span class="outfit-panel r"></span><span class="outfit-lapel l"></span><span class="outfit-lapel r"></span><span class="outfit-zipper"></span><span class="outfit-hem"></span></span>
+<span id="overalls" class="clothing overalls outfit-root"><span class="outfit-overall-bib"></span><span class="outfit-overall-strap l"></span><span class="outfit-overall-strap r"></span><span class="outfit-overall-pocket"></span><span class="outfit-pants l"></span><span class="outfit-pants r"></span><span class="outfit-ankle l"></span><span class="outfit-ankle r"></span></span>
+<span id="apron" class="clothing apron outfit-root"><span class="outfit-apron-neck"></span><span class="outfit-apron-body"></span><span class="outfit-apron-tie l"></span><span class="outfit-apron-tie r"></span><span class="outfit-apron-pocket"></span></span>
+<span id="scarf" class="clothing scarf outfit-root"><span class="outfit-scarf-wrap"></span><span class="outfit-scarf-tail t1"></span><span class="outfit-scarf-tail t2"></span></span>
+<span id="hat" class="clothing hat outfit-root"><span class="outfit-hat-crown"></span><span class="outfit-hat-band"></span><span class="outfit-hat-brim"></span></span>
+<span id="glasses" class="clothing glasses outfit-root"><span class="outfit-glasses-bridge"></span><span class="outfit-lens l"></span><span class="outfit-lens r"></span></span>
+<span id="bow" class="clothing bow outfit-root"><span class="outfit-bow-wing l"></span><span class="outfit-bow-wing r"></span><span class="outfit-bow-knot"></span></span>
+<span id="crown" class="clothing crown outfit-root"><span class="outfit-crown-base"></span><span class="outfit-crown-points"></span></span>
+</span>
+</button>
   <div id="roomMessage" class="msg">Tap Nibbles or press Tickle.</div>
  </div>
  <div class="grid grid3" style="margin-top:12px"><button id="tickleBtn" class="primary">Tickle Nibbles</button><button id="runBtn" class="secondary">Use treadmill</button><button id="stopBtn" class="secondary" disabled>Stop running</button></div>
@@ -2047,7 +2096,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v25.3">Build v25.3</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v25.4">Build v25.4</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -2220,7 +2269,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button type="button" id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v25.3.1 seven times whenever you need to show this section.
+   Tap Build v25.4.1 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -2268,7 +2317,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v25.3</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v25.4</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -2906,6 +2955,8 @@ function update(){
  renderDecorations();
  if($("marketCoins"))$("marketCoins").textContent=state.coins;
  document.querySelectorAll(".clothing").forEach(e=>{e.classList.remove("on");e.style.removeProperty("--cloth")});
+ const clothingLayer=document.querySelector("#hamster .clothes");
+ if(clothingLayer){clothingLayer.dataset.outfit=state.equipped||"none";clothingLayer.dataset.breed=h.dataset.breed||"normal";clothingLayer.dataset.visualStyle=h.dataset.visualStyle||"cartoon"}
  if(state.equipped&&clothes[state.equipped]){const c=clothes[state.equipped],el=$(c.type);if(el){el.classList.add("on");el.style.setProperty("--cloth",c.color)}}
  save();
 }
@@ -3256,15 +3307,9 @@ function useFurniture(key){
  const duration=key==="tunnel"?2400:(key==="music"||key==="piano")?3300:(key==="castle"||key==="climber")?3900:key==="swing"?4200:3800;
  furnitureActionTimer=setTimeout(clearFurnitureAction,duration);
 }
-function outfitMarkup(c){
- if(c.type==="shirt")return `<span class="clothing shirt on" style="--cloth:${c.color}"><span class="collar"></span></span>`;
- if(c.type==="hoodie")return `<span class="clothing hoodie on" style="--cloth:${c.color}"><span class="sleeve-left"></span><span class="sleeve-right"></span><span class="string-left"></span><span class="string-right"></span><span class="collar"></span></span>`;
- if(c.type==="pajamas")return `<span class="clothing pajamas on" style="--cloth:${c.color}"><span class="collar"></span><span class="button b1"></span><span class="button b2"></span><span class="button b3"></span></span>`;
- if(c.type==="jacket")return `<span class="clothing jacket on" style="--cloth:${c.color}"><span class="zipper"></span></span>`;
- if(c.type==="overalls")return `<span class="clothing overalls on" style="--cloth:${c.color}"><span class="pocket"></span></span>`;
- if(c.type==="apron")return `<span class="clothing apron on" style="--cloth:${c.color}"><span class="pocket"></span></span>`;
- return `<span class="clothing ${c.type} on" style="--cloth:${c.color}"></span>`;
-}
+const layeredOutfitPieces={"shirt":"<span class=\"outfit-torso\"></span><span class=\"outfit-sleeve l\"></span><span class=\"outfit-sleeve r\"></span><span class=\"outfit-collar\"></span><span class=\"outfit-hem\"></span>","hoodie":"<span class=\"outfit-hood\"></span><span class=\"outfit-torso\"></span><span class=\"outfit-sleeve l\"></span><span class=\"outfit-sleeve r\"></span><span class=\"outfit-cuff l\"></span><span class=\"outfit-cuff r\"></span><span class=\"outfit-collar\"></span><span class=\"outfit-string l\"></span><span class=\"outfit-string r\"></span><span class=\"outfit-pocket\"></span><span class=\"outfit-hem\"></span>","pajamas":"<span class=\"outfit-torso\"></span><span class=\"outfit-sleeve l\"></span><span class=\"outfit-sleeve r\"></span><span class=\"outfit-cuff l\"></span><span class=\"outfit-cuff r\"></span><span class=\"outfit-collar\"></span><span class=\"outfit-button b1\"></span><span class=\"outfit-button b2\"></span><span class=\"outfit-button b3\"></span><span class=\"outfit-pants l\"></span><span class=\"outfit-pants r\"></span><span class=\"outfit-ankle l\"></span><span class=\"outfit-ankle r\"></span>","jacket":"<span class=\"outfit-jacket-back\"></span><span class=\"outfit-sleeve l\"></span><span class=\"outfit-sleeve r\"></span><span class=\"outfit-cuff l\"></span><span class=\"outfit-cuff r\"></span><span class=\"outfit-panel l\"></span><span class=\"outfit-panel r\"></span><span class=\"outfit-lapel l\"></span><span class=\"outfit-lapel r\"></span><span class=\"outfit-zipper\"></span><span class=\"outfit-hem\"></span>","cape":"<span class=\"outfit-cape-panel\"></span><span class=\"outfit-cape-neck\"></span><span class=\"outfit-cape-clasp\"></span>","hat":"<span class=\"outfit-hat-crown\"></span><span class=\"outfit-hat-band\"></span><span class=\"outfit-hat-brim\"></span>","scarf":"<span class=\"outfit-scarf-wrap\"></span><span class=\"outfit-scarf-tail t1\"></span><span class=\"outfit-scarf-tail t2\"></span>","glasses":"<span class=\"outfit-glasses-bridge\"></span><span class=\"outfit-lens l\"></span><span class=\"outfit-lens r\"></span>","bow":"<span class=\"outfit-bow-wing l\"></span><span class=\"outfit-bow-wing r\"></span><span class=\"outfit-bow-knot\"></span>","crown":"<span class=\"outfit-crown-base\"></span><span class=\"outfit-crown-points\"></span>","backpack":"<span class=\"outfit-backpack-pack\"></span><span class=\"outfit-backpack-strap l\"></span><span class=\"outfit-backpack-strap r\"></span>","overalls":"<span class=\"outfit-overall-bib\"></span><span class=\"outfit-overall-strap l\"></span><span class=\"outfit-overall-strap r\"></span><span class=\"outfit-overall-pocket\"></span><span class=\"outfit-pants l\"></span><span class=\"outfit-pants r\"></span><span class=\"outfit-ankle l\"></span><span class=\"outfit-ankle r\"></span>","apron":"<span class=\"outfit-apron-neck\"></span><span class=\"outfit-apron-body\"></span><span class=\"outfit-apron-tie l\"></span><span class=\"outfit-apron-tie r\"></span><span class=\"outfit-apron-pocket\"></span>","headband":"<span class=\"outfit-headband-band\"></span><span class=\"outfit-headband-knot\"></span>"};
+function layeredOutfitInner(type){return layeredOutfitPieces[type]||"";}
+function outfitMarkup(c){const type=String(c?.type||"shirt");return `<span class="clothing ${type} outfit-root on" style="--cloth:${c.color}">${layeredOutfitInner(type)}</span>`;}
 function clothingPreview(c){
  const s=skins[state.skin]||skins[freeHamsterKey];
  const breed=s.breed||"special";
@@ -3452,14 +3497,14 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=253"></script>
-<script src="cloud.js?v=253"></script>
-<script src="online.js?v=253"></script>
-<script src="gallery.js?v=253"></script>
+<script src="premium.js?v=254"></script>
+<script src="cloud.js?v=254"></script>
+<script src="online.js?v=254"></script>
+<script src="gallery.js?v=254"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=253").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=254").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>

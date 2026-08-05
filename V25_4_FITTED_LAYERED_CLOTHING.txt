@@ -1,0 +1,19 @@
+HAMMY FOCUS HOUSE V25.4 — FITTED LAYERED CLOTHING
+
+The flat rectangle clothing renderer was replaced with layered fitted garments.
+
+- Shirts use curved torsos, collars, short sleeves, and a hem above the feet.
+- Hoodies include a hood behind the head, strings, cuffs, pocket, and fitted sleeves.
+- Pajamas include a fitted top, sleeves, cuffs, separate pants, and ankles above the feet.
+- Jackets use open left and right panels, lapels, sleeves, and a visible belly gap.
+- Capes attach behind the shoulders with a neck band and clasp.
+- Hats follow the head curve and stay between the ears.
+- Scarves, glasses, bows, crowns, backpacks, overalls, aprons, and Premium headbands use explicit layers.
+- Face, cheeks, mouth, nose, eyes, and paws remain above clothing.
+- Separate fit measurements support every breed.
+- Cartoon-Cute is puffier; Realistic-Cute is slimmer.
+- Clothing breathes and reacts to running and tickling.
+- Home, clothing cards, and Premium rooms use the same renderer.
+
+DEPLOYMENT CHECK
+/api/health must report version 25.4.
