@@ -260,3 +260,11 @@ The Hamsters page now has a saved Realistic-Cute versus Cartoon-Cute choosing
 panel with live breed previews. The selected style updates the home hamster,
 breed cards, clothing cards, and Premium previews without changing breed
 ownership or colour access.
+
+
+## Version 25.3 — Multi-Room Furniture
+
+Eight new interactive furniture pieces were added. Rooms now hold six pieces.
+Premium automatically generates additional rooms as needed, while free
+players can unlock Room 2 with a 10-day streak. Home-room arrow buttons switch
+between generated rooms, and furniture cards display their room location.

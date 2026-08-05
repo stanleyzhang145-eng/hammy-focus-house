@@ -1,0 +1,40 @@
+HAMMY FOCUS HOUSE V25.3 — MULTI-ROOM FURNITURE
+
+NEW FURNITURE
+- Leaf Hammock
+- Tiny Art Easel
+- Mini Hammy Piano
+- Star Telescope
+- Mini Kitchen
+- Climbing Tower
+- Friendship Tea Table
+- Cloud Swing
+
+ROOM RULES
+- Each room can hold six furniture pieces.
+- Left and right arrow buttons appear at the top of the Home room.
+- The room label shows the current room and furniture capacity.
+- A placed furniture card shows which room contains it.
+- Furniture can be moved to storage and placed again later.
+
+PREMIUM
+- When all generated rooms are full, placing another furniture piece
+  automatically creates the next room.
+- Premium can generate up to twelve rooms.
+- The game switches directly to the newly generated room.
+
+FREE
+- Free players begin with Room 1.
+- Room 2 unlocks after a 10-day consecutive focus streak.
+- Before the streak is earned, a full room requires removing furniture.
+- After Room 2 is full, free players must store furniture or unlock Premium.
+
+COMPATIBILITY
+- Old furniture saves migrate into rooms without deleting ownership.
+- Existing furniture is distributed into available rooms.
+- Extra furniture that cannot fit is moved safely into storage.
+- Breed looks, cloud saving, admin gifts, Premium, clothing, and focus
+  progress remain compatible.
+
+DEPLOYMENT CHECK
+/api/health must report version 25.3.

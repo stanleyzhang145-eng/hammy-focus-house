@@ -1,8 +1,8 @@
 {
   "name": "hammy-focus-house-cloud",
-  "version": "25.2.0",
+  "version": "25.3.0",
   "private": true,
-  "description": "Hammy Focus House v25.2 with a saved Realistic-Cute and Cartoon-Cute breed drawing chooser",
+  "description": "Hammy Focus House v25.3 with eight new furniture pieces and Premium or streak-unlocked multi-room furniture storage",
   "scripts": {
     "start": "node server.js",
     "check": "node --check server.js && node --check db.js && node --check cloud.js && node --check online.js && node --check gallery.js && node --check admin.js"

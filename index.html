@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=252">
-<link rel="stylesheet" href="cloud.css?v=252">
+<link rel="stylesheet" href="online.css?v=253">
+<link rel="stylesheet" href="cloud.css?v=253">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -1617,8 +1617,208 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
   .breed-look-preview .hamster{transform:translateX(-50%) scale(.42)!important}
 }
 
+
+/* ===== v25.3 multi-room furniture ===== */
+.room-navigation{
+  position:absolute;
+  left:50%;
+  top:11px;
+  z-index:70;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  transform:translateX(-50%);
+  padding:6px 8px;
+  border:3px solid var(--line);
+  border-radius:999px;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 4px 0 rgba(73,57,81,.12);
+}
+.room-arrow{
+  min-width:39px;
+  padding:6px 9px;
+  border-width:2px;
+  border-radius:999px;
+  box-shadow:none;
+}
+.room-navigation-copy{
+  display:grid;
+  min-width:130px;
+  text-align:center;
+  line-height:1.05;
+}
+.room-navigation-copy span{
+  margin-top:3px;
+  color:#786d83;
+  font-size:.7rem;
+  font-weight:800;
+}
+.room-unlock-message{
+  position:absolute;
+  left:14px;
+  top:16px;
+  z-index:55;
+  max-width:205px;
+  padding:6px 9px;
+  border:2px solid var(--line);
+  border-radius:12px;
+  background:rgba(255,255,255,.9);
+  font-size:.72rem;
+  font-weight:800;
+}
+.room[data-furniture-room="2"]{
+  --theme-wall:color-mix(in srgb,var(--accent) 12%,#f6f0ff);
+  --theme-floor:#dbbd94;
+}
+.room[data-furniture-room="3"]{
+  --theme-wall:#e7f6f0;
+  --theme-floor:#d8b989;
+}
+.room[data-furniture-room="4"]{
+  --theme-wall:#fff0f5;
+  --theme-floor:#d4b184;
+}
+.room[data-furniture-room="5"],
+.room[data-furniture-room="6"],
+.room[data-furniture-room="7"],
+.room[data-furniture-room="8"],
+.room[data-furniture-room="9"],
+.room[data-furniture-room="10"],
+.room[data-furniture-room="11"],
+.room[data-furniture-room="12"]{
+  --theme-wall:#edf3ff;
+  --theme-floor:#d8ba8d;
+}
+.furniture-room-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:12px;
+}
+.furniture-location{
+  display:inline-flex;
+  margin-top:5px;
+  padding:4px 8px;
+  border:2px solid var(--line);
+  border-radius:999px;
+  background:var(--soft);
+  font-size:.75rem;
+  font-weight:900;
+}
+
+/* New 2D furniture */
+.hammock2d{left:18px;top:270px;width:190px;height:105px}
+.hammock2d .post{position:absolute;top:0;width:13px;height:100px;border:4px solid var(--line);border-radius:8px;background:#9b6b47}
+.hammock2d .post.l{left:7px}.hammock2d .post.r{right:7px}
+.hammock2d .rope{position:absolute;top:18px;width:82px;border-top:4px solid var(--line)}
+.hammock2d .rope.l{left:14px;transform:rotate(18deg)}.hammock2d .rope.r{right:14px;transform:rotate(-18deg)}
+.hammock2d .cloth{position:absolute;left:26px;right:26px;top:34px;height:55px;border:5px solid var(--line);border-top:0;border-radius:0 0 70% 70%;background:#76b9b0}
+.hammock2d .furniture-button{left:63px;top:-25px}
+
+.easel2d{right:20px;top:265px;width:120px;height:150px}
+.easel2d .canvas{position:absolute;left:14px;top:5px;width:92px;height:80px;border:5px solid var(--line);border-radius:6px;background:#d9efff;overflow:hidden}
+.easel2d .paint-sun{position:absolute;right:10px;top:8px;width:24px;height:24px;border:3px solid var(--line);border-radius:50%;background:#ffd85e}
+.easel2d .paint-hill{position:absolute;left:-8px;right:-8px;bottom:-14px;height:55px;border:4px solid var(--line);border-radius:50%;background:#7fbe78}
+.easel2d .leg{position:absolute;top:82px;width:9px;height:67px;background:var(--line)}
+.easel2d .leg.l{left:30px;transform:rotate(11deg)}.easel2d .leg.r{right:30px;transform:rotate(-11deg)}
+.easel2d .tray{position:absolute;left:8px;right:8px;top:79px;height:13px;border:3px solid var(--line);border-radius:7px;background:#b77a50}
+.easel2d .furniture-button{left:30px;top:-27px}
+
+.piano2d{left:355px;top:142px;width:175px;height:112px}
+.piano2d .case{position:absolute;inset:9px 0 36px;border:5px solid var(--line);border-radius:13px 13px 6px 6px;background:#7b69a8}
+.piano2d .keys{position:absolute;left:15px;right:15px;top:58px;height:27px;border:4px solid var(--line);background:repeating-linear-gradient(90deg,#fff 0 15px,#3b3441 16px 20px)}
+.piano2d .leg{position:absolute;top:82px;width:10px;height:30px;background:var(--line)}
+.piano2d .leg.l{left:23px}.piano2d .leg.r{right:23px}
+.piano2d .music-note{position:absolute;top:-4px;color:#ffd85e;font-size:25px;font-weight:900;opacity:0}
+.piano2d .n1{left:32px}.piano2d .n2{right:35px}
+.piano2d.playing .music-note{animation:pianoNote 1s ease-out infinite}
+.piano2d .n2{animation-delay:.35s!important}
+.piano2d .furniture-button{left:59px;top:-27px}
+
+.telescope2d{right:180px;top:268px;width:120px;height:145px}
+.telescope2d .tube{position:absolute;left:11px;top:14px;width:92px;height:32px;border:5px solid var(--line);border-radius:18px;background:#7997c8;transform:rotate(-18deg)}
+.telescope2d .lens{position:absolute;right:1px;top:2px;width:24px;height:46px;border:5px solid var(--line);border-radius:50%;background:#9ce9ed;transform:rotate(-18deg)}
+.telescope2d .stand{position:absolute;left:55px;top:52px;width:10px;height:53px;background:var(--line)}
+.telescope2d .foot{position:absolute;top:97px;width:9px;height:47px;background:var(--line)}
+.telescope2d .foot.l{left:43px;transform:rotate(24deg)}.telescope2d .foot.r{right:43px;transform:rotate(-24deg)}
+.telescope2d .furniture-button{left:28px;top:-25px}
+
+.kitchen2d{left:18px;top:128px;width:190px;height:132px}
+.kitchen2d .counter{position:absolute;inset:22px 0 0;border:5px solid var(--line);border-radius:12px;background:#e9a66d}
+.kitchen2d .oven{position:absolute;left:17px;top:52px;width:65px;height:58px;border:4px solid var(--line);border-radius:8px;background:#59616e}
+.kitchen2d .oven span{position:absolute;inset:10px;border:3px solid #d8eff7;border-radius:5px;background:#2d3641}
+.kitchen2d .stove{position:absolute;right:18px;top:36px;width:73px;height:25px;border:4px solid var(--line);border-radius:8px;background:#d9dce2}
+.kitchen2d .stove span{position:absolute;top:4px;width:18px;height:11px;border:3px solid var(--line);border-radius:50%;background:#444}
+.kitchen2d .stove span:first-child{left:8px}.kitchen2d .stove span:last-child{right:8px}
+.kitchen2d .steam{position:absolute;top:0;width:10px;height:25px;border-left:4px solid rgba(255,255,255,.9);border-radius:50%;opacity:0}
+.kitchen2d .s1{right:52px}.kitchen2d .s2{right:30px}
+.kitchen2d.action-on .steam{animation:kitchenSteam 1s ease-out infinite}
+.kitchen2d .s2{animation-delay:.3s!important}
+.kitchen2d .furniture-button{left:61px;top:-26px}
+
+.climber2d{right:22px;bottom:21px;width:145px;height:180px}
+.climber2d .base{position:absolute;left:10px;right:10px;bottom:0;height:22px;border:5px solid var(--line);border-radius:12px;background:#9f7652}
+.climber2d .post{position:absolute;left:65px;bottom:20px;width:14px;height:135px;background:var(--line)}
+.climber2d .platform{position:absolute;width:90px;height:18px;border:4px solid var(--line);border-radius:9px;background:#8fc095}
+.climber2d .p1{left:3px;bottom:64px}.climber2d .p2{right:0;bottom:127px}
+.climber2d .ladder{position:absolute;left:18px;bottom:22px;width:44px;height:70px;border-left:6px solid var(--line);border-right:6px solid var(--line);background:repeating-linear-gradient(0deg,transparent 0 13px,var(--line) 14px 18px)}
+.climber2d .flag{position:absolute;right:3px;top:0;width:36px;height:25px;background:#f08ca2;clip-path:polygon(0 0,100% 25%,0 100%)}
+.climber2d .furniture-button{left:39px;top:-27px}
+
+.tea2d{left:245px;bottom:22px;width:150px;height:100px}
+.tea2d .top{position:absolute;left:6px;right:6px;top:27px;height:22px;border:5px solid var(--line);border-radius:50%;background:#d59c69}
+.tea2d .leg{position:absolute;left:68px;top:48px;width:13px;height:50px;background:var(--line)}
+.tea2d .cup{position:absolute;top:5px;width:29px;height:25px;border:4px solid var(--line);border-radius:5px 5px 12px 12px;background:#a8d8e8}
+.tea2d .c1{left:28px}.tea2d .c2{right:28px}
+.tea2d .teapot{position:absolute;left:57px;top:0;width:38px;height:31px;border:4px solid var(--line);border-radius:45%;background:#ef9eb4}
+.tea2d .teapot:after{content:"";position:absolute;right:-16px;top:5px;width:16px;height:10px;border-top:4px solid var(--line);transform:rotate(12deg)}
+.tea2d .furniture-button{left:48px;top:-27px}
+
+.swing2d{left:345px;top:24px;width:180px;height:175px}
+.swing2d .beam{position:absolute;left:0;right:0;top:4px;height:15px;border:4px solid var(--line);border-radius:9px;background:#9d704f}
+.swing2d .post{position:absolute;top:16px;width:14px;height:155px;background:var(--line)}
+.swing2d .post.l{left:10px;transform:rotate(5deg)}.swing2d .post.r{right:10px;transform:rotate(-5deg)}
+.swing2d .rope{position:absolute;top:20px;width:5px;height:95px;background:var(--line)}
+.swing2d .rope.l{left:62px}.swing2d .rope.r{right:62px}
+.swing2d .seat{position:absolute;left:43px;right:43px;top:110px;height:20px;border:4px solid var(--line);border-radius:8px;background:#db8e9f}
+.swing2d .furniture-button{left:59px;top:-25px}
+
+.hammock2d.action-on .cloth{animation:hammockSway 1.4s ease-in-out infinite alternate}
+.easel2d.action-on .canvas{animation:easelPaint .55s ease-in-out infinite alternate}
+.piano2d.action-on .keys{animation:pianoKeys .22s steps(2) infinite}
+.telescope2d.action-on .tube,.telescope2d.action-on .lens{animation:telescopeTilt 1.2s ease-in-out infinite alternate}
+.climber2d.action-on .flag{animation:flagWave .24s ease-in-out infinite alternate}
+.tea2d.action-on .teapot{animation:teaPour .75s ease-in-out 4 alternate}
+.swing2d.action-on .seat,.swing2d.action-on .rope{animation:swingSeat 1.1s ease-in-out infinite alternate}
+
+.hamster.furn-hammock{left:112px;bottom:139px;z-index:12;animation:rugNap 1.7s ease-in-out infinite!important}
+.hamster.furn-easel{left:calc(100% - 78px);bottom:170px;z-index:12;animation:deskStudy .52s ease-in-out infinite alternate!important}
+.hamster.furn-piano{left:445px;bottom:184px;z-index:12;animation:musicFurnitureDance .25s ease-in-out 12 alternate!important}
+.hamster.furn-telescope{left:calc(100% - 238px);bottom:184px;z-index:12;animation:aquariumWatch 1.2s ease-in-out infinite alternate!important}
+.hamster.furn-kitchen{left:112px;bottom:180px;z-index:12;animation:snackEating .26s ease-in-out infinite alternate!important}
+.hamster.furn-climber{left:calc(100% - 90px);bottom:178px;z-index:12;animation:castlePeek 1.05s ease-in-out 4 alternate!important}
+.hamster.furn-tea{left:320px;bottom:53px;z-index:12;animation:sofaRelax 1.15s ease-in-out infinite alternate!important}
+.hamster.furn-swing{left:435px;bottom:225px;z-index:12;animation:swingHamster 1.1s ease-in-out infinite alternate!important}
+
+@keyframes hammockSway{to{transform:rotate(3deg) translateY(3px)}}
+@keyframes easelPaint{to{transform:rotate(2deg)}}
+@keyframes pianoKeys{50%{filter:brightness(.78)}}
+@keyframes pianoNote{0%{opacity:0;transform:translateY(15px)}45%{opacity:1}100%{opacity:0;transform:translate(8px,-34px) rotate(12deg)}}
+@keyframes telescopeTilt{to{transform:rotate(-13deg) translateY(-3px)}}
+@keyframes kitchenSteam{0%{opacity:0;transform:translateY(9px)}45%{opacity:1}100%{opacity:0;transform:translate(-5px,-20px)}}
+@keyframes teaPour{to{transform:rotate(-18deg) translate(-3px,3px)}}
+@keyframes swingSeat{to{transform:translateX(8px) rotate(3deg)}}
+@keyframes swingHamster{to{transform:translateX(-50%) translate(11px,-5px) rotate(3deg) scale(.93)}}
+
+@media(max-width:720px){
+  .room-navigation{top:8px}
+  .room-unlock-message{top:62px;left:50%;transform:translateX(-50%);max-width:82%;text-align:center}
+  .furniture-room-summary{display:grid}
+}
+
 </style>
-<link rel="stylesheet" href="premium.css?v=252">
+<link rel="stylesheet" href="premium.css?v=253">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -1640,6 +1840,15 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
   <button id="dismissAnnouncement" class="secondary">Dismiss</button>
  </section>
  <div id="room" class="room"><div class="wall"></div><div class="floor"></div><div class="window"></div>
+  <div class="room-navigation">
+   <button id="roomLeftButton" type="button" class="secondary room-arrow" aria-label="Previous room">◀</button>
+   <div class="room-navigation-copy">
+    <strong id="roomNumberLabel">Room 1 of 1</strong>
+    <span id="roomCapacityLabel">0 / 6 furniture</span>
+   </div>
+   <button id="roomRightButton" type="button" class="secondary room-arrow" aria-label="Next room">▶</button>
+  </div>
+  <div id="roomUnlockMessage" class="room-unlock-message"></div>
   <div id="starGarlandDecor" class="market-decoration star-garland hidden"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
   <div id="rainbowBannerDecor" class="market-decoration rainbow-banner hidden">FOCUS!</div>
   <div id="flowerPotDecor" class="market-decoration flower-pot hidden"><span class="flower a"></span><span class="flower b"></span><span class="flower c"></span><span class="decor-pot"></span></div>
@@ -1661,6 +1870,16 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
   <div id="snackPlaced" class="furniture-item snack2d hidden"><button class="furniture-button" data-furniture-use="snack">Snack</button><div class="top"></div><div class="leg l"></div><div class="leg r"></div><div class="bowl"></div></div>
   <div id="musicPlaced" class="furniture-item music2d hidden"><button class="furniture-button" data-furniture-use="music">Dance</button><div class="speaker l"></div><div class="speaker r"></div><div class="note n1"></div><div class="note n2"></div></div>
   <div id="castlePlaced" class="furniture-item castle2d hidden"><button class="furniture-button" data-furniture-use="castle">Explore</button><div class="tower l"></div><div class="tower r"></div><div class="door"></div><div class="flag"></div></div>
+
+  <div id="hammockPlaced" class="furniture-item hammock2d hidden"><button class="furniture-button" data-furniture-use="hammock">Rest</button><div class="post l"></div><div class="post r"></div><div class="cloth"></div><div class="rope l"></div><div class="rope r"></div></div>
+  <div id="easelPlaced" class="furniture-item easel2d hidden"><button class="furniture-button" data-furniture-use="easel">Paint</button><div class="canvas"><span class="paint-sun"></span><span class="paint-hill"></span></div><div class="leg l"></div><div class="leg r"></div><div class="tray"></div></div>
+  <div id="pianoPlaced" class="furniture-item piano2d hidden"><button class="furniture-button" data-furniture-use="piano">Play</button><div class="case"></div><div class="keys"></div><div class="leg l"></div><div class="leg r"></div><span class="music-note n1">♪</span><span class="music-note n2">♫</span></div>
+  <div id="telescopePlaced" class="furniture-item telescope2d hidden"><button class="furniture-button" data-furniture-use="telescope">Look</button><div class="tube"></div><div class="lens"></div><div class="stand"></div><div class="foot l"></div><div class="foot r"></div></div>
+  <div id="kitchenPlaced" class="furniture-item kitchen2d hidden"><button class="furniture-button" data-furniture-use="kitchen">Cook</button><div class="counter"></div><div class="oven"><span></span></div><div class="stove"><span></span><span></span></div><div class="steam s1"></div><div class="steam s2"></div></div>
+  <div id="climberPlaced" class="furniture-item climber2d hidden"><button class="furniture-button" data-furniture-use="climber">Climb</button><div class="base"></div><div class="post"></div><div class="platform p1"></div><div class="platform p2"></div><div class="ladder"></div><div class="flag"></div></div>
+  <div id="teaPlaced" class="furniture-item tea2d hidden"><button class="furniture-button" data-furniture-use="tea">Tea</button><div class="top"></div><div class="leg"></div><div class="cup c1"></div><div class="cup c2"></div><div class="teapot"></div></div>
+  <div id="swingPlaced" class="furniture-item swing2d hidden"><button class="furniture-button" data-furniture-use="swing">Swing</button><div class="beam"></div><div class="post l"></div><div class="post r"></div><div class="rope l"></div><div class="rope r"></div><div class="seat"></div></div>
+
   <div id="treadmill" class="treadmill off"><div class="tm-base"></div><div class="tm-belt"></div><div class="tm-post"></div><div class="tm-handle"></div></div>
   <button id="hamster" class="hamster white" aria-label="Tickle Nibbles">
    <span id="speech" class="bubble hidden"></span><span id="zzz" class="zzz hidden">Zzz</span><span class="tail"></span><span class="ear l"></span><span class="ear r"></span><span class="body"></span><span class="belly"></span><span class="head"></span><span class="breed-detail crown-tuft"></span><span class="breed-detail mane l"></span><span class="breed-detail mane r"></span><span class="breed-detail flank-fur l"></span><span class="breed-detail flank-fur r"></span><span class="breed-detail chin-fluff"></span><span class="breed-detail dorsal-stripe"></span><span class="breed-detail ear-fold l"></span><span class="breed-detail ear-fold r"></span><span class="breed-detail whiskers l"></span><span class="breed-detail whiskers r"></span><span class="breed-detail coat-gloss g1"></span><span class="breed-detail coat-gloss g2"></span><span class="patch"></span><span class="muzzle"></span><span class="eye l"></span><span class="eye r"></span><span class="cheek l"></span><span class="cheek r"></span><span class="nose"></span><span class="mouth"></span><span class="paw l"></span><span class="paw r"></span><span class="leg l"></span><span class="leg r"></span><span class="foot l"></span><span class="foot r"></span>
@@ -1752,7 +1971,15 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 </section>
 
 <section id="furniturePage" class="page hidden">
- <div class="row"><div><h2>Furniture Shop</h2><p class="muted">Buy furniture, place it in the house, then tap its action button.</p></div></div>
+ <div class="row"><div><h2>Furniture Shop</h2><p class="muted">Each room holds six furniture pieces. Use the arrows in the Home room to move between rooms.</p></div></div>
+ <section class="furniture-room-summary card">
+  <div>
+   <span class="market-kicker">ROOM STORAGE</span>
+   <h3 id="furnitureRoomSummary">Room 1 has 0 of 6 furniture pieces</h3>
+   <p id="furnitureRoomRule" class="muted">Premium automatically creates another room when needed.</p>
+  </div>
+  <button id="openCurrentFurnitureRoom" type="button" class="secondary">View current room</button>
+ </section>
  <div id="furnitureGrid" class="grid grid2" style="margin-top:12px"></div>
 </section>
 <section id="hamstersPage" class="page hidden">
@@ -1820,7 +2047,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v25.2">Build v25.2</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v25.3">Build v25.3</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -1993,7 +2220,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button type="button" id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v25.2.1 seven times whenever you need to show this section.
+   Tap Build v25.3.1 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -2041,7 +2268,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v25.2</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v25.3</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -2141,9 +2368,9 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"normal_white",breedLook:"cartoon",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},clothes:["shirt","hoodie"],equipped:null,marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},activeBoosters:{coinBooster:0,fruitCharm:0},ownedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},placedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},ownedMarketThemes:{forest:false,candy:false,space:false},ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false}};
+const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"normal_white",breedLook:"cartoon",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},clothes:["shirt","hoodie"],equipped:null,marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},activeBoosters:{coinBooster:0,fruitCharm:0},ownedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},placedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},ownedMarketThemes:{forest:false,candy:false,space:false},ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},furnitureRooms:{},generatedFurnitureRooms:1,currentFurnitureRoom:1,furnitureRoomMigrationV1:false};
 let state;
-try{state={...defaults,...JSON.parse(localStorage.getItem("hammyV8")||localStorage.getItem("hammyV5")||"{}")};state.foods={...defaults.foods,...(state.foods||{})};state.marketInventory={...defaults.marketInventory,...(state.marketInventory||{})};state.activeBoosters={...defaults.activeBoosters,...(state.activeBoosters||{})};state.ownedDecorations={...defaults.ownedDecorations,...(state.ownedDecorations||{})};state.placedDecorations={...defaults.placedDecorations,...(state.placedDecorations||{})};state.ownedMarketThemes={...defaults.ownedMarketThemes,...(state.ownedMarketThemes||{})};state.ownedFurniture={...defaults.ownedFurniture,...(state.ownedFurniture||{})};state.placedFurniture={...defaults.placedFurniture,...(state.placedFurniture||{})};state.practiceDays=Number(state.practiceDays||0);state.totalFocusMinutes=Number(state.totalFocusMinutes||0);state.sessionCount=Number(state.sessionCount||0);state.lastPracticeDate=state.lastPracticeDate||"";state.breedLook=["realistic","cartoon"].includes(state.breedLook)?state.breedLook:"cartoon";state.theme=state.theme||"lavender"}catch{state=structuredClone(defaults)}
+try{state={...defaults,...JSON.parse(localStorage.getItem("hammyV8")||localStorage.getItem("hammyV5")||"{}")};state.foods={...defaults.foods,...(state.foods||{})};state.marketInventory={...defaults.marketInventory,...(state.marketInventory||{})};state.activeBoosters={...defaults.activeBoosters,...(state.activeBoosters||{})};state.ownedDecorations={...defaults.ownedDecorations,...(state.ownedDecorations||{})};state.placedDecorations={...defaults.placedDecorations,...(state.placedDecorations||{})};state.ownedMarketThemes={...defaults.ownedMarketThemes,...(state.ownedMarketThemes||{})};state.ownedFurniture={...defaults.ownedFurniture,...(state.ownedFurniture||{})};state.placedFurniture={...defaults.placedFurniture,...(state.placedFurniture||{})};state.furnitureRooms=state.furnitureRooms&&typeof state.furnitureRooms==="object"?state.furnitureRooms:{};state.generatedFurnitureRooms=Math.max(1,Number(state.generatedFurnitureRooms)||1);state.currentFurnitureRoom=Math.max(1,Number(state.currentFurnitureRoom)||1);state.furnitureRoomMigrationV1=Boolean(state.furnitureRoomMigrationV1);state.practiceDays=Number(state.practiceDays||0);state.totalFocusMinutes=Number(state.totalFocusMinutes||0);state.sessionCount=Number(state.sessionCount||0);state.lastPracticeDate=state.lastPracticeDate||"";state.breedLook=["realistic","cartoon"].includes(state.breedLook)?state.breedLook:"cartoon";state.theme=state.theme||"lavender"}catch{state=structuredClone(defaults)}
 const hamsterColors={
  white:{name:"White",fur:"#fff",fur2:"#f7f5f1",patch:"transparent",swatch:"#ffffff"},
  orange:{name:"Orange",fur:"#e89a3f",fur2:"#fff0d1",patch:"transparent",swatch:"#e89a3f"},
@@ -2403,8 +2630,186 @@ const furniture={
  wheel:{name:"Deluxe Running Wheel",cost:95,placed:"wheelPlaced",action:"Fast wheel-running animation"},
  snack:{name:"Snack Table",cost:85,placed:"snackPlaced",action:"Nibbles enjoys a snack"},
  music:{name:"Music Player",cost:110,placed:"musicPlaced",action:"Nibbles dances to music"},
- castle:{name:"Hamster Castle",cost:150,placed:"castlePlaced",action:"Nibbles explores the castle"}
+ castle:{name:"Hamster Castle",cost:150,placed:"castlePlaced",action:"Nibbles explores the castle"},
+ hammock:{name:"Leaf Hammock",cost:90,placed:"hammockPlaced",action:"Nibbles gently rocks and rests"},
+ easel:{name:"Tiny Art Easel",cost:115,placed:"easelPlaced",action:"Nibbles paints a colourful landscape"},
+ piano:{name:"Mini Hammy Piano",cost:140,placed:"pianoPlaced",action:"Nibbles plays a cheerful tune"},
+ telescope:{name:"Star Telescope",cost:130,placed:"telescopePlaced",action:"Nibbles searches the night sky"},
+ kitchen:{name:"Mini Kitchen",cost:160,placed:"kitchenPlaced",action:"Nibbles cooks a fruit snack"},
+ climber:{name:"Climbing Tower",cost:125,placed:"climberPlaced",action:"Nibbles climbs to the top platform"},
+ tea:{name:"Friendship Tea Table",cost:100,placed:"teaPlaced",action:"Nibbles enjoys a tiny tea party"},
+ swing:{name:"Cloud Swing",cost:145,placed:"swingPlaced",action:"Nibbles swings through the air"}
 };
+
+const FURNITURE_ROOM_CAPACITY=6;
+const PREMIUM_MAX_FURNITURE_ROOMS=12;
+
+function normalizeFurnitureRoomData(target=state){
+ const keys=Object.keys(furniture);
+ target.furnitureRooms=target.furnitureRooms&&typeof target.furnitureRooms==="object"
+  ?target.furnitureRooms
+  :{};
+ target.generatedFurnitureRooms=Math.max(1,Math.floor(Number(target.generatedFurnitureRooms)||1));
+ target.currentFurnitureRoom=Math.max(1,Math.floor(Number(target.currentFurnitureRoom)||1));
+
+ if(!target.furnitureRoomMigrationV1){
+  let room=1;
+  let roomCount=0;
+  const migrationRoomLimit=target.premium
+   ?PREMIUM_MAX_FURNITURE_ROOMS
+   :(Number(target.streak)>=10?2:1);
+
+  keys.forEach(key=>{
+   if(!target.placedFurniture[key]){
+    target.furnitureRooms[key]=0;
+    return;
+   }
+   if(roomCount>=FURNITURE_ROOM_CAPACITY){
+    if(room<migrationRoomLimit){
+     room++;
+     roomCount=0;
+    }else{
+     target.placedFurniture[key]=false;
+     target.furnitureRooms[key]=0;
+     return;
+    }
+   }
+   target.furnitureRooms[key]=room;
+   roomCount++;
+  });
+  target.generatedFurnitureRooms=Math.max(target.generatedFurnitureRooms,room);
+  target.furnitureRoomMigrationV1=true;
+ }
+
+ keys.forEach(key=>{
+  const assigned=Math.max(0,Math.floor(Number(target.furnitureRooms[key])||0));
+  target.furnitureRooms[key]=assigned;
+  target.placedFurniture[key]=assigned>0;
+ });
+
+ if(Number(target.streak)>=10){
+  target.generatedFurnitureRooms=Math.max(2,target.generatedFurnitureRooms);
+ }
+
+ target.generatedFurnitureRooms=Math.min(
+  PREMIUM_MAX_FURNITURE_ROOMS,
+  Math.max(1,target.generatedFurnitureRooms)
+ );
+ target.currentFurnitureRoom=Math.min(
+  target.generatedFurnitureRooms,
+  Math.max(1,target.currentFurnitureRoom)
+ );
+ return target;
+}
+
+normalizeFurnitureRoomData(state);
+
+function furnitureKeysInRoom(room){
+ normalizeFurnitureRoomData(state);
+ return Object.keys(furniture).filter(
+  key=>Number(state.furnitureRooms[key])===Number(room)
+ );
+}
+function furnitureCountInRoom(room){
+ return furnitureKeysInRoom(room).length;
+}
+function isFurnitureInCurrentRoom(key){
+ return Number(state.furnitureRooms[key])===Number(state.currentFurnitureRoom);
+}
+function canGenerateFurnitureRoom(){
+ if(state.generatedFurnitureRooms>=PREMIUM_MAX_FURNITURE_ROOMS)return false;
+ if(state.premium)return true;
+ return Number(state.streak)>=10&&state.generatedFurnitureRooms<2;
+}
+function furnitureRoomFullMessage(){
+ if(state.premium&&state.generatedFurnitureRooms>=PREMIUM_MAX_FURNITURE_ROOMS){
+  return "All Premium rooms are full. Store one furniture piece before placing another.";
+ }
+ if(!state.premium&&Number(state.streak)<10){
+  const remaining=Math.max(1,10-Number(state.streak||0));
+  return `This room is full. Store furniture or build a 10-day streak. ${remaining} consecutive day${remaining===1?"":"s"} remaining.`;
+ }
+ return "Your available rooms are full. Store a furniture piece or unlock Premium for automatic extra rooms.";
+}
+function findFurniturePlacementRoom(){
+ normalizeFurnitureRoomData(state);
+ if(furnitureCountInRoom(state.currentFurnitureRoom)<FURNITURE_ROOM_CAPACITY){
+  return state.currentFurnitureRoom;
+ }
+ for(let room=1;room<=state.generatedFurnitureRooms;room++){
+  if(furnitureCountInRoom(room)<FURNITURE_ROOM_CAPACITY)return room;
+ }
+ if(canGenerateFurnitureRoom()){
+  state.generatedFurnitureRooms++;
+  return state.generatedFurnitureRooms;
+ }
+ return 0;
+}
+function placeFurnitureInRoom(key){
+ const room=findFurniturePlacementRoom();
+ if(!room){
+  const message=furnitureRoomFullMessage();
+  say(message);
+  bubble(message,3200);
+  return 0;
+ }
+ state.furnitureRooms[key]=room;
+ state.placedFurniture[key]=true;
+ state.currentFurnitureRoom=room;
+ return room;
+}
+function storeFurniture(key){
+ state.furnitureRooms[key]=0;
+ state.placedFurniture[key]=false;
+ clearFurnitureAction();
+}
+function changeFurnitureRoom(direction){
+ normalizeFurnitureRoomData(state);
+ const next=Math.min(
+  state.generatedFurnitureRooms,
+  Math.max(1,state.currentFurnitureRoom+direction)
+ );
+ if(next===state.currentFurnitureRoom)return;
+ clearFurnitureAction();
+ state.currentFurnitureRoom=next;
+ update();
+ renderFurniture();
+}
+function renderFurnitureRoomNavigation(){
+ normalizeFurnitureRoomData(state);
+ const room=state.currentFurnitureRoom;
+ const count=furnitureCountInRoom(room);
+ const roomEl=$("room");
+ if(roomEl)roomEl.dataset.furnitureRoom=String(room);
+ if($("roomNumberLabel"))$("roomNumberLabel").textContent=`Room ${room} of ${state.generatedFurnitureRooms}`;
+ if($("roomCapacityLabel"))$("roomCapacityLabel").textContent=`${count} / ${FURNITURE_ROOM_CAPACITY} furniture`;
+ if($("roomLeftButton"))$("roomLeftButton").disabled=room<=1;
+ if($("roomRightButton"))$("roomRightButton").disabled=room>=state.generatedFurnitureRooms;
+
+ let rule;
+ if(state.premium){
+  rule="Premium: a new room is created automatically when every current room is full.";
+ }else if(Number(state.streak)>=10){
+  rule="10-day streak room unlocked. Free accounts can use Rooms 1 and 2.";
+ }else{
+  const remaining=Math.max(1,10-Number(state.streak||0));
+  rule=`Room 2 unlocks after a 10-day streak · ${remaining} day${remaining===1?"":"s"} remaining.`;
+ }
+ if($("roomUnlockMessage"))$("roomUnlockMessage").textContent=rule;
+ if($("furnitureRoomSummary"))$("furnitureRoomSummary").textContent=`Room ${room} has ${count} of ${FURNITURE_ROOM_CAPACITY} furniture pieces`;
+ if($("furnitureRoomRule"))$("furnitureRoomRule").textContent=rule;
+}
+function renderRoomFurniture(){
+ normalizeFurnitureRoomData(state);
+ Object.entries(furniture).forEach(([key,item])=>{
+  const element=$(item.placed);
+  if(!element)return;
+  const visible=isFurnitureInCurrentRoom(key);
+  element.classList.toggle("hidden",!visible);
+ });
+ renderFurnitureRoomNavigation();
+}
+
 let tickleCount=0,tickleReset=0,running=false,timer=null,remaining=20,total=20,paused=false,focusActive=false,focusFailedByLeaving=false;
 function save(){
  const serialized=JSON.stringify(state);
@@ -2425,6 +2830,12 @@ function normalizeGameState(nextState){
  next.ownedMarketThemes={...defaults.ownedMarketThemes,...(next.ownedMarketThemes||{})};
  next.ownedFurniture={...defaults.ownedFurniture,...(next.ownedFurniture||{})};
  next.placedFurniture={...defaults.placedFurniture,...(next.placedFurniture||{})};
+ next.furnitureRooms=next.furnitureRooms&&typeof next.furnitureRooms==="object"
+  ?next.furnitureRooms
+  :{};
+ next.generatedFurnitureRooms=Math.max(1,Number(next.generatedFurnitureRooms)||1);
+ next.currentFurnitureRoom=Math.max(1,Number(next.currentFurnitureRoom)||1);
+ next.furnitureRoomMigrationV1=Boolean(next.furnitureRoomMigrationV1);
  next.practiceDays=Number(next.practiceDays||0);
  next.totalFocusMinutes=Number(next.totalFocusMinutes||0);
  next.sessionCount=Number(next.sessionCount||0);
@@ -2433,6 +2844,7 @@ function normalizeGameState(nextState){
   ?next.breedLook
   :"cartoon";
  next.theme=next.theme||"lavender";
+ normalizeFurnitureRoomData(next);
  return next;
 }
 
@@ -2490,7 +2902,7 @@ function update(){
  const next=nextCostume();$("nextCostumeText").textContent=next?(next.days-state.practiceDays)+" more day"+((next.days-state.practiceDays)===1?"":"s"):"All unlocked";
  $("happyText").textContent=state.happy+"%";$("hungerText").textContent=state.hunger+"%";$("energyText").textContent=state.energy+"%";
  $("happyBar").style.width=state.happy+"%";$("hungerBar").style.width=state.hunger+"%";$("energyBar").style.width=state.energy+"%";
- Object.entries(furniture).forEach(([k,f])=>$(f.placed).classList.toggle("hidden",!state.placedFurniture[k]));
+ renderRoomFurniture();
  renderDecorations();
  if($("marketCoins"))$("marketCoins").textContent=state.coins;
  document.querySelectorAll(".clothing").forEach(e=>{e.classList.remove("on");e.style.removeProperty("--cloth")});
@@ -2687,32 +3099,97 @@ function furniturePreview(key){
  if(key==="music")return '<div class="music2d" style="position:absolute;left:50%;top:14px;transform:translateX(-50%)"><div class="speaker l"></div><div class="speaker r"></div></div>';
  if(key==="castle")return '<div class="castle2d" style="position:absolute;left:50%;top:2px;transform:translateX(-50%) scale(.7)"><div class="tower l"></div><div class="tower r"></div><div class="door"></div><div class="flag"></div></div>';
  if(key==="toybox")return '<div class="toybox2d" style="position:absolute;left:50%;bottom:9px;transform:translateX(-50%)"><div class="lid"></div><div class="box"></div><div class="ball"></div></div>';
+ if(key==="hammock")return '<div class="hammock2d" style="position:absolute;left:50%;top:5px;transform:translateX(-50%) scale(.72)"><div class="post l"></div><div class="post r"></div><div class="cloth"></div><div class="rope l"></div><div class="rope r"></div></div>';
+ if(key==="easel")return '<div class="easel2d" style="position:absolute;left:50%;top:1px;transform:translateX(-50%) scale(.72)"><div class="canvas"><span class="paint-sun"></span><span class="paint-hill"></span></div><div class="leg l"></div><div class="leg r"></div><div class="tray"></div></div>';
+ if(key==="piano")return '<div class="piano2d" style="position:absolute;left:50%;top:10px;transform:translateX(-50%) scale(.68)"><div class="case"></div><div class="keys"></div><div class="leg l"></div><div class="leg r"></div></div>';
+ if(key==="telescope")return '<div class="telescope2d" style="position:absolute;left:50%;top:0;transform:translateX(-50%) scale(.72)"><div class="tube"></div><div class="lens"></div><div class="stand"></div><div class="foot l"></div><div class="foot r"></div></div>';
+ if(key==="kitchen")return '<div class="kitchen2d" style="position:absolute;left:50%;top:3px;transform:translateX(-50%) scale(.65)"><div class="counter"></div><div class="oven"><span></span></div><div class="stove"><span></span><span></span></div></div>';
+ if(key==="climber")return '<div class="climber2d" style="position:absolute;left:50%;top:-5px;transform:translateX(-50%) scale(.65)"><div class="base"></div><div class="post"></div><div class="platform p1"></div><div class="platform p2"></div><div class="ladder"></div><div class="flag"></div></div>';
+ if(key==="tea")return '<div class="tea2d" style="position:absolute;left:50%;top:17px;transform:translateX(-50%) scale(.78)"><div class="top"></div><div class="leg"></div><div class="cup c1"></div><div class="cup c2"></div><div class="teapot"></div></div>';
+ if(key==="swing")return '<div class="swing2d" style="position:absolute;left:50%;top:-14px;transform:translateX(-50%) scale(.61)"><div class="beam"></div><div class="post l"></div><div class="post r"></div><div class="rope l"></div><div class="rope r"></div><div class="seat"></div></div>';
  return '<div class="bookshelf2d" style="position:absolute;left:50%;top:2px;transform:translateX(-50%)"><div class="shelf"><span class="book b"></span></div><div class="shelf"><span class="book c"></span></div><div class="shelf"><span class="book"></span></div></div>';
 }
 function renderFurniture(){
- const grid=$("furnitureGrid");grid.innerHTML="";
- Object.entries(furniture).forEach(([key,f])=>{
-   const owned=state.ownedFurniture[key],placed=state.placedFurniture[key];
-   const card=document.createElement("div");card.className="furniture-card";
-   card.innerHTML=`<div class="furniture-preview">${furniturePreview(key)}</div><strong>${f.name}</strong><p class="muted">${f.action}</p><p>${owned?(placed?"Placed in house":"In storage"):f.cost+" coins"}</p>`;
-   const b=document.createElement("button");b.className=owned?"secondary":"primary";b.textContent=!owned?"Buy":placed?"Store":"Place";
-   b.addEventListener("click",()=>{
+ normalizeFurnitureRoomData(state);
+ renderFurnitureRoomNavigation();
+ const grid=$("furnitureGrid");
+ grid.innerHTML="";
+ Object.entries(furniture).forEach(([key,item])=>{
+   const owned=Boolean(state.ownedFurniture[key]);
+   const room=Number(state.furnitureRooms[key])||0;
+   const placed=room>0;
+   const card=document.createElement("div");
+   card.className="furniture-card";
+   card.innerHTML=`<div class="furniture-preview">${furniturePreview(key)}</div>
+    <strong>${item.name}</strong>
+    <p class="muted">${item.action}</p>
+    <span class="furniture-location">${
+      !owned
+       ?`${item.cost} coins`
+       :placed
+        ?`Placed in Room ${room}`
+        :"In storage"
+    }</span>`;
+
+   const button=document.createElement("button");
+   button.className=owned?"secondary":"primary";
+   button.textContent=!owned
+    ?"Buy & place"
+    :placed
+      ?`Store from Room ${room}`
+      :"Place";
+
+   button.addEventListener("click",()=>{
      if(!owned){
-       if(state.coins<f.cost){say("You need more focus coins.");return}
-       state.coins-=f.cost;state.ownedFurniture[key]=true;state.placedFurniture[key]=true;say(f.name+" bought and placed.");
+       if(state.coins<item.cost){
+        say("You need more focus coins.");
+        return;
+       }
+       const placedRoom=placeFurnitureInRoom(key);
+       if(!placedRoom)return;
+       state.coins-=item.cost;
+       state.ownedFurniture[key]=true;
+       say(`${item.name} bought and placed in Room ${placedRoom}.`);
+     }else if(placed){
+       storeFurniture(key);
+       say(`${item.name} moved to storage.`);
      }else{
-       state.placedFurniture[key]=!state.placedFurniture[key];say(f.name+(state.placedFurniture[key]?" placed.":" stored."));
+       const placedRoom=placeFurnitureInRoom(key);
+       if(!placedRoom)return;
+       say(`${item.name} placed in Room ${placedRoom}.`);
      }
-     update();renderFurniture();
+     update();
+     renderFurniture();
    });
-   card.appendChild(b);grid.appendChild(card);
+
+   card.appendChild(button);
+
+   if(placed){
+    const visit=document.createElement("button");
+    visit.className="secondary";
+    visit.style.marginLeft="7px";
+    visit.textContent=`View Room ${room}`;
+    visit.addEventListener("click",()=>{
+      clearFurnitureAction();
+      state.currentFurnitureRoom=room;
+      update();
+      document.querySelectorAll(".nav button").forEach(node=>node.classList.remove("active"));
+      document.querySelectorAll(".page").forEach(node=>node.classList.add("hidden"));
+      document.querySelector('[data-page="home"]').classList.add("active");
+      $("homePage").classList.remove("hidden");
+    });
+    card.appendChild(visit);
+   }
+
+   grid.appendChild(card);
  });
 }
 let furnitureActionTimer=null;
 const furnitureActionClasses=[
  "furn-bed","furn-sofa","furn-desk","furn-plant","furn-aquarium","furn-tunnel",
  "furn-toybox","furn-bookshelf","furn-lamp","furn-rug","furn-wheel","furn-snack",
- "furn-music","furn-castle"
+ "furn-music","furn-castle","furn-hammock","furn-easel","furn-piano",
+ "furn-telescope","furn-kitchen","furn-climber","furn-tea","furn-swing"
 ];
 function clearFurnitureAction(){
  const h=$("hamster");
@@ -2730,7 +3207,7 @@ function clearFurnitureAction(){
  });
 }
 function useFurniture(key){
- if(!state.placedFurniture[key]||!furniture[key])return;
+ if(!isFurnitureInCurrentRoom(key)||!furniture[key])return;
  clearTimeout(furnitureActionTimer);
  clearFurnitureAction();
 
@@ -2753,21 +3230,30 @@ function useFurniture(key){
   wheel:"Nibbles climbs inside the deluxe wheel and runs!",
   snack:"Nibbles sits at the snack table and eats.",
   music:"Nibbles dances in front of the music player!",
-  castle:"Nibbles goes inside the castle and peeks through the doorway!"
+  castle:"Nibbles goes inside the castle and peeks through the doorway!",
+  hammock:"Nibbles climbs into the hammock and gently rocks.",
+  easel:"Nibbles paints a bright little landscape.",
+  piano:"Nibbles taps the piano keys and plays a cheerful tune!",
+  telescope:"Nibbles looks through the telescope for tiny stars.",
+  kitchen:"Nibbles cooks a warm fruit snack in the mini kitchen.",
+  climber:"Nibbles climbs all the way to the top platform!",
+  tea:"Nibbles sits down for a tiny friendship tea party.",
+  swing:"Nibbles holds on and swings through the air!"
  };
 
  if(key==="bed"||key==="rug")$("zzz").classList.remove("hidden");
  if(key==="lamp"&&placed)placed.classList.add("on");
  if(key==="wheel"&&placed)placed.classList.add("active");
- if(key==="music"&&placed)placed.classList.add("playing");
- if(key==="snack"){
-   state.hunger=Math.max(0,state.hunger-5);
+ if((key==="music"||key==="piano")&&placed)placed.classList.add("playing");
+ if(key==="snack"||key==="kitchen"||key==="tea"){
+   state.hunger=Math.max(0,state.hunger-(key==="kitchen"?7:5));
+   state.happy=Math.min(100,state.happy+2);
    update();
  }
  say(messages[key]);
  bubble(messages[key],2200);
 
- const duration=key==="tunnel"?2400:key==="music"?3300:key==="castle"?3900:3800;
+ const duration=key==="tunnel"?2400:(key==="music"||key==="piano")?3300:(key==="castle"||key==="climber")?3900:key==="swing"?4200:3800;
  furnitureActionTimer=setTimeout(clearFurnitureAction,duration);
 }
 function outfitMarkup(c){
@@ -2892,7 +3378,13 @@ function completeFocus(){
  const fruitTotal=loot.fruit+extraFruit;
  const fruitKeys=Object.keys(fruits),drops=[];for(let i=0;i<fruitTotal;i++){const key=fruitKeys[Math.floor(Math.random()*fruitKeys.length)];state.foods[key]++;drops.push(fruits[key].name)}
  const newlyUnlocked=Object.entries(clothes).filter(([k,c])=>c.days>oldDays&&c.days<=state.practiceDays).map(([k,c])=>{if(!state.clothes.includes(k))state.clothes.push(k);return c.name});
+ const roomUnlockedNow=!state.premium&&Number(state.streak)>=10&&Number(state.generatedFurnitureRooms)<2;
+ normalizeFurnitureRoomData(state);
  state.happy=Math.min(100,state.happy+Math.min(15,4+Math.floor(minutes/10)));update();renderFruit();renderClothing();renderFurniture();
+ if(roomUnlockedNow){
+  say("10-day streak achieved! Room 2 is now unlocked.");
+  bubble("Room 2 unlocked! Use the right arrow to visit it.",3200);
+ }
  const h=$("hamster");h.classList.remove("celebrating");void h.offsetWidth;h.classList.add("celebrating");setTimeout(()=>h.classList.remove("celebrating"),2500);
  $("reward").className=`card loot-card ${loot.key}`;$("reward").classList.remove("hidden");
  $("reward").innerHTML=`<span class="loot-name">${loot.name} loot</span><span class="loot-spark a"></span><span class="loot-spark b"></span><span class="loot-spark c"></span><h3 style="margin-top:10px">Focus complete!</h3><p><strong>${coins} coins</strong> and ${fruitTotal} fruit drop${fruitTotal===1?"":"s"}: ${drops.join(", ")}.${boosted?" Coin Booster applied.":""}${extraFruit?" Fruit Charm added 2 fruit.":""}</p><p class="muted">Longer sessions and Loot Level ${getLootLevel()} improve rarity.${newDay?" Today counted as a new practice day.":" You already earned today's practice day."}</p>${newlyUnlocked.length?`<p><strong>New costume unlocked:</strong> ${newlyUnlocked.join(", ")}</p>`:""}`;
@@ -2927,8 +3419,17 @@ window.addEventListener("beforeunload",()=>{
 
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));b.classList.add("active");$(b.dataset.page+"Page").classList.remove("hidden")}));
 $("hamster").addEventListener("click",tickle);$("tickleBtn").addEventListener("click",tickle);$("runBtn").addEventListener("click",startRun);$("stopBtn").addEventListener("click",stopRun);
+$("roomLeftButton").addEventListener("click",()=>changeFurnitureRoom(-1));
+$("roomRightButton").addEventListener("click",()=>changeFurnitureRoom(1));
+$("openCurrentFurnitureRoom").addEventListener("click",()=>{
+ document.querySelectorAll(".nav button").forEach(node=>node.classList.remove("active"));
+ document.querySelectorAll(".page").forEach(node=>node.classList.add("hidden"));
+ document.querySelector('[data-page="home"]').classList.add("active");
+ $("homePage").classList.remove("hidden");
+ update();
+});
 document.querySelectorAll("[data-furniture-use]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();useFurniture(b.dataset.furnitureUse)}));
-$("premiumBtn").addEventListener("click",()=>{state.premium=true;state.skin=freeHamsterKey;$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true;update();renderSkins();say("Premium demo unlocked. Choose any hamster.")});
+$("premiumBtn").addEventListener("click",()=>{state.premium=true;state.skin=freeHamsterKey;$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true;normalizeFurnitureRoomData(state);update();renderSkins();renderFurniture();say("Premium demo unlocked. Extra furniture rooms now generate automatically.")});
 
 $("task").addEventListener("change",()=>{
  $("customTaskRow").classList.toggle("hidden",$("task").value!=="custom");
@@ -2951,14 +3452,14 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
 }
 update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=252"></script>
-<script src="cloud.js?v=252"></script>
-<script src="online.js?v=252"></script>
-<script src="gallery.js?v=252"></script>
+<script src="premium.js?v=253"></script>
+<script src="cloud.js?v=253"></script>
+<script src="online.js?v=253"></script>
+<script src="gallery.js?v=253"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=252").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=253").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>
