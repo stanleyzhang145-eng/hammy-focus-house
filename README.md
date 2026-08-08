@@ -284,3 +284,13 @@ exit, or navigation controls. Existing fixed layouts migrate automatically.
 
 Hammy now finds a route around furniture, walks to an open interaction point,
 uses the furniture, and returns to a safe position instead of teleporting.
+
+
+## Version 25.6 — Language Mode
+
+Settings now includes English, French, Spanish, Simplified Chinese, Japanese,
+and Korean. The chosen language updates the live game without reloading and
+is stored in both local and cloud saves. Static pages, dynamically rendered
+cards, Room Designer controls, account tools, item names, and common status
+messages use the same translation engine. Player-created names and private
+account codes remain unchanged.

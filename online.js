@@ -227,7 +227,7 @@
     const stats=profile.stats||{};
     return `<div class="online-mini-profile">
       ${avatarMarkup(profile)}
-      <div><strong>${escapeHtml(profile.nickname||"Hammy Friend")}</strong><p class="muted">${escapeHtml(profile.costume||"No costume")}${profile.premium?" · Premium":""}</p>
+      <div><strong data-i18n-skip="true">${escapeHtml(profile.nickname||"Hammy Friend")}</strong><p class="muted">${escapeHtml(profile.costume||"No costume")}${profile.premium?" · Premium":""}</p>
        <div class="online-mini-stats">
         <div class="online-mini-stat"><strong>${clamp(stats.practiceDays,0,999999)}</strong><span>Days</span></div>
         <div class="online-mini-stat"><strong>${clamp(stats.streak,0,999999)}</strong><span>Streak</span></div>
@@ -283,7 +283,7 @@
       const room=premiumRooms[activeIndex];
       content.innerHTML=`<div class="premium-room-owner">
         ${avatarMarkup(profile)}
-        <div><strong>${escapeHtml(profile.nickname||"Hammy Friend")}</strong><p class="muted">Premium room collection</p></div>
+        <div><strong data-i18n-skip="true">${escapeHtml(profile.nickname||"Hammy Friend")}</strong><p class="muted">Premium room collection</p></div>
        </div>
        <div id="premiumRoomTabs" class="premium-room-tabs"></div>
        <h3 id="premiumRoomTitle" class="premium-room-title">${escapeHtml(roomNames[room.room]||"Premium Room")}</h3>

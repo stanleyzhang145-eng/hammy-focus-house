@@ -13,8 +13,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hammy Focus">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="online.css?v=255">
-<link rel="stylesheet" href="cloud.css?v=255">
+<link rel="stylesheet" href="online.css?v=256">
+<link rel="stylesheet" href="cloud.css?v=256">
 <title>Hammy Focus House</title>
 <style>
 :root{--ink:#3e3049;--panel:#fff;--bg:#f5effd;--line:#493951;--accent:#8b63d9;--soft:#eadffc;--fur:#fff;--fur2:#f7f5f1;--patch:transparent}
@@ -2100,8 +2100,100 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
   .room.designer-active:after{max-width:86%;white-space:normal;text-align:center}
 }
 
+
+/* ===== v25.6 Language Mode ===== */
+.language-mode-card,
+.theme-settings-card{
+  margin-top:12px;
+  padding:14px;
+  border:3px solid var(--line);
+  border-radius:20px;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 5px 0 rgba(73,57,81,.1);
+}
+.language-mode-heading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.language-mode-heading h3{margin:2px 0}
+.language-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+.language-option{
+  position:relative;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  gap:10px;
+  min-height:82px;
+  padding:11px;
+  color:var(--text);
+  text-align:left;
+  border:3px solid var(--line);
+  border-radius:16px;
+  background:white;
+  box-shadow:none;
+}
+.language-option:hover{transform:translateY(-1px)}
+.language-option.selected{
+  border-color:var(--accent);
+  outline:4px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  background:linear-gradient(145deg,#fff,#fff4fb);
+}
+.language-option-flag{
+  display:grid;
+  place-items:center;
+  width:43px;
+  height:43px;
+  border:2px solid var(--line);
+  border-radius:13px;
+  background:var(--soft);
+  font-size:1.45rem;
+}
+.language-option-copy{
+  display:grid;
+  gap:2px;
+}
+.language-option-copy strong{font-size:1rem}
+.language-option-copy small{color:#786d83;font-weight:800}
+.language-option-check{
+  position:absolute;
+  right:7px;
+  top:7px;
+  display:grid;
+  place-items:center;
+  width:23px;
+  height:23px;
+  border:2px solid var(--line);
+  border-radius:50%;
+  background:white;
+  font-size:.75rem;
+  font-weight:1000;
+}
+.language-option.selected .language-option-check{
+  color:white;
+  background:var(--accent);
+}
+html[data-game-language="zh-CN"] body,
+html[data-game-language="ja"] body,
+html[data-game-language="ko"] body{
+  line-break:strict;
+}
+@media(max-width:820px){
+  .language-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+  .language-mode-heading{display:grid}
+  .language-grid{grid-template-columns:1fr}
+}
+
 </style>
-<link rel="stylesheet" href="premium.css?v=255">
+<link rel="stylesheet" href="premium.css?v=256">
 </head>
 <body>
 <div class="app"><div class="shell">
@@ -2355,11 +2447,28 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 
 <section id="settingsPage" class="page hidden">
  <h2>Settings</h2>
- <p class="muted">Choose a theme. Your choice saves automatically on this device.</p>
- <div id="themeGrid" class="theme-grid"></div>
- <div class="settings-note">
-  Themes change the app background, buttons, cards, room walls, floor, and window while keeping your progress.
- </div>
+
+ <section class="language-mode-card">
+  <div class="language-mode-heading">
+   <div>
+    <span class="market-kicker">LANGUAGE MODE</span>
+    <h3>Choose your language</h3>
+    <p class="muted">The game changes language immediately and remembers the choice in local and cloud saves.</p>
+   </div>
+   <span id="languageStatusBadge" class="badge-static">ENGLISH</span>
+  </div>
+  <div id="languageGrid" class="language-grid" role="radiogroup" aria-label="Choose game language"></div>
+  <p id="languageModeNote" class="settings-note">Hammy names and player-created nicknames stay unchanged.</p>
+ </section>
+
+ <section class="theme-settings-card">
+  <h3>Theme</h3>
+  <p class="muted">Choose a theme. Your choice saves automatically on this device.</p>
+  <div id="themeGrid" class="theme-grid"></div>
+  <div class="settings-note">
+   Themes change the app background, buttons, cards, room walls, floor, and window while keeping your progress.
+  </div>
+ </section>
 </section>
 
 
@@ -2370,7 +2479,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <p class="muted">Keep Hammy progress, Premium access, and your online profile together across devices.</p>
   </div>
   <div class="cloud-chip-row">
-   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v25.5">Build v25.5</button>
+   <button id="secretAdminTrigger" class="cloud-chip secret-build-trigger" type="button" aria-label="Build v25.6">Build v25.6</button>
    <span id="cloudConnectionChip" class="cloud-chip offline">Checking cloud</span>
   </div>
  </div>
@@ -2543,7 +2652,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <button type="button" id="hideSecretAdmin" class="secondary">Hide</button>
   </div>
   <div id="secretAdminMessage" class="secret-admin-message" aria-live="polite">
-   Tap Build v25.5 seven times whenever you need to show this section.
+   Tap Build v25.6 seven times whenever you need to show this section.
   </div>
  </section>
 
@@ -2591,7 +2700,7 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
    <h2>Hammy Friends Online</h2>
    <p class="muted">Share a safe hamster profile and visit bases using private friend codes.</p>
   </div>
-  <div class="online-build-row"><span class="online-chip">Build v25.5</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
+  <div class="online-build-row"><span class="online-chip">Build v25.6</span><span id="onlineConnectionChip" class="online-chip offline">Offline</span></div>
  </div>
 
  <div class="online-safety-note">
@@ -2691,9 +2800,9 @@ body[data-theme="night"] .focus-failed{background:#5b2f3b;color:#fff}
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"normal_white",breedLook:"cartoon",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},clothes:["shirt","hoodie"],equipped:null,marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},activeBoosters:{coinBooster:0,fruitCharm:0},ownedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},placedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},ownedMarketThemes:{forest:false,candy:false,space:false},ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},furnitureRooms:{},generatedFurnitureRooms:1,currentFurnitureRoom:1,furnitureRoomMigrationV1:false,furnitureLayouts:{},furnitureLayoutMigrationV1:false,designerSnap:true};
+const defaults={coins:40,streak:0,practiceDays:0,totalFocusMinutes:0,sessionCount:0,lastPracticeDate:"",happy:70,hunger:30,energy:85,premium:false,skin:"normal_white",breedLook:"cartoon",language:"en",theme:"lavender",foods:{apple:2,banana:1,berry:0,mango:0,peach:0,grape:0,kiwi:0,watermelon:0},clothes:["shirt","hoodie"],equipped:null,marketInventory:{cozyCocoa:0,joyCookie:0,snackPack:0,coinBooster:0,fruitCharm:0},activeBoosters:{coinBooster:0,fruitCharm:0},ownedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},placedDecorations:{starGarland:false,rainbowBanner:false,flowerPot:false,miniFountain:false,cloudBeanbag:false},ownedMarketThemes:{forest:false,candy:false,space:false},ownedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},placedFurniture:{bed:false,sofa:false,desk:false,plant:false,aquarium:false,tunnel:false,toybox:false,bookshelf:false,lamp:false,rug:false,wheel:false,snack:false,music:false,castle:false,hammock:false,easel:false,piano:false,telescope:false,kitchen:false,climber:false,tea:false,swing:false},furnitureRooms:{},generatedFurnitureRooms:1,currentFurnitureRoom:1,furnitureRoomMigrationV1:false,furnitureLayouts:{},furnitureLayoutMigrationV1:false,designerSnap:true};
 let state;
-try{state={...defaults,...JSON.parse(localStorage.getItem("hammyV8")||localStorage.getItem("hammyV5")||"{}")};state.foods={...defaults.foods,...(state.foods||{})};state.marketInventory={...defaults.marketInventory,...(state.marketInventory||{})};state.activeBoosters={...defaults.activeBoosters,...(state.activeBoosters||{})};state.ownedDecorations={...defaults.ownedDecorations,...(state.ownedDecorations||{})};state.placedDecorations={...defaults.placedDecorations,...(state.placedDecorations||{})};state.ownedMarketThemes={...defaults.ownedMarketThemes,...(state.ownedMarketThemes||{})};state.ownedFurniture={...defaults.ownedFurniture,...(state.ownedFurniture||{})};state.placedFurniture={...defaults.placedFurniture,...(state.placedFurniture||{})};state.furnitureRooms=state.furnitureRooms&&typeof state.furnitureRooms==="object"?state.furnitureRooms:{};state.generatedFurnitureRooms=Math.max(1,Number(state.generatedFurnitureRooms)||1);state.currentFurnitureRoom=Math.max(1,Number(state.currentFurnitureRoom)||1);state.furnitureRoomMigrationV1=Boolean(state.furnitureRoomMigrationV1);state.furnitureLayouts=state.furnitureLayouts&&typeof state.furnitureLayouts==="object"?state.furnitureLayouts:{};state.furnitureLayoutMigrationV1=Boolean(state.furnitureLayoutMigrationV1);state.designerSnap=state.designerSnap!==false;state.practiceDays=Number(state.practiceDays||0);state.totalFocusMinutes=Number(state.totalFocusMinutes||0);state.sessionCount=Number(state.sessionCount||0);state.lastPracticeDate=state.lastPracticeDate||"";state.breedLook=["realistic","cartoon"].includes(state.breedLook)?state.breedLook:"cartoon";state.theme=state.theme||"lavender"}catch{state=structuredClone(defaults)}
+try{state={...defaults,...JSON.parse(localStorage.getItem("hammyV8")||localStorage.getItem("hammyV5")||"{}")};state.foods={...defaults.foods,...(state.foods||{})};state.marketInventory={...defaults.marketInventory,...(state.marketInventory||{})};state.activeBoosters={...defaults.activeBoosters,...(state.activeBoosters||{})};state.ownedDecorations={...defaults.ownedDecorations,...(state.ownedDecorations||{})};state.placedDecorations={...defaults.placedDecorations,...(state.placedDecorations||{})};state.ownedMarketThemes={...defaults.ownedMarketThemes,...(state.ownedMarketThemes||{})};state.ownedFurniture={...defaults.ownedFurniture,...(state.ownedFurniture||{})};state.placedFurniture={...defaults.placedFurniture,...(state.placedFurniture||{})};state.furnitureRooms=state.furnitureRooms&&typeof state.furnitureRooms==="object"?state.furnitureRooms:{};state.generatedFurnitureRooms=Math.max(1,Number(state.generatedFurnitureRooms)||1);state.currentFurnitureRoom=Math.max(1,Number(state.currentFurnitureRoom)||1);state.furnitureRoomMigrationV1=Boolean(state.furnitureRoomMigrationV1);state.furnitureLayouts=state.furnitureLayouts&&typeof state.furnitureLayouts==="object"?state.furnitureLayouts:{};state.furnitureLayoutMigrationV1=Boolean(state.furnitureLayoutMigrationV1);state.designerSnap=state.designerSnap!==false;state.practiceDays=Number(state.practiceDays||0);state.totalFocusMinutes=Number(state.totalFocusMinutes||0);state.sessionCount=Number(state.sessionCount||0);state.lastPracticeDate=state.lastPracticeDate||"";state.breedLook=["realistic","cartoon"].includes(state.breedLook)?state.breedLook:"cartoon";state.language=["en","fr","es","zh-CN","ja","ko"].includes(state.language)?state.language:"en";state.theme=state.theme||"lavender"}catch{state=structuredClone(defaults)}
 const hamsterColors={
  white:{name:"White",fur:"#fff",fur2:"#f7f5f1",patch:"transparent",swatch:"#ffffff"},
  orange:{name:"Orange",fur:"#e89a3f",fur2:"#fff0d1",patch:"transparent",swatch:"#e89a3f"},
@@ -2808,7 +2917,211 @@ function applyTheme(){
  const meta=document.querySelector('meta[name="theme-color"]');
  if(meta)meta.content=themes[state.theme].swatches[1];
 }
+
+const languageOptions={"en":{"native":"English","english":"English","flag":"EN","badge":"ENGLISH"},"fr":{"native":"Français","english":"French","flag":"FR","badge":"FRANÇAIS"},"es":{"native":"Español","english":"Spanish","flag":"ES","badge":"ESPAÑOL"},"zh-CN":{"native":"简体中文","english":"Simplified Chinese","flag":"中","badge":"简体中文"},"ja":{"native":"日本語","english":"Japanese","flag":"日","badge":"日本語"},"ko":{"native":"한국어","english":"Korean","flag":"한","badge":"한국어"}};
+const languageTranslations={"fr":{"Home":"Accueil","Focus":"Concentration","Fruit":"Fruits","Market":"Marché","Furniture":"Meubles","Hamsters":"Hamsters","Clothing":"Vêtements","Settings":"Réglages","Account":"Compte","Friends":"Amis","Coins:":"Pièces :","Day streak:":"Série de jours :","Practice days:":"Jours de pratique :","Loot Lv.":"Niv. butin","Happy":"Bonheur","Hunger":"Faim","Energy":"Énergie","HAMMY NEWS":"ACTUALITÉS HAMMY","Hammy News":"Actualités Hammy","Dismiss":"Fermer","Sleep":"Dormir","Sit":"S’asseoir","Study":"Étudier","Smell":"Sentir","Watch":"Regarder","Crawl":"Ramper","Play":"Jouer","Read":"Lire","Glow":"Briller","Nap":"Sieste","Run":"Courir","Snack":"Goûter","Dance":"Danser","Explore":"Explorer","Rest":"Se reposer","Paint":"Peindre","Look":"Observer","Cook":"Cuisiner","Climb":"Grimper","Tea":"Thé","Swing":"Se balancer","Tap Nibbles or press Tickle.":"Touchez Nibbles ou appuyez sur Chatouiller.","Door / Exit":"Porte / Sortie","Hammy space":"Espace de Hammy","ROOM DESIGNER":"CRÉATEUR DE PIÈCE","Press Edit Room, then drag furniture.":"Appuyez sur Modifier la pièce, puis faites glisser les meubles.","Edit Room":"Modifier la pièce","Select furniture":"Sélectionnez un meuble","Rotate":"Tourner","Flip":"Retourner","Snap to grid":"Aligner sur la grille","Move room":"Changer de pièce","Put in storage":"Ranger","Undo":"Annuler","Finish Editing":"Terminer","Your rooms":"Vos pièces","Tap a thumbnail to visit it.":"Touchez une miniature pour visiter la pièce.","Tickle Nibbles":"Chatouiller Nibbles","Use treadmill":"Utiliser le tapis","Stop running":"Arrêter de courir","Focus with Nibbles":"Se concentrer avec Nibbles","Complete the timer to earn coins and fruit.":"Terminez le minuteur pour gagner des pièces et des fruits.","Task":"Tâche","Time":"Durée","Ready":"Prêt","Start focus":"Commencer","Pause":"Pause","Cancel":"Annuler","Practice level":"Niveau de pratique","Raises loot quality":"Améliore la qualité du butin","Total focus":"Concentration totale","All completed sessions":"Toutes les séances terminées","Next costume":"Prochain costume","Practice-day milestone":"Étape de jours de pratique","Homework":"Devoirs","Reading":"Lecture","Studying":"Étude","Math practice":"Mathématiques","Writing":"Écriture","Science work":"Sciences","Language practice":"Langues","Music practice":"Musique","Piano practice":"Piano","Art or drawing":"Art ou dessin","Coding":"Programmation","Cleaning":"Nettoyage","Chores":"Corvées","Exercise":"Exercice","Meditation":"Méditation","Organizing":"Organisation","Creative project":"Projet créatif","Custom task":"Tâche personnalisée","20-second demo":"Démo de 20 secondes","1 minute":"1 minute","3 minutes":"3 minutes","5 minutes":"5 minutes","10 minutes":"10 minutes","15 minutes":"15 minutes","20 minutes":"20 minutes","25 minutes":"25 minutes","30 minutes":"30 minutes","45 minutes":"45 minutes","1 hour":"1 heure","1 hour 30 minutes":"1 heure 30 minutes","2 hours":"2 heures","Fruit pantry":"Garde-manger de fruits","Hammy Market":"Marché Hammy","Spend focus coins on snacks, boosters, decorations, fruit, and new themes.":"Dépensez vos pièces de concentration en goûters, bonus, décorations, fruits et thèmes.","DAILY SPECIAL":"OFFRE DU JOUR","Loading special…":"Chargement…","Buy":"Acheter","Snacks and Boosters":"Goûters et bonus","Room Decorations":"Décorations de pièce","Theme Licenses":"Thèmes","Furniture Shop":"Boutique de meubles","Each room holds six furniture pieces. Use the arrows in the Home room to move between rooms.":"Chaque pièce contient six meubles. Utilisez les flèches de l’accueil pour changer de pièce.","ROOM STORAGE":"RANGEMENT","Premium automatically creates another room when needed.":"Premium crée automatiquement une nouvelle pièce si nécessaire.","View current room":"Voir la pièce actuelle","Choose a Hamster Breed and Color":"Choisir une race et une couleur","Every breed has the same six colors. Free players can use only the White Normal Hamster.":"Chaque race propose les mêmes six couleurs. Les joueurs gratuits peuvent utiliser seulement le hamster normal blanc.","Demo unlock Premium":"Débloquer la démo Premium","BREED LOOK":"STYLE DE RACE","Choose how the breeds are drawn":"Choisissez le style des races","This changes the face and proportions while keeping each breed recognizable.":"Cela change le visage et les proportions tout en gardant chaque race reconnaissable.","CARTOON-CUTE":"MIGNON-CARTOON","REALISTIC-CUTE":"MIGNON-RÉALISTE","BREED COLLECTION":"COLLECTION DE RACES","SPECIAL COLLECTION":"COLLECTION SPÉCIALE","Fantasy and Custom Hamsters":"Hamsters fantastiques et personnalisés","PREMIUM":"PREMIUM","FREE":"GRATUIT","LOCKED":"VERROUILLÉ","CHOOSE":"CHOISIR","USING":"UTILISÉ","Selected":"Sélectionné","Use":"Utiliser","Wear or unequip fitted clothing.":"Portez ou retirez les vêtements ajustés.","Wear":"Porter","Unequip":"Retirer","Theme":"Thème","Choose a theme. Your choice saves automatically on this device.":"Choisissez un thème. Votre choix est enregistré automatiquement.","Themes change the app background, buttons, cards, room walls, floor, and window while keeping your progress.":"Les thèmes modifient l’arrière-plan, les boutons, les cartes et la pièce sans perdre votre progression.","Currently selected":"Actuellement sélectionné","Tap to apply":"Touchez pour appliquer","LANGUAGE MODE":"MODE DE LANGUE","Choose your language":"Choisissez votre langue","The game changes language immediately and remembers the choice in local and cloud saves.":"Le jeu change de langue immédiatement et mémorise ce choix localement et dans le cloud.","Hammy names and player-created nicknames stay unchanged.":"Les noms de Hammy et les surnoms créés par les joueurs ne changent pas.","Choose game language":"Choisir la langue du jeu","Language changed.":"Langue modifiée.","Cloud Account":"Compte cloud","Keep Hammy progress, Premium access, and your online profile together across devices.":"Gardez la progression, Premium et votre profil en ligne sur plusieurs appareils.","Checking cloud":"Vérification du cloud","Retry connection":"Réessayer","My Hammy account":"Mon compte Hammy","Guest":"Invité","Player ID":"ID joueur","Copy":"Copier","Recovery code":"Code de récupération","Cloud revision":"Révision cloud","Last synced":"Dernière synchro","Never":"Jamais","Device":"Appareil","This device":"Cet appareil","Sync now":"Synchroniser","Restore on another device":"Restaurer sur un autre appareil","Sign in and compare saves":"Se connecter et comparer","Create a brand-new cloud account":"Créer un nouveau compte cloud","Create new cloud account":"Créer le compte","Permanent":"Permanent","The old account cannot be restored afterward.":"L’ancien compte ne pourra pas être restauré.","Delete old account and create fresh account":"Supprimer l’ancien compte et recommencer","Exclusive Collection":"Collection exclusive","Reward":"Récompense","Mystery reward":"Récompense mystère","Time remaining":"Temps restant","Claim event reward":"Réclamer la récompense","No exclusive items yet.":"Aucun objet exclusif.","Private Reward Codes":"Codes de récompense privés","Reward code":"Code de récompense","Redeem code":"Utiliser le code","Hammy Friends Online":"Amis Hammy en ligne","Offline":"Hors ligne","My shared profile":"Mon profil partagé","Nickname":"Surnom","Public — appears in gallery":"Public — apparaît dans la galerie","Unlisted — only code or link":"Non répertorié — code ou lien seulement","White":"Blanc","Orange":"Orange","Black & White":"Noir et blanc","Caramel":"Caramel","Silver":"Argent","Strawberry":"Fraise","Classic Syrian Breed":"Race syrienne classique","Teddy Bear Breed":"Race nounours","Long-Haired Breed":"Race à poils longs","Winter Dwarf Breed":"Race naine d’hiver","Satin Syrian Breed":"Race syrienne satinée","Floppy-Ear Fantasy Breed":"Race fantastique aux oreilles tombantes","Cozy Bed":"Lit douillet","Tiny Sofa":"Petit canapé","Study Desk":"Bureau d’étude","Berry Plant":"Plante à baies","Mini Aquarium":"Mini aquarium","Play Tunnel":"Tunnel de jeu","Toy Box":"Coffre à jouets","Book Shelf":"Bibliothèque","Moon Lamp":"Lampe lune","Cloud Rug":"Tapis nuage","Deluxe Running Wheel":"Roue de course deluxe","Snack Table":"Table à goûter","Music Player":"Lecteur de musique","Hamster Castle":"Château hamster","Leaf Hammock":"Hamac feuille","Tiny Art Easel":"Petit chevalet","Mini Hammy Piano":"Mini piano Hammy","Star Telescope":"Télescope étoilé","Mini Kitchen":"Mini cuisine","Climbing Tower":"Tour d’escalade","Friendship Tea Table":"Table de thé d’amitié","Cloud Swing":"Balançoire nuage","Focus Shirt":"T-shirt concentration","Cloud Hoodie":"Sweat nuage","Berry Bow":"Nœud baie","Cozy Scarf":"Écharpe douillette","Explorer Hat":"Chapeau d’explorateur","Study Glasses":"Lunettes d’étude","Star Pajamas":"Pyjama étoilé","Hero Cape":"Cape de héros","Garden Overalls":"Salopette de jardin","Adventure Backpack":"Sac d’aventure","Baker Apron":"Tablier de boulanger","Champion Jacket":"Veste de champion","Moonlight Pajamas":"Pyjama clair de lune","Golden Focus Crown":"Couronne dorée","Galaxy Hoodie":"Sweat galaxie","Royal Pajamas":"Pyjama royal","Apple":"Pomme","Banana":"Banane","Berry":"Baie","Mango":"Mangue","Peach":"Pêche","Grape":"Raisin","Kiwi":"Kiwi","Watermelon":"Pastèque"},"es":{"Home":"Inicio","Focus":"Concentración","Fruit":"Fruta","Market":"Mercado","Furniture":"Muebles","Hamsters":"Hámsteres","Clothing":"Ropa","Settings":"Ajustes","Account":"Cuenta","Friends":"Amigos","Coins:":"Monedas:","Day streak:":"Racha diaria:","Practice days:":"Días de práctica:","Loot Lv.":"Nv. botín","Happy":"Felicidad","Hunger":"Hambre","Energy":"Energía","HAMMY NEWS":"NOTICIAS HAMMY","Hammy News":"Noticias Hammy","Dismiss":"Cerrar","Sleep":"Dormir","Sit":"Sentarse","Study":"Estudiar","Smell":"Oler","Watch":"Mirar","Crawl":"Gatear","Play":"Jugar","Read":"Leer","Glow":"Brillar","Nap":"Siesta","Run":"Correr","Snack":"Comer","Dance":"Bailar","Explore":"Explorar","Rest":"Descansar","Paint":"Pintar","Look":"Observar","Cook":"Cocinar","Climb":"Trepar","Tea":"Té","Swing":"Columpiarse","Tap Nibbles or press Tickle.":"Toca a Nibbles o pulsa Cosquillas.","Door / Exit":"Puerta / Salida","Hammy space":"Espacio de Hammy","ROOM DESIGNER":"DISEÑADOR DE HABITACIONES","Press Edit Room, then drag furniture.":"Pulsa Editar habitación y arrastra los muebles.","Edit Room":"Editar habitación","Select furniture":"Selecciona un mueble","Rotate":"Girar","Flip":"Voltear","Snap to grid":"Ajustar a cuadrícula","Move room":"Mover de habitación","Put in storage":"Guardar","Undo":"Deshacer","Finish Editing":"Terminar edición","Your rooms":"Tus habitaciones","Tap a thumbnail to visit it.":"Toca una miniatura para visitarla.","Tickle Nibbles":"Hacer cosquillas","Use treadmill":"Usar caminadora","Stop running":"Dejar de correr","Focus with Nibbles":"Concéntrate con Nibbles","Complete the timer to earn coins and fruit.":"Completa el temporizador para ganar monedas y fruta.","Task":"Tarea","Time":"Tiempo","Ready":"Listo","Start focus":"Empezar","Pause":"Pausa","Cancel":"Cancelar","Practice level":"Nivel de práctica","Raises loot quality":"Mejora la calidad del botín","Total focus":"Concentración total","All completed sessions":"Todas las sesiones completadas","Next costume":"Próximo traje","Practice-day milestone":"Meta de días de práctica","Homework":"Tarea escolar","Reading":"Lectura","Studying":"Estudio","Math practice":"Práctica de matemáticas","Writing":"Escritura","Science work":"Ciencias","Language practice":"Idiomas","Music practice":"Música","Piano practice":"Piano","Art or drawing":"Arte o dibujo","Coding":"Programación","Cleaning":"Limpieza","Chores":"Quehaceres","Exercise":"Ejercicio","Meditation":"Meditación","Organizing":"Organización","Creative project":"Proyecto creativo","Custom task":"Tarea personalizada","20-second demo":"Demo de 20 segundos","1 minute":"1 minuto","3 minutes":"3 minutos","5 minutes":"5 minutos","10 minutes":"10 minutos","15 minutes":"15 minutos","20 minutes":"20 minutos","25 minutes":"25 minutos","30 minutes":"30 minutos","45 minutes":"45 minutos","1 hour":"1 hora","1 hour 30 minutes":"1 hora 30 minutos","2 hours":"2 horas","Fruit pantry":"Despensa de fruta","Hammy Market":"Mercado Hammy","Spend focus coins on snacks, boosters, decorations, fruit, and new themes.":"Gasta monedas de concentración en comida, mejoras, decoraciones, fruta y temas.","DAILY SPECIAL":"OFERTA DIARIA","Loading special…":"Cargando…","Buy":"Comprar","Snacks and Boosters":"Comida y mejoras","Room Decorations":"Decoraciones","Theme Licenses":"Temas","Furniture Shop":"Tienda de muebles","Each room holds six furniture pieces. Use the arrows in the Home room to move between rooms.":"Cada habitación admite seis muebles. Usa las flechas de Inicio para cambiar de habitación.","ROOM STORAGE":"ALMACENAMIENTO","Premium automatically creates another room when needed.":"Premium crea otra habitación automáticamente cuando sea necesario.","View current room":"Ver habitación actual","Choose a Hamster Breed and Color":"Elige raza y color","Every breed has the same six colors. Free players can use only the White Normal Hamster.":"Cada raza tiene los mismos seis colores. Los jugadores gratis solo pueden usar el hámster normal blanco.","Demo unlock Premium":"Desbloquear demo Premium","BREED LOOK":"ESTILO DE RAZA","Choose how the breeds are drawn":"Elige cómo se dibujan las razas","This changes the face and proportions while keeping each breed recognizable.":"Cambia la cara y las proporciones sin perder la identidad de cada raza.","CARTOON-CUTE":"TIERNO-CARICATURA","REALISTIC-CUTE":"TIERNO-REALISTA","BREED COLLECTION":"COLECCIÓN DE RAZAS","SPECIAL COLLECTION":"COLECCIÓN ESPECIAL","Fantasy and Custom Hamsters":"Hámsteres fantásticos y personalizados","PREMIUM":"PREMIUM","FREE":"GRATIS","LOCKED":"BLOQUEADO","CHOOSE":"ELEGIR","USING":"EN USO","Selected":"Seleccionado","Use":"Usar","Wear or unequip fitted clothing.":"Ponte o quítate ropa ajustada.","Wear":"Poner","Unequip":"Quitar","Theme":"Tema","Choose a theme. Your choice saves automatically on this device.":"Elige un tema. Se guardará automáticamente en este dispositivo.","Themes change the app background, buttons, cards, room walls, floor, and window while keeping your progress.":"Los temas cambian el fondo, botones, tarjetas y habitación sin perder tu progreso.","Currently selected":"Seleccionado actualmente","Tap to apply":"Toca para aplicar","LANGUAGE MODE":"MODO DE IDIOMA","Choose your language":"Elige tu idioma","The game changes language immediately and remembers the choice in local and cloud saves.":"El juego cambia de idioma al instante y guarda la elección localmente y en la nube.","Hammy names and player-created nicknames stay unchanged.":"Los nombres de Hammy y los apodos creados por jugadores no cambian.","Choose game language":"Elegir idioma del juego","Language changed.":"Idioma cambiado.","Cloud Account":"Cuenta en la nube","Keep Hammy progress, Premium access, and your online profile together across devices.":"Mantén el progreso, Premium y tu perfil en línea en varios dispositivos.","Checking cloud":"Comprobando la nube","Retry connection":"Reintentar","My Hammy account":"Mi cuenta Hammy","Guest":"Invitado","Player ID":"ID de jugador","Copy":"Copiar","Recovery code":"Código de recuperación","Cloud revision":"Revisión de nube","Last synced":"Última sincronización","Never":"Nunca","Device":"Dispositivo","This device":"Este dispositivo","Sync now":"Sincronizar","Restore on another device":"Restaurar en otro dispositivo","Sign in and compare saves":"Iniciar sesión y comparar","Create a brand-new cloud account":"Crear una cuenta nueva","Create new cloud account":"Crear cuenta","Permanent":"Permanente","The old account cannot be restored afterward.":"La cuenta anterior no podrá recuperarse.","Delete old account and create fresh account":"Borrar cuenta anterior y empezar de nuevo","Exclusive Collection":"Colección exclusiva","Reward":"Recompensa","Mystery reward":"Recompensa misteriosa","Time remaining":"Tiempo restante","Claim event reward":"Reclamar recompensa","No exclusive items yet.":"Todavía no hay objetos exclusivos.","Private Reward Codes":"Códigos de recompensa privados","Reward code":"Código de recompensa","Redeem code":"Canjear código","Hammy Friends Online":"Amigos Hammy en línea","Offline":"Sin conexión","My shared profile":"Mi perfil compartido","Nickname":"Apodo","Public — appears in gallery":"Público — aparece en la galería","Unlisted — only code or link":"No listado — solo código o enlace","White":"Blanco","Orange":"Naranja","Black & White":"Blanco y negro","Caramel":"Caramelo","Silver":"Plateado","Strawberry":"Fresa","Classic Syrian Breed":"Raza siria clásica","Teddy Bear Breed":"Raza osito","Long-Haired Breed":"Raza de pelo largo","Winter Dwarf Breed":"Raza enana de invierno","Satin Syrian Breed":"Raza siria satinada","Floppy-Ear Fantasy Breed":"Raza fantástica de orejas caídas","Cozy Bed":"Cama acogedora","Tiny Sofa":"Sofá pequeño","Study Desk":"Escritorio de estudio","Berry Plant":"Planta de bayas","Mini Aquarium":"Mini acuario","Play Tunnel":"Túnel de juego","Toy Box":"Caja de juguetes","Book Shelf":"Estantería","Moon Lamp":"Lámpara lunar","Cloud Rug":"Alfombra nube","Deluxe Running Wheel":"Rueda de ejercicio deluxe","Snack Table":"Mesa de comida","Music Player":"Reproductor de música","Hamster Castle":"Castillo para hámster","Leaf Hammock":"Hamaca de hoja","Tiny Art Easel":"Caballete pequeño","Mini Hammy Piano":"Mini piano Hammy","Star Telescope":"Telescopio estelar","Mini Kitchen":"Mini cocina","Climbing Tower":"Torre para trepar","Friendship Tea Table":"Mesa de té de amistad","Cloud Swing":"Columpio nube","Focus Shirt":"Camiseta de concentración","Cloud Hoodie":"Sudadera nube","Berry Bow":"Lazo de baya","Cozy Scarf":"Bufanda acogedora","Explorer Hat":"Sombrero de explorador","Study Glasses":"Gafas de estudio","Star Pajamas":"Pijama estrellado","Hero Cape":"Capa de héroe","Garden Overalls":"Peto de jardín","Adventure Backpack":"Mochila de aventura","Baker Apron":"Delantal de panadero","Champion Jacket":"Chaqueta de campeón","Moonlight Pajamas":"Pijama luz de luna","Golden Focus Crown":"Corona dorada","Galaxy Hoodie":"Sudadera galaxia","Royal Pajamas":"Pijama real","Apple":"Manzana","Banana":"Banana","Berry":"Baya","Mango":"Mango","Peach":"Melocotón","Grape":"Uva","Kiwi":"Kiwi","Watermelon":"Sandía"},"zh-CN":{"Home":"主页","Focus":"专注","Fruit":"水果","Market":"商店","Furniture":"家具","Hamsters":"仓鼠","Clothing":"服装","Settings":"设置","Account":"账号","Friends":"好友","Coins:":"金币：","Day streak:":"连续天数：","Practice days:":"练习天数：","Loot Lv.":"奖励等级","Happy":"快乐","Hunger":"饥饿","Energy":"精力","HAMMY NEWS":"HAMMY 新闻","Hammy News":"Hammy 新闻","Dismiss":"关闭","Sleep":"睡觉","Sit":"坐下","Study":"学习","Smell":"闻一闻","Watch":"观看","Crawl":"钻过","Play":"玩耍","Read":"阅读","Glow":"发光","Nap":"小睡","Run":"跑步","Snack":"吃点心","Dance":"跳舞","Explore":"探索","Rest":"休息","Paint":"画画","Look":"观察","Cook":"做饭","Climb":"攀爬","Tea":"喝茶","Swing":"荡秋千","Tap Nibbles or press Tickle.":"点击 Nibbles 或按“挠痒痒”。","Door / Exit":"门 / 出口","Hammy space":"Hammy 空间","ROOM DESIGNER":"房间设计器","Press Edit Room, then drag furniture.":"按“编辑房间”，然后拖动家具。","Edit Room":"编辑房间","Select furniture":"选择家具","Rotate":"旋转","Flip":"翻转","Snap to grid":"吸附网格","Move room":"移动到房间","Put in storage":"放入仓库","Undo":"撤销","Finish Editing":"完成编辑","Your rooms":"你的房间","Tap a thumbnail to visit it.":"点击缩略图进入房间。","Tickle Nibbles":"挠 Nibbles 痒痒","Use treadmill":"使用跑步机","Stop running":"停止跑步","Focus with Nibbles":"和 Nibbles 一起专注","Complete the timer to earn coins and fruit.":"完成计时即可获得金币和水果。","Task":"任务","Time":"时间","Ready":"准备好","Start focus":"开始专注","Pause":"暂停","Cancel":"取消","Practice level":"练习等级","Raises loot quality":"提高奖励品质","Total focus":"总专注时间","All completed sessions":"所有完成的专注","Next costume":"下一个服装","Practice-day milestone":"练习天数里程碑","Homework":"作业","Reading":"阅读","Studying":"学习","Math practice":"数学练习","Writing":"写作","Science work":"科学作业","Language practice":"语言练习","Music practice":"音乐练习","Piano practice":"钢琴练习","Art or drawing":"美术或绘画","Coding":"编程","Cleaning":"清洁","Chores":"家务","Exercise":"运动","Meditation":"冥想","Organizing":"整理","Creative project":"创意项目","Custom task":"自定义任务","20-second demo":"20 秒演示","1 minute":"1 分钟","3 minutes":"3 分钟","5 minutes":"5 分钟","10 minutes":"10 分钟","15 minutes":"15 分钟","20 minutes":"20 分钟","25 minutes":"25 分钟","30 minutes":"30 分钟","45 minutes":"45 分钟","1 hour":"1 小时","1 hour 30 minutes":"1 小时 30 分钟","2 hours":"2 小时","Fruit pantry":"水果储藏室","Hammy Market":"Hammy 商店","Spend focus coins on snacks, boosters, decorations, fruit, and new themes.":"使用专注金币购买点心、增益、装饰、水果和新主题。","DAILY SPECIAL":"每日特惠","Loading special…":"正在加载…","Buy":"购买","Snacks and Boosters":"点心与增益","Room Decorations":"房间装饰","Theme Licenses":"主题","Furniture Shop":"家具商店","Each room holds six furniture pieces. Use the arrows in the Home room to move between rooms.":"每个房间最多放 6 件家具。使用主页房间里的箭头切换房间。","ROOM STORAGE":"房间收纳","Premium automatically creates another room when needed.":"需要时，Premium 会自动创建新房间。","View current room":"查看当前房间","Choose a Hamster Breed and Color":"选择仓鼠品种和颜色","Every breed has the same six colors. Free players can use only the White Normal Hamster.":"每个品种都有相同的六种颜色。免费玩家只能使用白色普通仓鼠。","Demo unlock Premium":"演示解锁 Premium","BREED LOOK":"品种画风","Choose how the breeds are drawn":"选择品种的画风","This changes the face and proportions while keeping each breed recognizable.":"这会改变脸型和比例，同时保留每个品种的特点。","CARTOON-CUTE":"卡通可爱","REALISTIC-CUTE":"写实可爱","BREED COLLECTION":"品种收藏","SPECIAL COLLECTION":"特别收藏","Fantasy and Custom Hamsters":"幻想与自定义仓鼠","PREMIUM":"PREMIUM","FREE":"免费","LOCKED":"已锁定","CHOOSE":"选择","USING":"使用中","Selected":"已选择","Use":"使用","Wear or unequip fitted clothing.":"穿上或脱下合身服装。","Wear":"穿上","Unequip":"脱下","Theme":"主题","Choose a theme. Your choice saves automatically on this device.":"选择主题。选项会自动保存在此设备。","Themes change the app background, buttons, cards, room walls, floor, and window while keeping your progress.":"主题会改变背景、按钮、卡片和房间外观，不会影响进度。","Currently selected":"当前已选择","Tap to apply":"点击应用","LANGUAGE MODE":"语言模式","Choose your language":"选择语言","The game changes language immediately and remembers the choice in local and cloud saves.":"游戏会立即切换语言，并保存在本地和云端存档中。","Hammy names and player-created nicknames stay unchanged.":"Hammy 名字和玩家创建的昵称不会被翻译。","Choose game language":"选择游戏语言","Language changed.":"语言已更改。","Cloud Account":"云端账号","Keep Hammy progress, Premium access, and your online profile together across devices.":"在不同设备间同步 Hammy 进度、Premium 和在线资料。","Checking cloud":"正在检查云端","Retry connection":"重试连接","My Hammy account":"我的 Hammy 账号","Guest":"访客","Player ID":"玩家 ID","Copy":"复制","Recovery code":"恢复码","Cloud revision":"云端版本","Last synced":"上次同步","Never":"从未","Device":"设备","This device":"此设备","Sync now":"立即同步","Restore on another device":"在另一台设备恢复","Sign in and compare saves":"登录并比较存档","Create a brand-new cloud account":"创建全新云端账号","Create new cloud account":"创建新账号","Permanent":"永久","The old account cannot be restored afterward.":"旧账号之后无法恢复。","Delete old account and create fresh account":"删除旧账号并重新开始","Exclusive Collection":"专属收藏","Reward":"奖励","Mystery reward":"神秘奖励","Time remaining":"剩余时间","Claim event reward":"领取活动奖励","No exclusive items yet.":"还没有专属物品。","Private Reward Codes":"私人奖励码","Reward code":"奖励码","Redeem code":"兑换","Hammy Friends Online":"Hammy 在线好友","Offline":"离线","My shared profile":"我的公开资料","Nickname":"昵称","Public — appears in gallery":"公开 — 显示在画廊","Unlisted — only code or link":"不公开 — 只能通过代码或链接","White":"白色","Orange":"橙色","Black & White":"黑白","Caramel":"焦糖色","Silver":"银色","Strawberry":"草莓色","Classic Syrian Breed":"经典叙利亚品种","Teddy Bear Breed":"泰迪熊品种","Long-Haired Breed":"长毛品种","Winter Dwarf Breed":"冬白侏儒品种","Satin Syrian Breed":"缎毛叙利亚品种","Floppy-Ear Fantasy Breed":"垂耳幻想品种","Cozy Bed":"舒适小床","Tiny Sofa":"迷你沙发","Study Desk":"学习桌","Berry Plant":"浆果植物","Mini Aquarium":"迷你水族箱","Play Tunnel":"玩耍隧道","Toy Box":"玩具箱","Book Shelf":"书架","Moon Lamp":"月亮灯","Cloud Rug":"云朵地毯","Deluxe Running Wheel":"豪华跑轮","Snack Table":"点心桌","Music Player":"音乐播放器","Hamster Castle":"仓鼠城堡","Leaf Hammock":"叶子吊床","Tiny Art Easel":"迷你画架","Mini Hammy Piano":"迷你 Hammy 钢琴","Star Telescope":"星空望远镜","Mini Kitchen":"迷你厨房","Climbing Tower":"攀爬塔","Friendship Tea Table":"友谊茶桌","Cloud Swing":"云朵秋千","Focus Shirt":"专注上衣","Cloud Hoodie":"云朵连帽衫","Berry Bow":"浆果蝴蝶结","Cozy Scarf":"舒适围巾","Explorer Hat":"探险帽","Study Glasses":"学习眼镜","Star Pajamas":"星星睡衣","Hero Cape":"英雄披风","Garden Overalls":"花园背带裤","Adventure Backpack":"探险背包","Baker Apron":"烘焙围裙","Champion Jacket":"冠军夹克","Moonlight Pajamas":"月光睡衣","Golden Focus Crown":"金色专注皇冠","Galaxy Hoodie":"银河连帽衫","Royal Pajamas":"皇家睡衣","Apple":"苹果","Banana":"香蕉","Berry":"浆果","Mango":"芒果","Peach":"桃子","Grape":"葡萄","Kiwi":"奇异果","Watermelon":"西瓜"},"ja":{"Home":"ホーム","Focus":"集中","Fruit":"フルーツ","Market":"マーケット","Furniture":"家具","Hamsters":"ハムスター","Clothing":"服","Settings":"設定","Account":"アカウント","Friends":"フレンド","Coins:":"コイン：","Day streak:":"連続日数：","Practice days:":"練習日数：","Loot Lv.":"報酬Lv.","Happy":"しあわせ","Hunger":"おなか","Energy":"げんき","HAMMY NEWS":"HAMMY ニュース","Hammy News":"Hammy ニュース","Dismiss":"閉じる","Sleep":"ねる","Sit":"すわる","Study":"勉強","Smell":"におう","Watch":"見る","Crawl":"くぐる","Play":"遊ぶ","Read":"読む","Glow":"光る","Nap":"お昼寝","Run":"走る","Snack":"おやつ","Dance":"踊る","Explore":"探検","Rest":"休む","Paint":"描く","Look":"のぞく","Cook":"料理","Climb":"登る","Tea":"お茶","Swing":"ブランコ","Tap Nibbles or press Tickle.":"Nibbles をタップするか、くすぐるを押してください。","Door / Exit":"ドア / 出口","Hammy space":"Hammy のスペース","ROOM DESIGNER":"ルームデザイナー","Press Edit Room, then drag furniture.":"「部屋を編集」を押して家具をドラッグします。","Edit Room":"部屋を編集","Select furniture":"家具を選択","Rotate":"回転","Flip":"反転","Snap to grid":"グリッドに合わせる","Move room":"別の部屋へ","Put in storage":"収納する","Undo":"元に戻す","Finish Editing":"編集を完了","Your rooms":"あなたの部屋","Tap a thumbnail to visit it.":"サムネイルをタップして移動します。","Tickle Nibbles":"Nibbles をくすぐる","Use treadmill":"トレッドミルを使う","Stop running":"走るのをやめる","Focus with Nibbles":"Nibbles と集中","Complete the timer to earn coins and fruit.":"タイマーを完了するとコインとフルーツを獲得できます。","Task":"タスク","Time":"時間","Ready":"準備完了","Start focus":"集中を開始","Pause":"一時停止","Cancel":"キャンセル","Practice level":"練習レベル","Raises loot quality":"報酬の品質が上がる","Total focus":"合計集中時間","All completed sessions":"完了したセッション","Next costume":"次の衣装","Practice-day milestone":"練習日数の目標","Homework":"宿題","Reading":"読書","Studying":"勉強","Math practice":"算数・数学","Writing":"作文","Science work":"理科","Language practice":"語学","Music practice":"音楽","Piano practice":"ピアノ","Art or drawing":"絵・お絵描き","Coding":"プログラミング","Cleaning":"掃除","Chores":"お手伝い","Exercise":"運動","Meditation":"瞑想","Organizing":"整理","Creative project":"創作プロジェクト","Custom task":"カスタムタスク","20-second demo":"20秒デモ","1 minute":"1分","3 minutes":"3分","5 minutes":"5分","10 minutes":"10分","15 minutes":"15分","20 minutes":"20分","25 minutes":"25分","30 minutes":"30分","45 minutes":"45分","1 hour":"1時間","1 hour 30 minutes":"1時間30分","2 hours":"2時間","Fruit pantry":"フルーツ棚","Hammy Market":"Hammy マーケット","Spend focus coins on snacks, boosters, decorations, fruit, and new themes.":"集中コインでおやつ、ブースター、飾り、フルーツ、テーマを購入できます。","DAILY SPECIAL":"本日の特売","Loading special…":"読み込み中…","Buy":"購入","Snacks and Boosters":"おやつとブースター","Room Decorations":"部屋の飾り","Theme Licenses":"テーマ","Furniture Shop":"家具ショップ","Each room holds six furniture pieces. Use the arrows in the Home room to move between rooms.":"各部屋には家具を6個置けます。ホームの矢印で部屋を切り替えます。","ROOM STORAGE":"ルーム収納","Premium automatically creates another room when needed.":"Premium は必要なときに新しい部屋を自動作成します。","View current room":"現在の部屋を見る","Choose a Hamster Breed and Color":"品種と色を選ぶ","Every breed has the same six colors. Free players can use only the White Normal Hamster.":"すべての品種に同じ6色があります。無料プレイヤーは白いノーマルハムスターのみ使えます。","Demo unlock Premium":"Premium デモを解除","BREED LOOK":"品種の見た目","Choose how the breeds are drawn":"品種の描き方を選ぶ","This changes the face and proportions while keeping each breed recognizable.":"品種の特徴を残したまま顔と体の比率を変えます。","CARTOON-CUTE":"カートゥーン・キュート","REALISTIC-CUTE":"リアル・キュート","BREED COLLECTION":"品種コレクション","SPECIAL COLLECTION":"スペシャルコレクション","Fantasy and Custom Hamsters":"ファンタジーとカスタムハムスター","PREMIUM":"PREMIUM","FREE":"無料","LOCKED":"ロック中","CHOOSE":"選ぶ","USING":"使用中","Selected":"選択済み","Use":"使う","Wear or unequip fitted clothing.":"フィットする服を着たり脱いだりできます。","Wear":"着る","Unequip":"脱ぐ","Theme":"テーマ","Choose a theme. Your choice saves automatically on this device.":"テーマを選びます。選択は自動保存されます。","Themes change the app background, buttons, cards, room walls, floor, and window while keeping your progress.":"テーマは進行状況を保ったまま背景、ボタン、カード、部屋を変更します。","Currently selected":"現在選択中","Tap to apply":"タップして適用","LANGUAGE MODE":"言語モード","Choose your language":"言語を選ぶ","The game changes language immediately and remembers the choice in local and cloud saves.":"言語はすぐに切り替わり、端末とクラウドのセーブに保存されます。","Hammy names and player-created nicknames stay unchanged.":"Hammy の名前とプレイヤーのニックネームは翻訳されません。","Choose game language":"ゲームの言語を選ぶ","Language changed.":"言語を変更しました。","Cloud Account":"クラウドアカウント","Keep Hammy progress, Premium access, and your online profile together across devices.":"Hammy の進行状況、Premium、オンラインプロフィールを端末間で共有します。","Checking cloud":"クラウドを確認中","Retry connection":"再接続","My Hammy account":"自分の Hammy アカウント","Guest":"ゲスト","Player ID":"プレイヤーID","Copy":"コピー","Recovery code":"復旧コード","Cloud revision":"クラウド版","Last synced":"最終同期","Never":"未同期","Device":"端末","This device":"この端末","Sync now":"今すぐ同期","Restore on another device":"別の端末で復元","Sign in and compare saves":"ログインしてセーブを比較","Create a brand-new cloud account":"新しいクラウドアカウントを作成","Create new cloud account":"新規作成","Permanent":"永久","The old account cannot be restored afterward.":"古いアカウントは復元できません。","Delete old account and create fresh account":"古いアカウントを削除して最初から始める","Exclusive Collection":"限定コレクション","Reward":"報酬","Mystery reward":"ミステリー報酬","Time remaining":"残り時間","Claim event reward":"イベント報酬を受け取る","No exclusive items yet.":"限定アイテムはまだありません。","Private Reward Codes":"非公開報酬コード","Reward code":"報酬コード","Redeem code":"コードを使う","Hammy Friends Online":"Hammy オンラインフレンド","Offline":"オフライン","My shared profile":"公開プロフィール","Nickname":"ニックネーム","Public — appears in gallery":"公開 — ギャラリーに表示","Unlisted — only code or link":"非公開 — コードまたはリンクのみ","White":"白","Orange":"オレンジ","Black & White":"白黒","Caramel":"キャラメル","Silver":"シルバー","Strawberry":"ストロベリー","Classic Syrian Breed":"クラシック・シリアン","Teddy Bear Breed":"テディベア","Long-Haired Breed":"ロングヘア","Winter Dwarf Breed":"ウィンタードワーフ","Satin Syrian Breed":"サテン・シリアン","Floppy-Ear Fantasy Breed":"たれ耳ファンタジー","Cozy Bed":"ふかふかベッド","Tiny Sofa":"小さなソファ","Study Desk":"勉強机","Berry Plant":"ベリーの植物","Mini Aquarium":"ミニ水槽","Play Tunnel":"遊びトンネル","Toy Box":"おもちゃ箱","Book Shelf":"本棚","Moon Lamp":"月のランプ","Cloud Rug":"雲のラグ","Deluxe Running Wheel":"デラックス回し車","Snack Table":"おやつテーブル","Music Player":"音楽プレイヤー","Hamster Castle":"ハムスター城","Leaf Hammock":"葉っぱのハンモック","Tiny Art Easel":"小さなイーゼル","Mini Hammy Piano":"ミニ Hammy ピアノ","Star Telescope":"星の望遠鏡","Mini Kitchen":"ミニキッチン","Climbing Tower":"クライミングタワー","Friendship Tea Table":"友情のティーテーブル","Cloud Swing":"雲のブランコ","Focus Shirt":"集中シャツ","Cloud Hoodie":"雲のパーカー","Berry Bow":"ベリーリボン","Cozy Scarf":"ふかふかマフラー","Explorer Hat":"探検帽","Study Glasses":"勉強メガネ","Star Pajamas":"星のパジャマ","Hero Cape":"ヒーローマント","Garden Overalls":"ガーデンオーバーオール","Adventure Backpack":"冒険リュック","Baker Apron":"パン屋エプロン","Champion Jacket":"チャンピオンジャケット","Moonlight Pajamas":"月明かりパジャマ","Golden Focus Crown":"金の集中クラウン","Galaxy Hoodie":"ギャラクシーパーカー","Royal Pajamas":"ロイヤルパジャマ","Apple":"りんご","Banana":"バナナ","Berry":"ベリー","Mango":"マンゴー","Peach":"もも","Grape":"ぶどう","Kiwi":"キウイ","Watermelon":"すいか"},"ko":{"Home":"홈","Focus":"집중","Fruit":"과일","Market":"마켓","Furniture":"가구","Hamsters":"햄스터","Clothing":"의상","Settings":"설정","Account":"계정","Friends":"친구","Coins:":"코인:","Day streak:":"연속 일수:","Practice days:":"연습 일수:","Loot Lv.":"보상 레벨","Happy":"행복","Hunger":"배고픔","Energy":"에너지","HAMMY NEWS":"HAMMY 소식","Hammy News":"Hammy 소식","Dismiss":"닫기","Sleep":"자기","Sit":"앉기","Study":"공부","Smell":"냄새 맡기","Watch":"보기","Crawl":"기어가기","Play":"놀기","Read":"읽기","Glow":"빛내기","Nap":"낮잠","Run":"달리기","Snack":"간식","Dance":"춤추기","Explore":"탐험","Rest":"쉬기","Paint":"그리기","Look":"보기","Cook":"요리","Climb":"오르기","Tea":"차 마시기","Swing":"그네 타기","Tap Nibbles or press Tickle.":"Nibbles를 누르거나 간지럽히기를 누르세요.","Door / Exit":"문 / 출구","Hammy space":"Hammy 공간","ROOM DESIGNER":"방 디자이너","Press Edit Room, then drag furniture.":"방 편집을 누른 뒤 가구를 드래그하세요.","Edit Room":"방 편집","Select furniture":"가구 선택","Rotate":"회전","Flip":"뒤집기","Snap to grid":"격자에 맞추기","Move room":"다른 방으로","Put in storage":"보관함에 넣기","Undo":"실행 취소","Finish Editing":"편집 완료","Your rooms":"내 방","Tap a thumbnail to visit it.":"미리보기를 눌러 방문하세요.","Tickle Nibbles":"Nibbles 간지럽히기","Use treadmill":"러닝머신 사용","Stop running":"달리기 중지","Focus with Nibbles":"Nibbles와 집중하기","Complete the timer to earn coins and fruit.":"타이머를 완료하면 코인과 과일을 얻습니다.","Task":"할 일","Time":"시간","Ready":"준비","Start focus":"집중 시작","Pause":"일시정지","Cancel":"취소","Practice level":"연습 레벨","Raises loot quality":"보상 품질 증가","Total focus":"총 집중 시간","All completed sessions":"완료한 모든 세션","Next costume":"다음 의상","Practice-day milestone":"연습 일수 목표","Homework":"숙제","Reading":"독서","Studying":"공부","Math practice":"수학 연습","Writing":"글쓰기","Science work":"과학 공부","Language practice":"언어 연습","Music practice":"음악 연습","Piano practice":"피아노 연습","Art or drawing":"미술 또는 그림","Coding":"코딩","Cleaning":"청소","Chores":"집안일","Exercise":"운동","Meditation":"명상","Organizing":"정리","Creative project":"창작 프로젝트","Custom task":"사용자 지정 할 일","20-second demo":"20초 데모","1 minute":"1분","3 minutes":"3분","5 minutes":"5분","10 minutes":"10분","15 minutes":"15분","20 minutes":"20분","25 minutes":"25분","30 minutes":"30분","45 minutes":"45분","1 hour":"1시간","1 hour 30 minutes":"1시간 30분","2 hours":"2시간","Fruit pantry":"과일 보관함","Hammy Market":"Hammy 마켓","Spend focus coins on snacks, boosters, decorations, fruit, and new themes.":"집중 코인으로 간식, 부스터, 장식, 과일, 테마를 구매하세요.","DAILY SPECIAL":"오늘의 특가","Loading special…":"불러오는 중…","Buy":"구매","Snacks and Boosters":"간식과 부스터","Room Decorations":"방 장식","Theme Licenses":"테마","Furniture Shop":"가구 상점","Each room holds six furniture pieces. Use the arrows in the Home room to move between rooms.":"각 방에는 가구 6개를 둘 수 있습니다. 홈의 화살표로 방을 이동하세요.","ROOM STORAGE":"방 보관함","Premium automatically creates another room when needed.":"필요하면 Premium이 새 방을 자동으로 만듭니다.","View current room":"현재 방 보기","Choose a Hamster Breed and Color":"햄스터 품종과 색상 선택","Every breed has the same six colors. Free players can use only the White Normal Hamster.":"모든 품종에는 같은 6가지 색이 있습니다. 무료 플레이어는 흰색 일반 햄스터만 사용할 수 있습니다.","Demo unlock Premium":"Premium 데모 잠금 해제","BREED LOOK":"품종 스타일","Choose how the breeds are drawn":"품종 그림 스타일 선택","This changes the face and proportions while keeping each breed recognizable.":"각 품종의 특징을 유지하면서 얼굴과 비율을 바꿉니다.","CARTOON-CUTE":"카툰-귀여움","REALISTIC-CUTE":"리얼-귀여움","BREED COLLECTION":"품종 컬렉션","SPECIAL COLLECTION":"특별 컬렉션","Fantasy and Custom Hamsters":"판타지 및 커스텀 햄스터","PREMIUM":"PREMIUM","FREE":"무료","LOCKED":"잠김","CHOOSE":"선택","USING":"사용 중","Selected":"선택됨","Use":"사용","Wear or unequip fitted clothing.":"몸에 맞는 의상을 입거나 벗으세요.","Wear":"입기","Unequip":"벗기","Theme":"테마","Choose a theme. Your choice saves automatically on this device.":"테마를 선택하세요. 선택은 이 기기에 자동 저장됩니다.","Themes change the app background, buttons, cards, room walls, floor, and window while keeping your progress.":"테마는 진행 상황을 유지하면서 배경, 버튼, 카드와 방을 바꿉니다.","Currently selected":"현재 선택됨","Tap to apply":"눌러서 적용","LANGUAGE MODE":"언어 모드","Choose your language":"언어 선택","The game changes language immediately and remembers the choice in local and cloud saves.":"언어가 즉시 바뀌며 로컬과 클라우드 저장에 기억됩니다.","Hammy names and player-created nicknames stay unchanged.":"Hammy 이름과 플레이어가 만든 별명은 번역되지 않습니다.","Choose game language":"게임 언어 선택","Language changed.":"언어가 변경되었습니다.","Cloud Account":"클라우드 계정","Keep Hammy progress, Premium access, and your online profile together across devices.":"여러 기기에서 Hammy 진행 상황, Premium, 온라인 프로필을 함께 유지하세요.","Checking cloud":"클라우드 확인 중","Retry connection":"다시 연결","My Hammy account":"내 Hammy 계정","Guest":"게스트","Player ID":"플레이어 ID","Copy":"복사","Recovery code":"복구 코드","Cloud revision":"클라우드 버전","Last synced":"마지막 동기화","Never":"없음","Device":"기기","This device":"이 기기","Sync now":"지금 동기화","Restore on another device":"다른 기기에서 복원","Sign in and compare saves":"로그인하고 저장 비교","Create a brand-new cloud account":"새 클라우드 계정 만들기","Create new cloud account":"새 계정 만들기","Permanent":"영구","The old account cannot be restored afterward.":"이후 이전 계정은 복원할 수 없습니다.","Delete old account and create fresh account":"이전 계정 삭제 후 새로 시작","Exclusive Collection":"전용 컬렉션","Reward":"보상","Mystery reward":"미스터리 보상","Time remaining":"남은 시간","Claim event reward":"이벤트 보상 받기","No exclusive items yet.":"아직 전용 아이템이 없습니다.","Private Reward Codes":"비공개 보상 코드","Reward code":"보상 코드","Redeem code":"코드 사용","Hammy Friends Online":"Hammy 온라인 친구","Offline":"오프라인","My shared profile":"공유 프로필","Nickname":"별명","Public — appears in gallery":"공개 — 갤러리에 표시","Unlisted — only code or link":"비공개 — 코드 또는 링크만","White":"흰색","Orange":"주황색","Black & White":"검정과 흰색","Caramel":"카라멜","Silver":"은색","Strawberry":"딸기색","Classic Syrian Breed":"클래식 시리안 품종","Teddy Bear Breed":"테디베어 품종","Long-Haired Breed":"장모 품종","Winter Dwarf Breed":"윈터 드워프 품종","Satin Syrian Breed":"새틴 시리안 품종","Floppy-Ear Fantasy Breed":"늘어진 귀 판타지 품종","Cozy Bed":"포근한 침대","Tiny Sofa":"작은 소파","Study Desk":"공부 책상","Berry Plant":"베리 화분","Mini Aquarium":"미니 수족관","Play Tunnel":"놀이 터널","Toy Box":"장난감 상자","Book Shelf":"책장","Moon Lamp":"달 램프","Cloud Rug":"구름 러그","Deluxe Running Wheel":"고급 러닝 휠","Snack Table":"간식 테이블","Music Player":"음악 플레이어","Hamster Castle":"햄스터 성","Leaf Hammock":"잎사귀 해먹","Tiny Art Easel":"작은 이젤","Mini Hammy Piano":"미니 Hammy 피아노","Star Telescope":"별 망원경","Mini Kitchen":"미니 주방","Climbing Tower":"등반 타워","Friendship Tea Table":"우정 티 테이블","Cloud Swing":"구름 그네","Focus Shirt":"집중 셔츠","Cloud Hoodie":"구름 후드티","Berry Bow":"베리 리본","Cozy Scarf":"포근한 목도리","Explorer Hat":"탐험가 모자","Study Glasses":"공부 안경","Star Pajamas":"별 잠옷","Hero Cape":"영웅 망토","Garden Overalls":"정원 멜빵바지","Adventure Backpack":"모험 배낭","Baker Apron":"제빵사 앞치마","Champion Jacket":"챔피언 재킷","Moonlight Pajamas":"달빛 잠옷","Golden Focus Crown":"황금 집중 왕관","Galaxy Hoodie":"은하 후드티","Royal Pajamas":"왕실 잠옷","Apple":"사과","Banana":"바나나","Berry":"베리","Mango":"망고","Peach":"복숭아","Grape":"포도","Kiwi":"키위","Watermelon":"수박"}};
+const languageFormats={"fr":{"roomOf":"Pièce {a} sur {b}","capacity":"{a} / 6 meubles","roomHas":"La pièce {a} contient {b} meubles sur 6","arrange":"Aménager la pièce {a}","room":"Pièce {a}","placed":"Placé dans la pièce {a}","view":"Voir la pièce {a}","roomCount":"Pièce {a} · {b}/6","moreDays":"Encore {a} jour(s)","minutes":"{a} min","days":"{a} jours","coins":"{a} pièces","furniture":"{a} meuble(s)"},"es":{"roomOf":"Habitación {a} de {b}","capacity":"{a} / 6 muebles","roomHas":"La habitación {a} tiene {b} de 6 muebles","arrange":"Organizar habitación {a}","room":"Habitación {a}","placed":"Colocado en habitación {a}","view":"Ver habitación {a}","roomCount":"Habitación {a} · {b}/6","moreDays":"Faltan {a} día(s)","minutes":"{a} min","days":"{a} días","coins":"{a} monedas","furniture":"{a} mueble(s)"},"zh-CN":{"roomOf":"房间 {a} / {b}","capacity":"{a} / 6 件家具","roomHas":"房间 {a} 有 {b} / 6 件家具","arrange":"布置房间 {a}","room":"房间 {a}","placed":"已放在房间 {a}","view":"查看房间 {a}","roomCount":"房间 {a} · {b}/6","moreDays":"还需 {a} 天","minutes":"{a} 分钟","days":"{a} 天","coins":"{a} 金币","furniture":"{a} 件家具"},"ja":{"roomOf":"部屋 {a} / {b}","capacity":"家具 {a} / 6","roomHas":"部屋 {a}：家具 {b} / 6","arrange":"部屋 {a}を配置","room":"部屋 {a}","placed":"部屋 {a}に配置","view":"部屋 {a}を見る","roomCount":"部屋 {a} · {b}/6","moreDays":"あと {a}日","minutes":"{a}分","days":"{a}日","coins":"{a}コイン","furniture":"家具 {a}個"},"ko":{"roomOf":"방 {a} / {b}","capacity":"가구 {a} / 6","roomHas":"방 {a}: 가구 {b} / 6","arrange":"방 {a} 꾸미기","room":"방 {a}","placed":"방 {a}에 배치됨","view":"방 {a} 보기","roomCount":"방 {a} · {b}/6","moreDays":"{a}일 남음","minutes":"{a}분","days":"{a}일","coins":"{a} 코인","furniture":"가구 {a}개"}};
+Object.assign(languageTranslations["fr"],{"Days":"Jours","Streak":"Série","No costume":"Aucun costume","Publish profile":"Publier le profil","Update shared profile":"Mettre à jour le profil","Premium room collection":"Collection de pièces Premium","Hammy Friend":"Ami Hammy","Profile":"Profil","Save":"Enregistrer","Delete":"Supprimer","Refresh":"Actualiser","Visit":"Visiter","Back":"Retour","Close":"Fermer","Loading…":"Chargement…","Offline":"Hors ligne","Online":"En ligne","Owned":"Possédé","In storage":"Rangé","Place":"Placer","Buy & place":"Acheter et placer","Equip & show":"Équiper et afficher","Unequip":"Retirer"});
+Object.assign(languageTranslations["es"],{"Days":"Días","Streak":"Racha","No costume":"Sin traje","Publish profile":"Publicar perfil","Update shared profile":"Actualizar perfil","Premium room collection":"Colección de habitaciones Premium","Hammy Friend":"Amigo Hammy","Profile":"Perfil","Save":"Guardar","Delete":"Eliminar","Refresh":"Actualizar","Visit":"Visitar","Back":"Volver","Close":"Cerrar","Loading…":"Cargando…","Offline":"Sin conexión","Online":"En línea","Owned":"Obtenido","In storage":"Guardado","Place":"Colocar","Buy & place":"Comprar y colocar","Equip & show":"Equipar y mostrar","Unequip":"Quitar"});
+Object.assign(languageTranslations["zh-CN"],{"Days":"天数","Streak":"连续","No costume":"无服装","Publish profile":"发布资料","Update shared profile":"更新资料","Premium room collection":"Premium 房间收藏","Hammy Friend":"Hammy 好友","Profile":"资料","Save":"保存","Delete":"删除","Refresh":"刷新","Visit":"拜访","Back":"返回","Close":"关闭","Loading…":"正在加载…","Offline":"离线","Online":"在线","Owned":"已拥有","In storage":"在仓库中","Place":"放置","Buy & place":"购买并放置","Equip & show":"装备并显示","Unequip":"脱下"});
+Object.assign(languageTranslations["ja"],{"Days":"日数","Streak":"連続","No costume":"衣装なし","Publish profile":"プロフィールを公開","Update shared profile":"プロフィールを更新","Premium room collection":"Premium 部屋コレクション","Hammy Friend":"Hammy フレンド","Profile":"プロフィール","Save":"保存","Delete":"削除","Refresh":"更新","Visit":"訪問","Back":"戻る","Close":"閉じる","Loading…":"読み込み中…","Offline":"オフライン","Online":"オンライン","Owned":"所持済み","In storage":"収納中","Place":"配置","Buy & place":"購入して配置","Equip & show":"装備して表示","Unequip":"脱ぐ"});
+Object.assign(languageTranslations["ko"],{"Days":"일수","Streak":"연속","No costume":"의상 없음","Publish profile":"프로필 공개","Update shared profile":"프로필 업데이트","Premium room collection":"Premium 방 컬렉션","Hammy Friend":"Hammy 친구","Profile":"프로필","Save":"저장","Delete":"삭제","Refresh":"새로고침","Visit":"방문","Back":"뒤로","Close":"닫기","Loading…":"불러오는 중…","Offline":"오프라인","Online":"온라인","Owned":"보유함","In storage":"보관 중","Place":"배치","Buy & place":"구매하고 배치","Equip & show":"장착하고 표시","Unequip":"벗기"});
+const i18nTextRecords=new WeakMap();
+const i18nAttributeRecords=new WeakMap();
+let languageApplyRunning=false;
+let languageRefreshQueued=false;
+let languageObserver=null;
+
+function normalizeGameLanguage(value){
+ return Object.prototype.hasOwnProperty.call(languageOptions,value)?value:"en";
+}
+function currentGameLanguage(){
+ return normalizeGameLanguage(state?.language);
+}
+function formatLanguageText(template,values){
+ return String(template||"").replace(/\{([ab])\}/g,(_,key)=>String(values[key]??""));
+}
+function translateDynamicPhrase(text,language){
+ if(language==="en")return text;
+ const format=languageFormats[language];
+ if(!format)return text;
+ let match;
+ if((match=text.match(/^Room (\d+) of (\d+)$/)))return formatLanguageText(format.roomOf,{a:match[1],b:match[2]});
+ if((match=text.match(/^(\d+) \/ 6 furniture$/)))return formatLanguageText(format.capacity,{a:match[1]});
+ if((match=text.match(/^Room (\d+) has (\d+) of 6 furniture pieces$/)))return formatLanguageText(format.roomHas,{a:match[1],b:match[2]});
+ if((match=text.match(/^Arrange Room (\d+)$/)))return formatLanguageText(format.arrange,{a:match[1]});
+ if((match=text.match(/^Placed in Room (\d+)$/)))return formatLanguageText(format.placed,{a:match[1]});
+ if((match=text.match(/^View Room (\d+)$/)))return formatLanguageText(format.view,{a:match[1]});
+ if((match=text.match(/^Room (\d+) · (\d+)\/6$/)))return formatLanguageText(format.roomCount,{a:match[1],b:match[2]});
+ if((match=text.match(/^Room (\d+)$/)))return formatLanguageText(format.room,{a:match[1]});
+ if((match=text.match(/^(\d+) more days?$/)))return formatLanguageText(format.moreDays,{a:match[1]});
+ if((match=text.match(/^(\d+) min$/)))return formatLanguageText(format.minutes,{a:match[1]});
+ if((match=text.match(/^(\d+) days?$/)))return formatLanguageText(format.days,{a:match[1]});
+ if((match=text.match(/^(\d+) coins$/)))return formatLanguageText(format.coins,{a:match[1]});
+ if((match=text.match(/^(\d+) furniture$/)))return formatLanguageText(format.furniture,{a:match[1]});
+ if((match=text.match(/^Nibbles is walking to the (.+)\.$/))){
+  const item=translatePhrase(match[1],language);
+  const walking={
+   fr:`Nibbles marche vers ${item}.`,
+   es:`Nibbles camina hacia ${item}.`,
+   "zh-CN":`Nibbles 正在走向${item}。`,
+   ja:`Nibbles が${item}へ歩いています。`,
+   ko:`Nibbles가 ${item} 쪽으로 걸어갑니다.`
+  };
+  return walking[language]||text;
+ }
+ return text;
+}
+function translatePhrase(value,language=currentGameLanguage()){
+ const raw=String(value??"");
+ const leading=raw.match(/^\s*/)?.[0]||"";
+ const trailing=raw.match(/\s*$/)?.[0]||"";
+ const core=raw.slice(leading.length,raw.length-trailing.length);
+ if(!core||language==="en")return raw;
+ const direct=languageTranslations[language]?.[core];
+ const translated=direct||translateDynamicPhrase(core,language);
+ return leading+translated+trailing;
+}
+function shouldSkipLanguageNode(node){
+ const element=node.nodeType===Node.ELEMENT_NODE?node:node.parentElement;
+ return Boolean(element?.closest(
+  "script,style,noscript,code,pre,[data-i18n-skip],#languageGrid"
+ ));
+}
+function translateTextNode(node){
+ if(shouldSkipLanguageNode(node))return;
+ const current=node.nodeValue||"";
+ if(!current.trim())return;
+ let record=i18nTextRecords.get(node);
+ if(!record){
+  record={base:current,last:null};
+  i18nTextRecords.set(node,record);
+ }else if(current!==record.last&&current!==record.base){
+  record.base=current;
+ }
+ const next=translatePhrase(record.base);
+ record.last=next;
+ if(current!==next)node.nodeValue=next;
+}
+function translateElementAttributes(element){
+ if(!(element instanceof Element)||shouldSkipLanguageNode(element))return;
+ let records=i18nAttributeRecords.get(element);
+ if(!records){
+  records={};
+  i18nAttributeRecords.set(element,records);
+ }
+ for(const attribute of ["placeholder","title","aria-label"]){
+  if(!element.hasAttribute(attribute))continue;
+  const current=element.getAttribute(attribute)||"";
+  let record=records[attribute];
+  if(!record){
+   record={base:current,last:null};
+   records[attribute]=record;
+  }else if(current!==record.last&&current!==record.base){
+   record.base=current;
+  }
+  const next=translatePhrase(record.base);
+  record.last=next;
+  if(current!==next)element.setAttribute(attribute,next);
+ }
+}
+function applyLanguage(root=document){
+ if(languageApplyRunning)return;
+ languageApplyRunning=true;
+ try{
+  const language=currentGameLanguage();
+  document.documentElement.lang=language;
+  document.documentElement.dataset.gameLanguage=language;
+  document.title=translatePhrase("Hammy Focus House",language);
+
+  const start=root.nodeType===Node.DOCUMENT_NODE
+   ?root.documentElement
+   :root;
+  if(start&&start.nodeType===Node.ELEMENT_NODE)translateElementAttributes(start);
+
+  const textWalker=document.createTreeWalker(
+   start||document.documentElement,
+   NodeFilter.SHOW_TEXT
+  );
+  let textNode;
+  while((textNode=textWalker.nextNode()))translateTextNode(textNode);
+
+  const elementWalker=document.createTreeWalker(
+   start||document.documentElement,
+   NodeFilter.SHOW_ELEMENT
+  );
+  let element;
+  while((element=elementWalker.nextNode()))translateElementAttributes(element);
+ }finally{
+  languageApplyRunning=false;
+ }
+}
+function scheduleLanguageRefresh(){
+ if(languageRefreshQueued)return;
+ languageRefreshQueued=true;
+ requestAnimationFrame(()=>{
+  languageRefreshQueued=false;
+  applyLanguage(document);
+ });
+}
+function renderLanguagePanel(){
+ const grid=$("languageGrid");
+ if(!grid)return;
+ const language=currentGameLanguage();
+ grid.innerHTML="";
+ Object.entries(languageOptions).forEach(([code,item])=>{
+  const selected=language===code;
+  const button=document.createElement("button");
+  button.type="button";
+  button.className=`language-option${selected?" selected":""}`;
+  button.dataset.i18nSkip="true";
+  button.setAttribute("role","radio");
+  button.setAttribute("aria-checked",String(selected));
+  button.innerHTML=`<span class="language-option-flag">${item.flag}</span>
+   <span class="language-option-copy"><strong>${item.native}</strong><small>${item.english}</small></span>
+   <span class="language-option-check">${selected?"✓":""}</span>`;
+  button.addEventListener("click",()=>setGameLanguage(code));
+  grid.appendChild(button);
+ });
+ $("languageStatusBadge").textContent=languageOptions[language].badge;
+}
+function setGameLanguage(code){
+ const next=normalizeGameLanguage(code);
+ if(state.language===next){
+  renderLanguagePanel();
+  applyLanguage(document);
+  return;
+ }
+ state.language=next;
+ save();
+ renderLanguagePanel();
+ applyLanguage(document);
+ say("Language changed.");
+}
+function initializeLanguageMode(){
+ state.language=normalizeGameLanguage(state.language);
+ renderLanguagePanel();
+ applyLanguage(document);
+ if(languageObserver)languageObserver.disconnect();
+ languageObserver=new MutationObserver(mutations=>{
+  if(languageApplyRunning)return;
+  if(mutations.some(mutation=>
+   mutation.type==="characterData"||
+   mutation.type==="childList"||
+   mutation.type==="attributes"
+  ))scheduleLanguageRefresh();
+ });
+ languageObserver.observe(document.body,{
+  subtree:true,
+  childList:true,
+  characterData:true,
+  attributes:true,
+  attributeFilter:["placeholder","title","aria-label"]
+ });
+}
+
 function renderSettings(){
+ renderLanguagePanel();
  const grid=$("themeGrid");
  if(!grid)return;
  grid.innerHTML="";
@@ -3820,6 +4133,9 @@ function normalizeGameState(nextState){
  next.breedLook=["realistic","cartoon"].includes(next.breedLook)
   ?next.breedLook
   :"cartoon";
+ next.language=["en","fr","es","zh-CN","ja","ko"].includes(next.language)
+  ?next.language
+  :"en";
  next.theme=next.theme||"lavender";
  normalizeFurnitureRoomData(next);
  ensureDesignerState(next);
@@ -3844,6 +4160,8 @@ window.HammyGameState={
        renderSettings();
        renderMarket();
        renderDecorations();
+       renderLanguagePanel();
+       applyLanguage(document);
      }
      return JSON.parse(JSON.stringify(state));
    }finally{
@@ -3851,7 +4169,12 @@ window.HammyGameState={
    }
  }
 };
-function say(text){$("status").textContent=text;$("roomMessage").textContent=text}
+function say(text){
+ const translated=translatePhrase(text);
+ $("status").textContent=translated;
+ $("roomMessage").textContent=translated;
+ scheduleLanguageRefresh();
+}
 function safeSkin(){
  state.skin=migrateSkinKey(state.skin);
  const standard=standardSkinKeys.has(state.skin);
@@ -3889,7 +4212,12 @@ function update(){
  if(state.equipped&&clothes[state.equipped]){const c=clothes[state.equipped],el=$(c.type);if(el){el.classList.add("on");el.style.setProperty("--cloth",c.color)}}
  save();
 }
-function bubble(text,ms=1400){$("speech").textContent=text;$("speech").classList.remove("hidden");setTimeout(()=>$("speech").classList.add("hidden"),ms)}
+function bubble(text,ms=1400){
+ $("speech").textContent=translatePhrase(text);
+ $("speech").classList.remove("hidden");
+ scheduleLanguageRefresh();
+ setTimeout(()=>$("speech").classList.add("hidden"),ms);
+}
 function particles(){
  for(let i=0;i<9;i++){const p=document.createElement("span");p.className="particle";p.style.left=(43+Math.random()*16)+"%";p.style.top=(46+Math.random()*12)+"%";p.style.setProperty("--dx",(Math.random()*180-90)+"px");p.style.setProperty("--dy",(-80-Math.random()*120)+"px");$("room").appendChild(p);setTimeout(()=>p.remove(),1100)}
 }
@@ -4671,6 +4999,7 @@ $("useCustomTask").addEventListener("click",()=>{
 $("buyDailySpecial").addEventListener("click",buyDailySpecial);
 $("startBtn").addEventListener("click",startFocus);$("pauseBtn").addEventListener("click",pauseFocus);$("cancelBtn").addEventListener("click",cancelFocus);$("duration").addEventListener("change",()=>{if(!timer){remaining=Number($("duration").value);timerView()}});
 safeSkin();applyTheme();
+initializeLanguageMode();
 migrateFurnitureLayoutsFromFixedPositions();
 renderRoomDesignerUi();
 renderRoomThumbnails();
@@ -4679,16 +5008,16 @@ if(localStorage.getItem("hammyFocusFailed")==="1"){
  $("timerTask").textContent="Previous session failed";
  localStorage.removeItem("hammyFocusFailed");
 }
-update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
+update();renderSkins();renderClothing();renderFruit();renderFurniture();renderSettings();renderMarket();renderDecorations();timerView();applyLanguage(document);if(state.premium){$("premiumBtn").textContent="Premium unlocked";$("premiumBtn").disabled=true}
 </script>
-<script src="premium.js?v=255"></script>
-<script src="cloud.js?v=255"></script>
-<script src="online.js?v=255"></script>
-<script src="gallery.js?v=255"></script>
+<script src="premium.js?v=256"></script>
+<script src="cloud.js?v=256"></script>
+<script src="online.js?v=256"></script>
+<script src="gallery.js?v=256"></script>
 <script>
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
   window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("./service-worker.js?v=255").catch(error=>console.warn("Service worker registration failed",error));
+    navigator.serviceWorker.register("./service-worker.js?v=256").catch(error=>console.warn("Service worker registration failed",error));
   });
 }
 </script>

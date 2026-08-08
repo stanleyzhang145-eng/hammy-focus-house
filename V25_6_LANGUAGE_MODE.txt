@@ -1,0 +1,47 @@
+HAMMY FOCUS HOUSE V25.6 — LANGUAGE MODE
+
+SUPPORTED LANGUAGES
+- English
+- Français
+- Español
+- 简体中文
+- 日本語
+- 한국어
+
+LANGUAGE SETTINGS
+- A Language Mode panel appears in Settings.
+- Every language has a large touch-friendly selection card.
+- The language changes immediately without reloading the game.
+- The selected language saves locally and inside the cloud game state.
+- Switching devices restores the saved language with the rest of the account.
+
+TRANSLATED AREAS
+- Main navigation
+- Player statistics
+- Home controls and furniture action buttons
+- Room Designer Mode
+- Focus tasks, durations, and controls
+- Fruit, Market, and Furniture pages
+- Breed and colour selection
+- Clothing and themes
+- Main cloud-account controls
+- Events, reward codes, exclusive collection, and online profile headings
+- Furniture, fruit, breed, colour, and clothing names
+- Dynamic room numbers, room capacities, days, minutes, and coin amounts
+
+LIVE TRANSLATION
+- Content created later by cloud.js, online.js, premium.js, and gallery.js is
+  translated using a MutationObserver.
+- Dynamic cards remain translated after they redraw.
+- English source text is remembered so the player can switch between any
+  languages repeatedly.
+- Player-created nicknames, Player IDs, recovery codes, and Hammy names are
+  not changed.
+
+COMPATIBILITY
+- Existing saves without a language field safely default to English.
+- Language Mode preserves Room Designer layouts, furniture, rooms, Premium,
+  streaks, breeds, fitted clothing, admin gifts, friends, and cloud saving.
+
+DEPLOYMENT CHECK
+/api/health must report version 25.6.
